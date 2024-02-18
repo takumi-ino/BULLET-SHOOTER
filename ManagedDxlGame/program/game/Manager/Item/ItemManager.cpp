@@ -217,8 +217,8 @@ void ItemManager::SetPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<Power
 						if (Player::_hp > Player::_MAX_HP)
 							Player::_hp = Player::_MAX_HP;
 						break;
-
 					}
+					break;
 				}
 				case PowerUpItem::TYPE::Attack:
 				{
@@ -244,7 +244,7 @@ void ItemManager::SetPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<Power
 				}
 				case PowerUpItem::TYPE::Bomb:
 				{
-					OnCaughtItem("ボム", "ボムを1つ獲得。");
+					OnCaughtItem("ボム", "");
 
 					Player::_current_bomb_stock_count += 1;
 					break;
@@ -283,7 +283,7 @@ void ItemManager::OnCaughtItem(const std::string item_name, const std::string ef
 
 	std::string msg = item_name + "を獲得。 \n" + effect;
 
-	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(0, 255, 0), 15);
+	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(0, 255, 0), 16, 35);
 
 	EventNoticeText::_message_queue.push_back(event_msg);
 }
@@ -541,7 +541,6 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 				}
 			}
 		}
-
 	}
 
 	ScoreItemCollisionPairLists();
@@ -559,65 +558,3 @@ void ItemManager::Update(const float& deltaTime) {
 	SetScoreItem_CollisionPairLists();
 	SetPowerUpItem_CollisionPairLists();
 }
-
-/*
-void EnemyManager::NotifyEnemyPosition_ToItemManager() {
-
-	std::vector<Shared<ItemBase>> allItems;
-
-	allItems.insert(allItems.end(), ItemManager::_scoreItem_small.begin(), ItemManager::_scoreItem_small.end());
-	allItems.insert(allItems.end(), ItemManager::_scoreItem_medium.begin(), ItemManager::_scoreItem_medium.end());
-	allItems.insert(allItems.end(), ItemManager::_scoreItem_large.begin(), ItemManager::_scoreItem_large.end());
-
-	allItems.insert(allItems.end(), ItemManager::_powerUpItem_heal.begin(), ItemManager::_powerUpItem_heal.end());
-	allItems.insert(allItems.end(), ItemManager::_powerUpItem_attack.begin(), ItemManager::_powerUpItem_attack.end());
-	allItems.insert(allItems.end(), ItemManager::_powerUpItem_defense.begin(), ItemManager::_powerUpItem_defense.end());
-	allItems.insert(allItems.end(), ItemManager::_powerUpItem_speed.begin(), ItemManager::_powerUpItem_speed.end());
-	allItems.insert(allItems.end(), ItemManager::_powerUpItem_bomb.begin(), ItemManager::_powerUpItem_bomb.end());
-
-	for (const auto& observer : _observerItems) {
-		observer->SpawnItemsOnEnemyDeath(allItems, _enemyZako_position_ref, _isEnemyZako_dead_ref);
-	}
-}
-
-
-
-void ItemManager::SpawnItemsOnEnemyDeath(std::vector<Shared<ItemBase>>& items, const tnl::Vector3& enemyPos, const bool isEnemyDead) {
-
-	std::random_device rd;
-	std::mt19937 mt(rd());
-
-	std::uniform_real_distribution<float> rnd_valX(-100, 100);
-	std::uniform_real_distribution<float> rnd_valY(-10, 10);
-	std::uniform_real_distribution<float> rnd_valZ(-100, 100);
-
-	// 1体撃破でスポーンするアイテムの数を指定（↓処理のループ回数）
-	std::uniform_int_distribution<int> rnd_loop_count(0, 4);
-	int loop_count = rnd_loop_count(mt);
-
-	// アイテムのリストをシャッフル
-	std::shuffle(items.begin(), items.end(), mt);
-
-	for (int i = 0; i < loop_count; ++i) {
-
-		tnl::Vector3 rnd_offset;
-		rnd_offset.x = (float)rnd_valX(mt);
-		rnd_offset.y = (float)rnd_valY(mt);
-		rnd_offset.z = (float)rnd_valZ(mt);
-
-		auto& item = items[i];
-
-		if (isEnemyDead && !item->_hasSpawned) {
-			item->_mesh->pos_ = enemyPos + rnd_offset;
-			item->_hasSpawned = true;
-			item->_isActive = true;
-			break;
-		}
-	}
-
-	ScoreItemCollisionPairLists();
-	PowerUpItemCollisionPairLists();
-	ScoreItemAndPowerUpItem_CollisionPairLists();
-}
-
-*/

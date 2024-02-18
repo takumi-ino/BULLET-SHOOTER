@@ -2,8 +2,6 @@
 #include "ItemBase.h"
 
 
-class ScenePlay;
-
 // プレイヤー強化アイテム
 class PowerUpItem : public ItemBase
 {

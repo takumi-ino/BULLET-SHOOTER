@@ -4,14 +4,12 @@
 class ScoreItem;
 class PowerUpItem;
 
-
 class ItemBase
 {
 public:
 
 	ItemBase() {}
 	ItemBase(const std::vector<Shared<ItemBase>>& scoreItem, const  std::vector<Shared<ItemBase>>& power) {}
-
 
 public:
 
@@ -28,6 +26,4 @@ public:
 	tnl::Vector3 _gravity{ 0, -9.8f, 0 };
 	tnl::Vector3 _collisionSize{};
 	tnl::Vector3 _position{};
-
 };
-

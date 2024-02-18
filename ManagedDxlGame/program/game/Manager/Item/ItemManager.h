@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../../ScenePlay/Item/ScoreItem.h"
 
 class Collision;
