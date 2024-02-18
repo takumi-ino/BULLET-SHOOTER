@@ -110,7 +110,7 @@ void EnemyBoss_PatchouliKnowledge::Render(Shared<dxe::Camera> camera) {
 }
 
 
-bool EnemyBoss_PatchouliKnowledge::Update(float delta_time) {
+bool EnemyBoss_PatchouliKnowledge::Update(const float delta_time) {
 
 	if (_isDead) return false;
 

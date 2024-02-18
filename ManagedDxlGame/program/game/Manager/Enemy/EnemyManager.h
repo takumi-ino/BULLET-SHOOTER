@@ -13,17 +13,16 @@ class EnemyBossBase;
 class Player;
 class ItemManager;
 class StraightBullet;
+class HomingBullet;
 class EnemyBullet;
 class EventNoticeText;
 
 // 生成・削除・更新を管理
-
 class EnemyManager
 {
 public:
 
 	EnemyManager() {}
-
 	EnemyManager(
 		const int stageID, 
 		const Shared<Player>& player,
@@ -37,27 +36,33 @@ public:
 		_enemy_boss_list.clear();
 	}
 
-
+	// 敵座標取得
 	const std::vector<tnl::Vector3>& GetEnemyZakoPosition();
 	const tnl::Vector3& GetEnemyBossPosition();
 
-
+	// イベント通知
 	void AttachItemManagerInstance(const Shared<ItemManager>& observer);
 	void NotifyEnemyPosition_ToItemManager();
-	void SendEnemyPosition(const tnl::Vector3& new_position, bool isEnemyActive);
+	void SendEnemyPosition(const tnl::Vector3& new_position, const bool isEnemyActive);
 
-	void Update(const float& deltaTime);
-	void Render(const Shared<dxe::Camera>& camera) const;
-
+	// 弾情報取得
 	const std::list<Shared<StraightBullet>>& GetStraightBullets() { return _straightBullet_zako_ref; };
 	void SetStraightBullets(std::list<Shared<StraightBullet>>& bullets) { _straightBullet_zako_ref = bullets; };
 
-	void EnemyZakoStraightBullet_CollisionPairLists();
+	const std::list<Shared<HomingBullet>>& GetHomingBullets() { return _homingBullet_zako_ref; };
+	void SetStraightBullets(std::list<Shared<HomingBullet>>& bullets) { _homingBullet_zako_ref = bullets; };
+
+	void EnemyZakoStraightBullet_CollisionPairLists(std::list<Shared<StraightBullet>>& straightBullets_list);
+	void EnemyZakoHomingBullet_CollisionPairLists(std::list<Shared<HomingBullet>>& homingBullets_list);
+
+	void Update(const float& deltaTime);
+	void Render(const Shared<dxe::Camera>& camera) const;
 
 private:
 
 	// 雑魚
 	void InitEnemyZakoInfo();
+	void UpdateEnemyZakoList(const float& deltaTime);
 
 	// ボス
 	void InitEnemyBossInfo();
@@ -66,16 +71,15 @@ private:
 	void UpdateBossAppearanceTextTimer(const float& deltaTime);
 	void SummonBoss();
 	bool IsKilledStageBoss();
+	void UpdateEnemyBossList(const float& deltaTime);
 
 	// 当たり判定
 	void EnemyZakoCollisionPairLists();
-	void EnemyZakoStraightBullets_CollisionPairLists_DRY(const std::list<Shared<StraightBullet>>& straightBullets_list);
 	void EnemyBossCollisionPairLists();
 	void BulletHellCollisionPairLists_DRY(std::vector<Shared<EnemyBullet>>& bullets_vector);
 	void BulletHellCollisionPairLists();
 
 	void SetCollisionPairList();
-
 
 	// イベント通知
 	void OnEnemyKilled(const std::string enemy_name);
@@ -83,10 +87,9 @@ private:
 	void UpdateEventHitText(const float& deltaTime);
 
 	// その他
-	void CheckDoSpawnEnemy();
+	void CheckDoSpawnEnemy();     // 一定の条件を満たすことでボスもしくは新たなザコ敵を召喚
 	void SetMaxEnemySpawnCount(); // 1度に生成可能な敵数（難易度ごとに調整）
 	void LoadEnemyDataFromCsv(const std::string& difficulty);
-
 
 	// ステージ移動
 	tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
@@ -101,23 +104,24 @@ private:
 	Shared<EnemyBossBase> _enemyBossBase = nullptr;
 
 	// 参照
-	Shared<Player>      _player_ref = nullptr;
-	Shared<dxe::Camera> _mainCamera_ref = nullptr;
-	Shared<Collision>   _collision_ref = nullptr;
-	Shared<Score>       _score_ref = nullptr;
-	Shared<EnemyZakoBox> _zakoBox_ref = nullptr;
+	Shared<Player>        _player_ref = nullptr;
+	Shared<dxe::Camera>   _mainCamera_ref = nullptr;
+	Shared<Collision>     _collision_ref = nullptr;
+	Shared<Score>         _score_ref = nullptr;
+	Shared<EnemyZakoBox>  _zakoBox_ref = nullptr;
 	std::list<Shared<StraightBullet>> _straightBullet_zako_ref{};
+	std::list<Shared<HomingBullet>> _homingBullet_zako_ref{};
 
 
 	// Zako
-	std::vector<Shared<EnemyZakoBase>> _enemy_zako_list{};
+	std::vector<Shared<EnemyZakoBase>>     _enemy_zako_list{};
 	std::unordered_map<int, EnemyZakoInfo> _enemyZakoData_map{};
 	EnemyZakoInfo _sEnemy_zakoBox_info{};
 	EnemyZakoInfo _sEnemy_zakoDome_info{};
 	EnemyZakoInfo _sEnemy_zakoCylinder_info{};
 
 	// Boss
-	std::vector<Shared<EnemyBossBase>> _enemy_boss_list{};
+	std::vector<Shared<EnemyBossBase>>     _enemy_boss_list{};
 	std::unordered_map<int, EnemyBossInfo> _enemyBossData_map{};
 	EnemyBossInfo _sBoss_PatchouliKnowledge_info{};
 	EnemyBossInfo _sBoss_Cirno_info{};
@@ -125,7 +129,7 @@ private:
 
 private:
 
-	// オブザーバーパターン。敵の位置から得点アイテムをスポーン
+	// オブザーバーパターン。敵の位置からアイテムをスポーン
 	std::vector<Shared<ItemManager>> _observerItems;
 	tnl::Vector3 _enemyZako_position_ref{};
 	bool _isEnemyZako_dead_ref{};
@@ -134,9 +138,9 @@ private:
 
 	const std::string _SELECTED_LEVEL;
 
-	static int _remainingZakoBox_spawnCount;
-	static int _remainingZakoDome_spawnCount;
-	static int _remainingZakoCylinder_spawnCount;
+	int _remainingZakoBox_spawnCount{};
+	int _remainingZakoDome_spawnCount{};
+	int _remainingZakoCylinder_spawnCount{};
 
 	static float _showBossAppearanceText_timer;
 

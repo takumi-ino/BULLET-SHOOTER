@@ -24,22 +24,18 @@
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
 #include"../../ScenePlay/Item/ItemBase.h"
 
-int EnemyManager::_remainingZakoBox_spawnCount = 0;
-int EnemyManager::_remainingZakoDome_spawnCount = 0;
-int EnemyManager::_remainingZakoCylinder_spawnCount = 0;
 
 // 初期化処理-------------------------------------------------------------------------------------------------------------------------
-
 EnemyManager::EnemyManager(
 	const int stageID, const Shared<Player>& player, const Shared<dxe::Camera>& camera,
 	const Shared<Collision>& collision, const std::string difficulty)
 	: _player_ref(player), _mainCamera_ref(camera), _collision_ref(collision), _SELECTED_LEVEL(difficulty), _stageID(stageID) {
-	
+
 	_isInitializedBossInfo = false;
 
 
-	//SoundManager::GetInstance().LoadStageBGM(_stageID);
-	//SoundManager::GetInstance().PlayStageBGM(false); // ボス(true)か雑魚(false)か
+	SoundManager::GetInstance().LoadStageBGM(_stageID);
+	SoundManager::GetInstance().PlayStageBGM(false); // ボス(true)か雑魚(false)か
 
 	_alertSE_hdl = LoadSoundMem("sound/se/bossAppears.mp3");
 
@@ -59,7 +55,7 @@ EnemyManager::EnemyManager(
 
 void EnemyManager::SetMaxEnemySpawnCount()
 {
-	if (_SELECTED_LEVEL == "Easy")         _maxEnemySpawnCount_PerInterval = 1;
+	if (_SELECTED_LEVEL == "Easy")         _maxEnemySpawnCount_PerInterval = 2;
 	else if (_SELECTED_LEVEL == "Normal")  _maxEnemySpawnCount_PerInterval = 2;
 	else if (_SELECTED_LEVEL == "Hard")    _maxEnemySpawnCount_PerInterval = 3;
 	else if (_SELECTED_LEVEL == "Lunatic") _maxEnemySpawnCount_PerInterval = 4;
@@ -126,6 +122,7 @@ void EnemyManager::InitEnemyZakoInfo() {
 		}
 	}
 }
+
 
 
 void EnemyManager::InitEnemyBossInfo() {
@@ -282,7 +279,6 @@ void EnemyManager::CheckDoSpawnEnemy() {
 }
 
 
-
 void EnemyManager::SummonBoss()
 {
 	if (!_isInitializedBossInfo) {
@@ -311,7 +307,6 @@ void EnemyManager::SetCollisionPairList() {
 
 	EnemyZakoCollisionPairLists();
 	EnemyBossCollisionPairLists();
-	EnemyZakoStraightBullet_CollisionPairLists();
 	BulletHellCollisionPairLists();
 }
 
@@ -374,21 +369,20 @@ void EnemyManager::EnemyBossCollisionPairLists()
 				it->DecreaseBossHP(Player::_at);
 				ScoreManager::GetInstance().AddHitBulletScore(100);
 			}
+			else {
+				static bool isNotify = false;
+
+				if (it->_isDead && !isNotify) {
+					OnEnemyKilled(it->_name); // 名前を通知
+					isNotify = true;
+				}
+			}
 		}
 	}
 }
 
 //　雑魚敵の直行弾とプレイヤー------------------------------------------------------------------------------
-void EnemyManager::EnemyZakoStraightBullet_CollisionPairLists()
-{
-	EnemyZakoStraightBullets_CollisionPairLists_DRY(this->GetStraightBullets());
-	//EnemyZakoStraightBullets_CollisionPairLists_DRY(EnemyZakoDome::_straight_bullets_zakoDome);
-	//EnemyZakoStraightBullets_CollisionPairLists_DRY(EnemyZakoCylinder::_straight_bullets_zakoCylinder);
-}
-
-void EnemyManager::EnemyZakoStraightBullets_CollisionPairLists_DRY(const std::list<Shared<StraightBullet>>& straightBullets_list) {
-
-	//Shared<Player> player = std::make_shared<Player>();
+void EnemyManager::EnemyZakoStraightBullet_CollisionPairLists(std::list<Shared<StraightBullet>>& straightBullets_list) {
 
 	if (!_player_ref) return;
 
@@ -402,16 +396,65 @@ void EnemyManager::EnemyZakoStraightBullets_CollisionPairLists_DRY(const std::li
 				for (auto ene : _enemy_zako_list) {
 
 					if ((*ene)._name == "Box") {
-						if (_player_ref->DecreaseHP(EnemyZakoBox::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyZakoBox::_at - Player::_def)) {
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
 					if ((*ene)._name == "Dome") {
-						if (_player_ref->DecreaseHP(EnemyZakoDome::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyZakoDome::_at - Player::_def)) {
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
+
 					if ((*ene)._name == "Cylinder") {
-						if (_player_ref->DecreaseHP(EnemyZakoCylinder::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyZakoCylinder::_at - Player::_def)) {
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
+					}
+				}
+
+				blt->_isActive = false;
+			}
+		}
+	}
+}
+
+
+//　雑魚敵の追跡弾とプレイヤー-----------------------------------------------------------------------------------------
+void EnemyManager::EnemyZakoHomingBullet_CollisionPairLists(std::list<Shared<HomingBullet>>& homingBullets_list) {
+
+	if (!_player_ref) return;
+
+	if (homingBullets_list.size() >= 1) {
+		for (auto blt : homingBullets_list) {
+			tnl::Vector3 prev_pos = (*blt)._mesh->pos_;
+			if (_collision_ref->CheckCollision_EnemyHomingBulletAndPlayer(blt, _player_ref)) {
+
+				if (_enemy_zako_list.empty()) return;
+
+				for (auto ene : _enemy_zako_list) {
+
+					if ((*ene)._name == "Box") {
+						if (_player_ref->DecreaseHP(EnemyZakoBox::_at - Player::_def)) {
+							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
+					}
+					if ((*ene)._name == "Dome") {
+						if (_player_ref->DecreaseHP(EnemyZakoDome::_at - Player::_def)) {
+							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
+					}
+
+					if ((*ene)._name == "Cylinder") {
+						if (_player_ref->DecreaseHP(EnemyZakoCylinder::_at - Player::_def)) {
+							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
 				}
 
@@ -456,16 +499,25 @@ void EnemyManager::BulletHellCollisionPairLists_DRY(std::vector<Shared<EnemyBull
 				for (auto it : _enemy_boss_list) {
 
 					if (it->_name == "Patchouli Knowledge") {
-						if (_player_ref->DecreaseHP(EnemyBoss_PatchouliKnowledge::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyBoss_PatchouliKnowledge::_at - Player::_def)) {
+
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
 					if (it->_name == "Cirno") {
-						if (_player_ref->DecreaseHP(EnemyBoss_Cirno::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyBoss_Cirno::_at - Player::_def)) {
+
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
 					if (it->_name == "Moriya Suwako") {
-						if (_player_ref->DecreaseHP(EnemyBoss_MoriyaSuwako::_at - Player::_def))
+						if (_player_ref->DecreaseHP(EnemyBoss_MoriyaSuwako::_at - Player::_def)) {
+
 							Player::_isInvincible = true;
+							Player::PlayDamageHitSE();
+						}
 					}
 				}
 
@@ -481,6 +533,7 @@ void EnemyManager::AttachItemManagerInstance(const Shared<ItemManager>& observer
 	_observerItems.push_back(observer);
 }
 
+
 void EnemyManager::NotifyEnemyPosition_ToItemManager() {
 
 	for (const auto& observer : _observerItems) {
@@ -488,7 +541,8 @@ void EnemyManager::NotifyEnemyPosition_ToItemManager() {
 	}
 }
 
-void EnemyManager::SendEnemyPosition(const tnl::Vector3& new_position, bool isEnemyDead) {
+
+void EnemyManager::SendEnemyPosition(const tnl::Vector3& new_position, const bool isEnemyDead) {
 	_enemyZako_position_ref = new_position;
 	_isEnemyZako_dead_ref = isEnemyDead;
 	NotifyEnemyPosition_ToItemManager();
@@ -497,7 +551,7 @@ void EnemyManager::SendEnemyPosition(const tnl::Vector3& new_position, bool isEn
 
 //　-------------------------------------------------------------------------------------------------------------------
 const std::vector<tnl::Vector3>& EnemyManager::GetEnemyZakoPosition() {
-	
+
 	_enemyPosList.clear();
 	for (auto& it_zako : _enemy_zako_list) {
 
@@ -509,7 +563,6 @@ const std::vector<tnl::Vector3>& EnemyManager::GetEnemyZakoPosition() {
 
 	return _enemyPosList;
 }
-
 
 
 const tnl::Vector3& EnemyManager::GetEnemyBossPosition() {
@@ -525,14 +578,12 @@ const tnl::Vector3& EnemyManager::GetEnemyBossPosition() {
 }
 
 
-
 bool EnemyManager::IsKilledStageBoss() {
 
 	if (_enemy_zako_list.empty() && _enemy_boss_list.empty())
 		return true;
 	return false;
 }
-
 
 
 void EnemyManager::ShowAppearsBossText() {
@@ -557,14 +608,12 @@ void EnemyManager::UpdateBossAppearanceTextTimer(const float& deltaTime)
 	}
 }
 
-
 // 敵殺傷イベント通知------------------------------------------------------------------------------------------------------------------------------------------
-
 void EnemyManager::OnEnemyKilled(const std::string enemy_name) {
 
 	std::string msg = enemy_name + "を撃破 ";
 
-	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(255, 0, 0), 14);
+	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(255, 0, 0), 16, 30);
 
 	EventNoticeText::_message_queue.push_back(event_msg);
 }
@@ -586,14 +635,14 @@ void EnemyManager::UpdateEventHitText(const float& deltaTime)
 		msg->Update(deltaTime);
 	}
 	// 表示時間が切れたメッセージを削除する
-	auto iter = EventNoticeText::_message_queue.begin();
-	while (iter != EventNoticeText::_message_queue.end()) {
+	auto it = EventNoticeText::_message_queue.begin();
+	while (it != EventNoticeText::_message_queue.end()) {
 
-		if ((*iter)->IsExpired()) {
-			iter = EventNoticeText::_message_queue.erase(iter);
+		if ((*it)->IsExpired()) {
+			it = EventNoticeText::_message_queue.erase(it);
 		}
 		else {
-			++iter;
+			++it;
 		}
 	}
 }
@@ -659,8 +708,7 @@ bool EnemyManager::SeqMoveToResult(const float deltaTime) {
 	return false;
 }
 
-// 描画・更新------------------------------------------------------------------------------------------------------------------------------------------
-
+// 描画------------------------------------------------------------------------------------------------------------------------------------------
 void EnemyManager::Render(const Shared<dxe::Camera>& camera) const {
 
 	_itemManager->Render(camera);
@@ -684,51 +732,9 @@ void EnemyManager::Render(const Shared<dxe::Camera>& camera) const {
 	}
 }
 
-
-
-float EnemyManager::_showBossAppearanceText_timer;
-
-
-void EnemyManager::Update(const float& deltaTime) {
-
-	_sequence.update(deltaTime);
-
-	SetCollisionPairList();
-
-	_itemManager->Update(deltaTime);
-
-	UpdateEventHitText(deltaTime);
-
-	if (_enemy_zako_list.empty()) {
-
-		CheckDoSpawnEnemy();
-	}
-
-
-	UpdateBossAppearanceTextTimer(deltaTime);
-
-
-	// ザコ
-	if (!_enemy_zako_list.empty()) {
-
-		for (auto it_zako = _enemy_zako_list.begin(); it_zako != _enemy_zako_list.end();) {
-
-			if ((*it_zako)->Update(deltaTime) == false) {
-
-				// 関数内でItemManagerクラスに通知
-				SendEnemyPosition((*it_zako)->_mesh->pos_, (*it_zako)->_isDead);
-
-				_player_ref->EraseEnemyZakoListRef(*it_zako);
-				it_zako = _enemy_zako_list.erase(it_zako);
-			}
-			else {
-
-				it_zako++;
-			}
-		}
-	}
-
-	// ボス
+// 更新------------------------------------------------------------------------------------------------------------------------------------------
+void EnemyManager::UpdateEnemyBossList(const float& deltaTime)
+{
 	if (_enemy_zako_list.empty() && !_enemy_boss_list.empty()) {
 
 		if (_summon_boss) {
@@ -749,3 +755,51 @@ void EnemyManager::Update(const float& deltaTime) {
 	}
 }
 
+
+void EnemyManager::UpdateEnemyZakoList(const float& deltaTime)
+{
+	if (!_enemy_zako_list.empty()) {
+
+		for (auto it_zako = _enemy_zako_list.begin(); it_zako != _enemy_zako_list.end();) {
+
+			if ((*it_zako)->Update(deltaTime) == false) {
+
+				// 関数内でItemManagerクラスに通知
+				SendEnemyPosition((*it_zako)->_mesh->pos_, (*it_zako)->_isDead);
+
+				_player_ref->EraseEnemyZakoListRef(*it_zako);
+				it_zako = _enemy_zako_list.erase(it_zako);
+			}
+			else {
+
+				it_zako++;
+			}
+		}
+	}
+}
+
+
+float EnemyManager::_showBossAppearanceText_timer;
+
+
+void EnemyManager::Update(const float& deltaTime) {
+
+	_sequence.update(deltaTime);
+
+	_itemManager->Update(deltaTime);
+
+	if (_enemy_zako_list.empty()) {
+
+		CheckDoSpawnEnemy();
+	}
+
+	SetCollisionPairList();
+
+	UpdateEventHitText(deltaTime);
+
+	UpdateBossAppearanceTextTimer(deltaTime);
+
+	UpdateEnemyZakoList(deltaTime);
+
+	UpdateEnemyBossList(deltaTime);
+}

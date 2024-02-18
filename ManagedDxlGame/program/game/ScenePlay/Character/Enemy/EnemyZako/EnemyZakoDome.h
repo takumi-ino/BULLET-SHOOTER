@@ -33,26 +33,11 @@ private:
 	void UpdateHomingBullet(const float delta_time) override;
 
 	// ‚»‚êˆÈŠO----------------------------------------------------------------------
-
 	void DoRoutineMoves(const float& delta_time) override;
-	void ChasePlayer(const float delta_time) override;
 	void AttackPlayer(const float& delta_time) override;
 
-
-	bool Update(float delta_time) override;
+	bool Update(const float delta_time) override;
 	void Render(Shared<dxe::Camera> camera) override;
-
-public:
-
-	std::list<Shared<StraightBullet>>      _straight_bullets;
-	std::list<Shared<HomingBullet>>        _homing_bullets;
-
-private:
-
-	Shared<BulletFactory> _bulletFactory = nullptr;
-
-	std::deque<Shared<StraightBullet>>_straightBullet_queue;
-	std::deque<Shared<HomingBullet>>_homingBullet_queue;
 
 public:
 
@@ -60,14 +45,6 @@ public:
 	static int   _def;
 
 private:
-
-	tnl::Vector3 prev_pos;
-
-	int straight_bullet_count;
-	int homing_bullet_count;
-
-	bool _isShotStraightBullet = true;
-	bool _isShotHomingBullet = false;
 
 	const float _IDLE_DISTANCE = 500.0f;
 	const float _ATTACK_DISTANCE = 450.0f;

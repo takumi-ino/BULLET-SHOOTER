@@ -12,7 +12,7 @@ int   EnemyZakoDome::_def;
 
 
 EnemyZakoDome::EnemyZakoDome(const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera)
-	: EnemyZakoBase(data, player, camera), straight_bullet_count(0), homing_bullet_count(0)
+	: EnemyZakoBase(data, player, camera)
 {
 	_explode_particle = std::make_shared<dxe::Particle>("particle/preset/explosion.bin");
 
@@ -20,6 +20,10 @@ EnemyZakoDome::EnemyZakoDome(const EnemyZakoInfo& data, const Shared<Player>& pl
 
 	_at = 5;
 	_def = 2;
+
+	_straight_bullet_count = 0;
+	_homing_bullet_count = 0;
+
 
 	_enemyManager = std::make_shared<EnemyManager>();
 
@@ -101,20 +105,6 @@ void EnemyZakoDome::DoRoutineMoves(const float& delta_time) {
 
 
 
-
-
-void EnemyZakoDome::ChasePlayer(const float delta_time) {
-
-	//ƒvƒŒƒCƒ„[’ÇÕ
-	tnl::Vector3 direction = _player_ref->GetPos() - _mesh->pos_;
-
-	direction.Normalize(direction);
-
-	_mesh->pos_ += direction * delta_time * _charaMoveSpeed;
-}
-
-
-
 void EnemyZakoDome::AttackPlayer(const float& delta_time) {
 
 	if (_isShotStraightBullet) {
@@ -157,10 +147,11 @@ void EnemyZakoDome::ShotStraightBullet(const float& delta_time) {
 
 	static float reload_time_counter = 0.0f;  // ƒŠƒ[ƒhŠÔ‚ğ’ÇÕ‚·‚é•Ï”
 
-	straight_bullet_count++;
+	_straight_bullet_count++;
 
 	// Œ‚‚Á‚½’e‚ÌŠÔŠu‚ğ‹ó‚¯‚é‚½‚ß‚Ìˆ—
-	if (straight_bullet_count % _bulletFireInterval == 0 && !_straightBullet_queue.empty()) {
+	if (_straight_bullet_count % _bulletFireInterval == 0 && !_straightBullet_queue.empty()) {
+
 
 		Shared<StraightBullet> bullet = _straightBullet_queue.front();
 		_straightBullet_queue.pop_front();
@@ -169,7 +160,13 @@ void EnemyZakoDome::ShotStraightBullet(const float& delta_time) {
 		bullet->_mesh->rot_ = _mesh->rot_;
 
 		_straight_bullets.push_back(bullet);
-		straight_bullet_count = 0;
+		_straight_bullet_count = 0;
+
+		PlaySoundMem(_shotSE_hdl, DX_PLAYTYPE_LOOP);
+
+	}
+	else {
+		StopSoundMem(_shotSE_hdl);
 	}
 
 	ReloadStraightBulletByTimer(reload_time_counter, delta_time);
@@ -206,7 +203,7 @@ void EnemyZakoDome::UpdateStraightBullet(float delta_time)
 
 		if ((*it_blt)->_isActive) {
 
-			_enemyManager->EnemyZakoStraightBullet_CollisionPairLists();
+			_enemyManager->EnemyZakoStraightBullet_CollisionPairLists(_straight_bullets);
 
 			(*it_blt)->_timer += delta_time;
 
@@ -234,17 +231,15 @@ void EnemyZakoDome::UpdateStraightBullet(float delta_time)
 
 
 
-
-
 void EnemyZakoDome::ShotHomingBullet(const float& delta_time) {
 
 	static float reload_time_counter = 0.0f;
 
-	homing_bullet_count++;
+	_homing_bullet_count++;
 
 
 	// Œ‚‚Á‚½’e‚ÌŠÔŠu‚ğ‹ó‚¯‚é‚½‚ß‚Ìˆ—
-	if (homing_bullet_count % _bulletFireInterval == 0 && !_homingBullet_queue.empty()) {
+	if (_homing_bullet_count % _bulletFireInterval == 0 && !_homingBullet_queue.empty()) {
 
 		Shared<HomingBullet> bullet = _homingBullet_queue.front();
 		_homingBullet_queue.pop_front();
@@ -253,7 +248,7 @@ void EnemyZakoDome::ShotHomingBullet(const float& delta_time) {
 		bullet->_mesh->rot_ = _mesh->rot_;
 
 		_homing_bullets.push_back(bullet);
-		homing_bullet_count = 0;
+		_homing_bullet_count = 0;
 	}
 
 	ReloadHomingBulletByTimer(reload_time_counter, delta_time);
@@ -311,7 +306,7 @@ void EnemyZakoDome::UpdateHomingBullet(const float delta_time) {
 }
 
 
-bool EnemyZakoDome::Update(float delta_time) {
+bool EnemyZakoDome::Update(const float delta_time) {
 
 	if (_isDead) return false;
 
@@ -319,8 +314,6 @@ bool EnemyZakoDome::Update(float delta_time) {
 
 	UpdateStraightBullet(delta_time);
 	UpdateHomingBullet(delta_time);
-
-	SearchPlayerMovementState(delta_time);
 
 	return true;
 }

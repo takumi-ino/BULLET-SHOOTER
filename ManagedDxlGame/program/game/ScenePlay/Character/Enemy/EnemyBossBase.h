@@ -41,6 +41,12 @@ protected:
 
 	std::list<Shared<EnemyBossBase>> _enemyBoss_list_ref;
 
+	Shared<BulletHell> _bulletHell = nullptr;
+
+protected:
+
+	int _MAX_HP{};
+
 private:
 
 	std::stack<std::deque<int>> _remaining_life_indicator;

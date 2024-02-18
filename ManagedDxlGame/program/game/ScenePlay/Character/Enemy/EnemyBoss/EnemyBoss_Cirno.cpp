@@ -15,7 +15,6 @@ EnemyBoss_Cirno::EnemyBoss_Cirno(const EnemyBossInfo& info, const Shared<Player>
 
 
 void EnemyBoss_Cirno::SetMeshInfo() {
-
 	_mesh = dxe::Mesh::CreateSphereMV(50);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/bossTexture/Cirno.png"));
 
@@ -50,13 +49,13 @@ void EnemyBoss_Cirno::AttackPlayer(const float& delta_time) {
 		ScenePlay::_isUsingBullet_normal_cirno = false;
 	}
 
-	if (3 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_icicleFall_cirno = true;
-		_bulletHell->ShotBulletHell_IcicleFall_Cirno(delta_time);
-	}
-	else {
-		ScenePlay::_isUsingBullet_icicleFall_cirno = false;
-	}
+	//if (4 == EnemyBossBase::_bossHp.size()) {
+	//	ScenePlay::_isUsingBullet_icicleFall_cirno = true;
+	//	_bulletHell->ShotBulletHell_IcicleFall_Cirno(delta_time);
+	//}
+	//else {
+	//	ScenePlay::_isUsingBullet_icicleFall_cirno = false;
+	//}
 
 	if (1 == EnemyBossBase::_bossHp.size()) {
 		ScenePlay::_isUsingBullet_perfectFreeze_cirno = true;
@@ -113,7 +112,7 @@ void EnemyBoss_Cirno::Render(Shared<dxe::Camera> camera) {
 }
 
 
-bool EnemyBoss_Cirno::Update(float delta_time) {
+bool EnemyBoss_Cirno::Update(const float delta_time) {
 
 	if (_isDead) return false;
 

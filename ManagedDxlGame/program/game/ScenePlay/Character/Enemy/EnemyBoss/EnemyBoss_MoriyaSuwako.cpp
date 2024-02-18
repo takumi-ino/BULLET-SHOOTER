@@ -38,24 +38,24 @@ void EnemyBoss_MoriyaSuwako::AttackPlayer(const float& delta_time) {
 
 	if (!_bulletHell) return;
 
-	if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
+	//if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
-		ScenePlay::_isUsingBullet_normal_suwako = true;
-		_bulletHell->ShotBulletHell_Normal_Suwako(delta_time);
-	}
-	else {
-		ScenePlay::_isUsingBullet_normal_suwako = false;
-	}
+	//	ScenePlay::_isUsingBullet_normal_suwako = true;
+	//	_bulletHell->ShotBulletHell_Normal_Suwako(delta_time);
+	//}
+	//else {
+	//	ScenePlay::_isUsingBullet_normal_suwako = false;
+	//}
 
-	if (3 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = true;
-		_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(delta_time);
-	}
-	else {
-		ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = false;
-	}
+	//if (3 == EnemyBossBase::_bossHp.size()) {
+	//	ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = true;
+	//	_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(delta_time);
+	//}
+	//else {
+	//	ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = false;
+	//}
 
-	if (1 == EnemyBossBase::_bossHp.size()) {
+	if (4 == EnemyBossBase::_bossHp.size()) {
 		ScenePlay::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = true;
 		_bulletHell->ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(delta_time);
 	}
@@ -109,7 +109,7 @@ void EnemyBoss_MoriyaSuwako::Render(Shared<dxe::Camera> camera) {
 }
 
 
-bool EnemyBoss_MoriyaSuwako::Update(float delta_time) {
+bool EnemyBoss_MoriyaSuwako::Update(const float delta_time) {
 
 	if (_isDead) return false;
 

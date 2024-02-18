@@ -4,6 +4,7 @@
 #include "../Player/Player.h"
 #include "../../../Loader/CsvLoader.h"
 #include "EnemyBossBase.h"
+#include "../game/ScenePlay/Bullet/Enemy/BulletHell.h"
 
 std::deque<int>EnemyBossBase::_bossHp;
 

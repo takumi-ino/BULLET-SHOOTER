@@ -14,7 +14,7 @@ public:
 	// 形状、テクスチャ、ポジション、スケール
 	virtual void SetMeshInfo() {}
 
-	virtual bool Update(float delta_time) { return true; }
+	virtual bool Update(const float delta_time) { return true; }
 
 	virtual void Render(Shared<dxe::Camera> camera) {}
 

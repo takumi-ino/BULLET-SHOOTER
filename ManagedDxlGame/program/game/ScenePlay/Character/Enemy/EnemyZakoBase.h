@@ -3,23 +3,25 @@
 
 class Player;
 class CsvLoader;
-class BulletHell;
 class EnemyBullet;
 class EnemyManager;
+class StraightBullet;
+class HomingBullet;
+class BulletFactory;
 struct EnemyZakoInfo;
 
 class EnemyZakoBase : public EnemyBase
 {
 public:
 
-	enum class MOVE_BEHAVE {
+	enum class BEHAVE {
 
 		Stop,
 		Moving,
 		Turn
 	};
 
-	MOVE_BEHAVE _behave = EnemyZakoBase::MOVE_BEHAVE::Moving;
+	BEHAVE _behave = EnemyZakoBase::BEHAVE::Moving;
 
 	EnemyZakoBase() {}
 
@@ -45,13 +47,23 @@ protected:
 	void SearchPlayerMovementState(const float delta_time);
 	void MoveToRandomInvestigatePos(const float& delta_time);
 
+	void ChasePlayer(const float delta_time);
+
 public:
 
-	std::list<Shared<EnemyZakoBase>> _enemy_list_ref;
+	std::list<Shared<EnemyZakoBase>>       _enemy_list_ref{};
 
 protected:
 
-	Shared<EnemyManager>             _enemyManager = nullptr;
+	Shared<EnemyManager>                   _enemyManager = nullptr;
+
+	Shared<BulletFactory>                  _bulletFactory = nullptr;
+
+	std::list<Shared<StraightBullet>>      _straight_bullets{};
+	std::list<Shared<HomingBullet>>        _homing_bullets{};
+
+	std::deque<Shared<StraightBullet>>     _straightBullet_queue{};
+	std::deque<Shared<HomingBullet>>       _homingBullet_queue{};
 
 public:
 
@@ -75,12 +87,21 @@ public:
 
 protected:
 
-	// 巡回状態のときに目指す地点
-	tnl::Vector3 _investigatePos{};
+	int   _shotSE_hdl{};
+
+	int   _straight_bullet_count{};
+	int   _homing_bullet_count{};
 
 	float _randomInvestigateRange_x{};
 	float _randomInvestigateRange_y{};
 	float _randomInvestigateRange_z{};
+
+	bool  _isShotStraightBullet = true;
+	bool  _isShotHomingBullet = false;
+
+	tnl::Vector3 prev_pos;
+	// 巡回状態のときに目指す地点
+	tnl::Vector3 _investigatePos{};
 
 private:
 

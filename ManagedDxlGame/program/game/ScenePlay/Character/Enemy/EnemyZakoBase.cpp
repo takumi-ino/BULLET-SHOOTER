@@ -4,6 +4,9 @@
 #include "../../Bullet/Enemy/EnemyBullet.h"
 #include "../../../Loader/CsvLoader.h"
 #include "../../../Manager/Enemy/EnemyManager.h"
+#include "../game/ScenePlay/Bullet/Enemy/StraightBullet.h"
+#include "../game/ScenePlay/Bullet/Enemy/HomingBullet.h"
+#include "../game/ScenePlay/Bullet/Enemy/BulletFactory.h"
 #include "EnemyZakoBase.h"
 
 Shared<dxe::Particle> EnemyZakoBase::_explode_particle;
@@ -29,7 +32,21 @@ EnemyZakoBase::EnemyZakoBase(const EnemyZakoInfo& data, const Shared<Player>& pl
 
 	_player_ref = player;
 	_mainCamera_ref = camera;
+
+	_shotSE_hdl = LoadSoundMem("sound/se/shot.wav");
 }
+
+
+void EnemyZakoBase::ChasePlayer(const float delta_time) {
+
+	//プレイヤー追跡
+	tnl::Vector3 direction = _player_ref->GetPos() - _mesh->pos_;
+
+	direction.Normalize(direction);
+
+	_mesh->pos_ += direction * delta_time * _charaMoveSpeed;
+}
+
 
 
 void EnemyZakoBase::SearchPlayerMovementState(const float delta_time)
@@ -47,7 +64,7 @@ void EnemyZakoBase::SearchPlayerMovementState(const float delta_time)
 
 		static float state_timer = 0.0f;
 
-		if (_behave == EnemyZakoBase::MOVE_BEHAVE::Moving) {
+		if (_behave == EnemyZakoBase::BEHAVE::Moving) {
 			//　時間制限付きでランダムに移動
 			//  ランダムな時間経過後停止(5秒以内)
 			_isReachedToInvestigatePos = false;
@@ -58,34 +75,34 @@ void EnemyZakoBase::SearchPlayerMovementState(const float delta_time)
 
 			if (_isReachedToInvestigatePos) {
 
-				_behave = EnemyZakoBase::MOVE_BEHAVE::Stop;
+				_behave = EnemyZakoBase::BEHAVE::Stop;
 			}
 			else {
 				_isReachedToInvestigatePos = false;
-				_behave = EnemyZakoBase::MOVE_BEHAVE::Moving;
+				_behave = EnemyZakoBase::BEHAVE::Moving;
 			}
 		}
-		else if (_behave == EnemyZakoBase::MOVE_BEHAVE::Stop) {
+		else if (_behave == EnemyZakoBase::BEHAVE::Stop) {
 
 			//	時には同じ位置にとどまり左右の確認などを行う
 			state_timer += delta_time;
 
 			if (state_timer > 5) {
 
-				_behave = static_cast<EnemyZakoBase::MOVE_BEHAVE>(rand() % 3);
+				_behave = static_cast<EnemyZakoBase::BEHAVE>(rand() % 3);
 
-				if (_behave == EnemyZakoBase::MOVE_BEHAVE::Turn)
+				if (_behave == EnemyZakoBase::BEHAVE::Turn)
 					_isTurning = true;
 				else _isTurning = false;
 
 				state_timer = 0.f;
 			}
 			else {
-				_behave = EnemyZakoBase::MOVE_BEHAVE::Stop;
+				_behave = EnemyZakoBase::BEHAVE::Stop;
 			}
 		}
 
-		else if (_behave == EnemyZakoBase::MOVE_BEHAVE::Turn) {
+		else if (_behave == EnemyZakoBase::BEHAVE::Turn) {
 
 			static float angle = 0;
 
@@ -116,16 +133,16 @@ void EnemyZakoBase::SearchPlayerMovementState(const float delta_time)
 				int rnd = rand() % 2;
 
 				if (rnd == 0) {
-					_behave = EnemyZakoBase::MOVE_BEHAVE::Stop;
+					_behave = EnemyZakoBase::BEHAVE::Stop;
 					_isTurning = false;
 				}
 				else {
-					_behave = EnemyZakoBase::MOVE_BEHAVE::Moving;
+					_behave = EnemyZakoBase::BEHAVE::Moving;
 					_isTurning = false;
 				}
 			}
 			else {
-				_behave = EnemyZakoBase::MOVE_BEHAVE::Turn;
+				_behave = EnemyZakoBase::BEHAVE::Turn;
 			}
 		}
 	}
@@ -190,8 +207,8 @@ bool EnemyZakoBase::ShowHpGage_EnemyZako() {
 
 	if (_hp <= 0) return false;
 
-	tnl::Vector3 hpGage_pos =
-		tnl::Vector3::ConvertToScreen(_mesh->pos_, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, _mainCamera_ref->view_, _mainCamera_ref->proj_);
+	tnl::Vector3 hpGage_pos = tnl::Vector3::ConvertToScreen
+		(_mesh->pos_, DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT, _mainCamera_ref->view_, _mainCamera_ref->proj_);
 
 	float x1 = hpGage_pos.x - 30;
 	float x2 = hpGage_pos.x + 30;
