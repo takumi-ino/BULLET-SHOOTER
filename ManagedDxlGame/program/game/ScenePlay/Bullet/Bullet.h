@@ -15,6 +15,9 @@ public:
 
 public:
 
-	float _timer{};
+	Shared<dxe::Mesh> _mesh;
 
+public:
+
+	float _timer{};
 };

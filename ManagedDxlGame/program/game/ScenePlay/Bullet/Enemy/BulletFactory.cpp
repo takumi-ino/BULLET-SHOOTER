@@ -3,8 +3,6 @@
 #include "BulletFactory.h"
 
 
-
-
 std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet(const StraightBullet::USER user, const int maxBulletSpawnCount) {
 
 	switch (user) {
@@ -74,6 +72,7 @@ std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoDome(c
 
 }
 
+
 std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoCylinder(const int maxBulletSpawnCount) {
 
 	std::list<Shared<StraightBullet>> straightBullet;
@@ -94,16 +93,13 @@ std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoCylind
 		straightBullet.push_back(bullet);
 	}
 
-
 	return straightBullet;
-
 }
 
 
 
 std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet(
 	const HomingBullet::USER user, const int maxBulletSpawnCount) {
-
 
 	switch (user) {
 
@@ -119,7 +115,6 @@ std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet(
 	}
 
 	return std::list<Shared<HomingBullet>>();
-
 }
 
 
@@ -146,23 +141,57 @@ std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoBox(const 
 	}
 
 	return homingBullet;
-
 }
 
 
 std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoDome(const int maxBulletSpawnCount) {
+
 	std::list<Shared<HomingBullet>> homingBullet;
 
+	for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+		Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+
+
+		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+
+		spawn_pos.x += _enemyMesh_ref->rot_.x;
+		spawn_pos.y += _enemyMesh_ref->rot_.y;
+		spawn_pos.z += _enemyMesh_ref->rot_.z;
+
+		bullet->_mesh->pos_ = spawn_pos;
+		bullet->_isActive = true;
+
+		homingBullet.push_back(bullet);
+	}
+
 	return homingBullet;
+
 
 }
 
 
 std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoCylinder(const int maxBulletSpawnCount) {
+
 	std::list<Shared<HomingBullet>> homingBullet;
 
+	for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+		Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+
+
+		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+
+		spawn_pos.x += _enemyMesh_ref->rot_.x;
+		spawn_pos.y += _enemyMesh_ref->rot_.y;
+		spawn_pos.z += _enemyMesh_ref->rot_.z;
+
+		bullet->_mesh->pos_ = spawn_pos;
+		bullet->_isActive = true;
+
+		homingBullet.push_back(bullet);
+	}
+
 	return homingBullet;
-
-
 
 }

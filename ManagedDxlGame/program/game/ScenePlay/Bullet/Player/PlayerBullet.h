@@ -15,7 +15,6 @@ public:
 
 public:
 
-	Shared<dxe::Mesh> _mesh = nullptr;
 	Shared<Player> _player_ref = nullptr;
 
 public:
@@ -26,7 +25,7 @@ public:
 
 	tnl::Vector3 _collisionSize{ 10,10,10 };
 
-	bool _isActive;
+	bool  _isActive = true;
 	float _elapsed{};
 	float _speed{};
 };

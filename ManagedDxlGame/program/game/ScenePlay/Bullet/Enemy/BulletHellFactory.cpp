@@ -47,10 +47,12 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Patc
 	int id_everyDirBullet = 0;
 
 	// 回転用の弾生成 (左回転と右回転の２種類があるが、ここでは全てを同時に生成する）
-	for (int i = 0; i < _ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
+	for (int i = 0; i < ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
 
 		// 球体--------------------------------------------------------------------------------------------------------------------------
 		Shared<EnemyBullet> round_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 20.0f);
+
+		round_bullet->_angle = (2.0f * tnl::PI / ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
 
 		round_bullet->_id = id_roundBullet++;
 		round_bullet->_speed = 150.0f;
@@ -61,16 +63,16 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Patc
 	}
 
 
-	for (int i = 0; i < _ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
+	for (int i = 0; i < ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
 
 		// 球体と一緒に動く光線------------------------------------------------------------------------------------------------------------
-		Shared<EnemyBullet> round_bullet_beam = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::White, 500.f);
+		Shared<EnemyBullet> round_bullet_beam = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::Blue, 500.f);
 		
-		round_bullet_beam->_angle = (2.0f * tnl::PI / _ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
+		round_bullet_beam->_angle = (2.0f * tnl::PI / ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
 
 		float pitch = tnl::PI / 2.0f;
 
-		float angle = (2.0f * tnl::PI / _ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
+		float angle = (2.0f * tnl::PI / ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
 		float yaw = angle;
 		float roll = 0.f;
 
@@ -81,26 +83,24 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Patc
 		round_bullet_beam->_id = id_roundBullet++;
 		round_bullet_beam->_speed = 150.0f;
 		round_bullet_beam->_isActive = true;
-		round_bullet_beam->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Round_White;
-
+		round_bullet_beam->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Round_Blue;
 
 		enemyBullet.push_back(round_bullet_beam);
 	}
 
 
 	// 全方向連射弾--------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < _EVERYDIRECTION_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
+	for (int i = 0; i < EVERYDIRECTION_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
 
-		Shared<EnemyBullet> every_direction_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::EmeraldGreen, 12.0f);
+		Shared<EnemyBullet> every_direction_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Red, 12.0f);
 
 		
 		every_direction_bullet->_id = id_everyDirBullet++;
 		every_direction_bullet->_isActive = false;
-		every_direction_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_EmeraldGreen;
+		every_direction_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_Red;
 
 		enemyBullet.push_back(every_direction_bullet);
 	}
-
 
 	return enemyBullet;
 }
@@ -111,10 +111,9 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_MetalFatigu
 	std::vector<Shared<EnemyBullet>> enemyBullet;
 	int id = 0;
 
-	for (int i = 0; i < _EVERYDIRECTION_BULLETCOUNT_T_METALFATIGUE_PATCHOULI; i++) {
+	for (int i = 0; i < EVERYDIRECTION_BULLETCOUNT_T_METALFATIGUE_PATCHOULI; i++) {
 
 		Shared<EnemyBullet> every_direction_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 15.0f);
-
 
 		every_direction_bullet->_id = id++;
 		every_direction_bullet->_isActive = false;
@@ -128,9 +127,23 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_MetalFatigu
 	Shared<EnemyBullet> split_one_into_eight_bullet_wave2;
 	Shared<EnemyBullet> split_one_into_eight_bullet_wave3;
 
-	InitSplitOneIntoEightBullet(_SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI, id, split_one_into_eight_bullet_wave1, enemyBullet, EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
-	//InitSplitOneIntoEightBullet(_SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI, id, split_one_into_eight_bullet_wave2, enemyBullet, EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
-	//InitSplitOneIntoEightBullet(_SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI, id, split_one_into_eight_bullet_wave3, enemyBullet, EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+		id, 
+		split_one_into_eight_bullet_wave1, 
+		enemyBullet,
+		EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+	
+	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+		id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+		split_one_into_eight_bullet_wave2,
+		enemyBullet,
+		EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+
+	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+		id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI * 2,
+		split_one_into_eight_bullet_wave3,
+		enemyBullet,
+		EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
 
 
 	return enemyBullet;
@@ -161,30 +174,27 @@ void BulletHellFactory::InitSplitOneIntoEightBullet(
 
 
 
-
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_SilentSerena_Patchouli() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
 	int id = 0;
 
 	// 全方向連射弾--------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < _CIRCLECONTIGUOUS_BULLETCOUNT_T_SILENTSERENA_PATCHOULI; i++) {
+	for (int i = 0; i < CIRCLECONTIGUOUS_BULLETCOUNT_T_SILENTSERENA_PATCHOULI; i++) {
 
-		Shared<EnemyBullet> circle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::EmeraldGreen, 15.0f);
+		Shared<EnemyBullet> circle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Sky, 15.0f);
 		
 		circle_contiguous_bullet->_id = id++;
 		circle_contiguous_bullet->_isActive = false;
-		circle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_EmeraldGreen;
+		circle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_Sky;
 
 		enemyBullet.push_back(circle_contiguous_bullet);
 	}
 
-
 	// スローで動くランダム弾--------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < _SLOWLYCOMING_BULLETCOUNT_T_SILENTSERENA_PATCHOULI; i++) {
+	for (int i = 0; i < SLOWLYCOMING_BULLETCOUNT_T_SILENTSERENA_PATCHOULI; i++) {
 
-		Shared<EnemyBullet> slowly_coming_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue,10.0f);
-
+		Shared<EnemyBullet> slowly_coming_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue,11.0f);
 
 		slowly_coming_bullet->_id = id++;
 		slowly_coming_bullet->_isActive = false;
@@ -201,25 +211,27 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_SilentSeren
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Cirno() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
-	int id = 0;
+	int straight_id = 0;
+	int every_direction_id = 0;
 
-	for (int i = 0; i < _STRAIGHTAPPROACH_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
 
-		Shared<EnemyBullet> straight_approach_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 15.0f);		
-		
-		straight_approach_bullet->_id = id++;
-		straight_approach_bullet->_isActive = false;
-		straight_approach_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Straight_Blue;
+	for (int i = 0; i < STRAIGHTAPPROACH_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
+
+		Shared<EnemyBullet> straight_approach_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::Blue, 10.0f);
+
+		straight_approach_bullet->_id = straight_id++;
+		straight_approach_bullet->_isActive = true;
+		straight_approach_bullet->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Straight_Blue;
 
 		enemyBullet.push_back(straight_approach_bullet);
 	}
 
-	for (int i = 0; i < _EVERYDIRECTION_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
+	for (int i = 0; i < EVERYDIRECTION_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
 
 		Shared<EnemyBullet> every_direction_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 15.0f);
 
-		every_direction_bullet->_id = id++;
-		every_direction_bullet->_isActive = false;
+		every_direction_bullet->_id = every_direction_id++;
+		every_direction_bullet->_isActive = true;
 		every_direction_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_Blue;
 
 		enemyBullet.push_back(every_direction_bullet);
@@ -232,24 +244,25 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Cirn
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IcicleFall_Cirno() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
-	int id = 0;
+	int shotOuter_moveInner_id = 0;
+	int lineUp_straight_id = 0;
 
-	for (int i = 0; i < _SHOTOUTERMOVEINNER_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
+	for (int i = 0; i < SHOTOUTERMOVEINNER_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
 
 		Shared<EnemyBullet> shotOuter_moveInner_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 15.0f);
 
-		shotOuter_moveInner_bullet->_id = id++;
-		shotOuter_moveInner_bullet->_isActive = false;
+		shotOuter_moveInner_bullet->_id = shotOuter_moveInner_id++;
+		shotOuter_moveInner_bullet->_isActive = true;
 		shotOuter_moveInner_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Straight_Blue;
 
 		enemyBullet.push_back(shotOuter_moveInner_bullet);
 	}
 
-	for (int i = 0; i < _LINEUPSTRAIGHTSHOT_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
+	for (int i = 0; i < LINEUPSTRAIGHTSHOT_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
 
 		Shared<EnemyBullet> lineUp_straight_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 15.0f);
 
-		lineUp_straight_bullet->_id = id++;
+		lineUp_straight_bullet->_id = lineUp_straight_id++;
 		lineUp_straight_bullet->_isActive = false;
 		lineUp_straight_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Straight_Yellow;
 
@@ -265,29 +278,30 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IcicleFall_
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_PerfectFreeze() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
-	int id = 0;
+	int circle_contiguous_bullet_id = 0;
+	int expand_straight_bullet_id = 0;
 
 	// 全方向連射弾--------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < _CIRCLECONTIGUOUS_BULLETCOUNT_T_PERFECTFREEZE_CIRNO; i++) {
+	for (int i = 0; i < CIRCLECONTIGUOUS_BULLETCOUNT_T_PERFECTFREEZE_CIRNO; i++) {
 
-		Shared<EnemyBullet> circle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::EmeraldGreen, 15.0f);
+		Shared<EnemyBullet> circle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::White, 15.0f);
 
-		circle_contiguous_bullet->_id = id++;
-		circle_contiguous_bullet->_isActive = false;
-		circle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_EmeraldGreen;
+		circle_contiguous_bullet->_id = circle_contiguous_bullet_id++;
+		circle_contiguous_bullet->_isActive = true;
+		circle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Round_White;
 
 		enemyBullet.push_back(circle_contiguous_bullet);
 	}
 
 
-	// 5列の直行弾を左から右へ広がるように発射（1回で全て放射）--------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < _EXPANDSTRAIGHTSHOT_BULLETCOUNT_T_PERFECTFREEZE_CIRNO; i++) {
+	// 3行１列の弾を５連続、これを８方向へ撃つ(間隔を空けずに全て放射）--------------------------------------------------------------------------------------------------------------------------
+	for (int i = 0; i < EXPANDSTRAIGHTSHOT_BULLETCOUNT_T_PERFECTFREEZE_CIRNO; i++) {
 
 		Shared<EnemyBullet> expand_straight_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 10.0f);
 
-		expand_straight_bullet->_id = id++;
-		expand_straight_bullet->_isActive = false;
-		expand_straight_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_RandomStraight_Blue;
+		expand_straight_bullet->_id = expand_straight_bullet_id++;
+		expand_straight_bullet->_isActive = true;
+		expand_straight_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Straight_Blue;
 
 		enemyBullet.push_back(expand_straight_bullet);
 	}
@@ -300,18 +314,55 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_PerfectFree
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_Normal_Suwako() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
+	int rightCircle_contiguous_bullet_id = 0;
+	int leftCircle_contiguous_bullet_id = 0;
+
+
+	// 全方向連射弾（右回り）--------------------------------------------------------------------------------------------------------------------------
+	for (int i = 0; i < CIRCLECONTIGUOUS_BULLETCOUNT_T_NORMAL_SUWAKO; i++) {
+
+		Shared<EnemyBullet> rightCircle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::Red, 15.0f);
+
+		rightCircle_contiguous_bullet->_id = rightCircle_contiguous_bullet_id++;
+		rightCircle_contiguous_bullet->_isActive = false;
+		rightCircle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Round_Red;
+
+		enemyBullet.push_back(rightCircle_contiguous_bullet);
+	}
+
+	// 全方向連射弾（左回り）--------------------------------------------------------------------------------------------------------------------------
+	for (int i = 0; i < CIRCLECONTIGUOUS_BULLETCOUNT_T_NORMAL_SUWAKO; i++) {
+
+		Shared<EnemyBullet> leftCircle_contiguous_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::Blue, 10.0f);
+
+		leftCircle_contiguous_bullet->_id = leftCircle_contiguous_bullet_id++;
+		leftCircle_contiguous_bullet->_isActive = false;
+		leftCircle_contiguous_bullet->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Round_Blue;
+
+		enemyBullet.push_back(leftCircle_contiguous_bullet);
+	}
 
 	return enemyBullet;
-
 }
 
 
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IronRingOfMoriya_Suwako() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
+	int slow_approach_bullet_id = 0;
+
+	for (int i = 0; i < SLOWLYCOMING_BULLETCOUNT_T_IRONRINGOFMORIYA_SUWAKO; i++) {
+
+		Shared<EnemyBullet> slow_approach_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::Red, 12.0f);
+
+		slow_approach_bullet->_id = slow_approach_bullet_id++;
+		slow_approach_bullet->_isActive = false;
+		slow_approach_bullet->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Round_Red;
+
+		enemyBullet.push_back(slow_approach_bullet);
+	}
 
 	return enemyBullet;
-
 }
 
 
@@ -319,9 +370,33 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IronRingOfM
 std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_KeroChanStandsFirm_AgainstTheStorm() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
+	int fall_approach_bullet_id = 0;
+	int straight_approach_bullet_id = 0;
+
+
+	for (int i = 0; i < FALLINGAPPROACH_BULLETCOUNT_T_KCSTANDSFIRMAGAINSTSTORM_SUWAKO; i++) {
+
+		Shared<EnemyBullet> fall_approach_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 12.0f);
+
+		fall_approach_bullet->_id = fall_approach_bullet_id++;
+		fall_approach_bullet->_isActive = false;
+		fall_approach_bullet->specificType = EnemyBullet::SPECIFICTYPE::Sphere_Straight_Blue;
+
+		enemyBullet.push_back(fall_approach_bullet);
+	}
+
+	for (int i = 0; i < STRAIGHTAPPROACH_BULLETCOUNT_T_KCSTANDSFIRMAGAINSTSTORM_SUWAKO; i++) {
+
+		Shared<EnemyBullet> straight_approach_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Cylinder, EnemyBullet::COLOR::EmeraldGreen, 12.0f);
+
+		straight_approach_bullet->_id = straight_approach_bullet_id++;
+		straight_approach_bullet->_isActive = false;
+		straight_approach_bullet->specificType = EnemyBullet::SPECIFICTYPE::Cylinder_Straight_EmeraldGreen;
+
+		enemyBullet.push_back(straight_approach_bullet);
+	}
 
 	return enemyBullet;
-
 }
 
 

@@ -9,6 +9,7 @@ PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& di
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/colorTexture/red.bmp"));
 	_mesh->pos_ = spawn_pos;
 	_moveDirection = direction; 
+	_moveDirection.normalize();
 	_speed = 1000.0f;
 }
 
@@ -21,7 +22,7 @@ void PlayerBullet::Render(Shared<dxe::Camera> _mainCamera) {
 
 void PlayerBullet::Update(float delta_time) {
 
-	static tnl::Vector3 start{};
+	static tnl::Vector3 start = _mesh->pos_;
 
 	_mesh->pos_ += _moveDirection * delta_time * _speed;
 
