@@ -36,9 +36,10 @@ bool Collision::CheckCollision_PlayerBulletAndEnemyBoss(const Shared<PlayerBulle
 	return false;
 }
 
+
 bool Collision::CheckCollision_EnemyStraightBulletAndPlayer(const Shared<StraightBullet> bullet, const Shared<Player> player) {
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_mesh->scl_)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collide_size)) {
 		return true;
 	}
 	return false;
@@ -47,7 +48,7 @@ bool Collision::CheckCollision_EnemyStraightBulletAndPlayer(const Shared<Straigh
 
 bool Collision::CheckCollision_EnemyHomingBulletAndPlayer(const Shared<HomingBullet> bullet, const Shared<Player> player) {
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_mesh->scl_)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collide_size)) {
 		return true;
 	}
 	return false;

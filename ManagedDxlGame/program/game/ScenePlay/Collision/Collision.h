@@ -29,8 +29,9 @@ public:
 	bool CheckCollision_PlayerBulletAndEnemyBoss(const Shared<PlayerBullet> meshA, const Shared<EnemyBossBase> meshB);
 	bool CheckCollision_PlayerAndEnemyZako(const Shared<Player> player, const  Shared<EnemyZakoBase> enemy, const tnl::Vector3 prevPos_player, const tnl::Vector3 prevPos_enemy);
 	bool CheckCollision_EnemyStraightBulletAndPlayer(Shared<StraightBullet> bullet, Shared<Player> player);
-	bool CheckCollision_BulletHellBulletsAndPlayer(Shared<EnemyBullet> bullet, Shared<Player> player, tnl::Vector3 collisionSize, tnl::Vector3 prev_pos);
 	bool CheckCollision_EnemyHomingBulletAndPlayer(Shared<HomingBullet> bullet, Shared<Player> player);
+
+	bool CheckCollision_BulletHellBulletsAndPlayer(Shared<EnemyBullet> bullet, Shared<Player> player, tnl::Vector3 collisionSize, tnl::Vector3 prev_pos);
 
 
 	// プレイヤーと得点アイテム
