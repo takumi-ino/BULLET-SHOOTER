@@ -48,12 +48,15 @@ bool ScenePlay::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako;
 bool ScenePlay::_isRenderPlayersBombEffect;
 bool ScenePlay::_isShowBeginGameText = false;
 
+int ScenePlay::_STAGE_ID;
 
 
-ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage) : _STAGE_ID(stage) {
+ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage) {
 
 	_isShowBeginGameText = true;
 	PauseMenu::_isShowPauseOption = false;
+
+	_STAGE_ID = stage;
 
 	_mainCamera = std::make_shared<FreeLookCamera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
@@ -83,15 +86,9 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage) : _
 	ItemManager::GetInstance().CreateScoreItemPool(selected_difficulty, _STAGE_ID);
 	ItemManager::GetInstance().CreatePowerUpItemPool(selected_difficulty, _STAGE_ID);
 
-
 	TurnOff_FirstStageBulletHellLists();
 	TurnOff_SecondStageBulletHellLists();
 	TurnOff_ThirdStageBulletHellLists();
-
-	//DestroyFirstStageBulletHellLists();
-	//DestroySecondStageBulletHellLists();
-	//DestroyThirdStageBulletHellLists();
-
 
 	_bltHellFactory = std::make_shared<BulletHellFactory>();
 	// 生成する弾幕を最初に選び、初期化
@@ -104,53 +101,103 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage) : _
 	_pauseMenu = std::make_shared<PauseMenu>(_STAGE_ID, selected_difficulty);
 
 	// 画面左下の索敵レーダーの画像
-	miniMap_hdl = LoadGraph("graphics/miniMap/radar.jpg");
+	_miniMap_hdl = LoadGraph("graphics/miniMap/radar.jpg");
 }
 
 
 
 // プレイヤーボム効果-------------------------------------------------------------------------------------------------------------------------
 void ScenePlay::ReactivateEnemyBullets() {
-	//for (auto b : _bullet_normal_patchouli) {
-	//	b->_isActive = true;
-	//}
-	//for (auto b : _bullet_metalFatigue_patchouli) {
-	//	b->_isActive = true;
-	//}
-	//for (auto b : _bullet_silentSerena_patchouli) {
-	//	b->_isActive = true;
-	//}
-	//Shared< EnemyZakoBox> box = std::make_shared< EnemyZakoBox>();
 
-	//for (auto b : box->_straight_bullets_zakoBox) {
-	//	b->_isActive = true;
-	//}
-	//for (auto b : EnemyZakoBox::_homing_bullets_zakoBox) {
-	//	b->_isActive = true;
-	//}
-
+	switch (_STAGE_ID)
+	{
+	case 1:
+	{
+		for (auto b : _bullet_normal_patchouli) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_metalFatigue_patchouli) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_silentSerena_patchouli) {
+			b->_isActive = true;
+		}
+		break;
+	}
+	case 2:
+	{
+		for (auto b : _bullet_normal_cirno) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_icicleFall_cirno) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_perfectFreeze_cirno) {
+			b->_isActive = true;
+		}
+		break;
+	}
+	case 3:
+	{
+		for (auto b : _bullet_normal_suwako) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_ironRingOfMoriya_suwako) {
+			b->_isActive = true;
+		}
+		for (auto b : _bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+			b->_isActive = true;
+		}
+		break;
+	}
+	}
 }
+
 void ScenePlay::DeactivateAllEnemyBullets() {
 
-	//for (auto b : _bullet_normal_patchouli) {
-	//	b->_isActive = false;
-	//}
-	//for (auto b : _bullet_metalFatigue_patchouli) {
-	//	b->_isActive = false;
-	//}
-	//for (auto b : _bullet_silentSerena_patchouli) {
-	//	b->_isActive = false;
-	//}
-	//Shared< EnemyZakoBox> box = std::make_shared< EnemyZakoBox>();
-
-	//for (auto b : box->_straight_bullets_zakoBox) {
-	//	b->_isActive = false;
-	//}
-	//for (auto b : _homing_bullets_zakoBox) {
-	//	b->_isActive = false;
-	//}
+	switch (_STAGE_ID)
+	{
+	case 1:
+	{
+		for (auto b : _bullet_normal_patchouli) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_metalFatigue_patchouli) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_silentSerena_patchouli) {
+			b->_isActive = false;
+		}
+		break;
+	}
+	case 2:
+	{
+		for (auto b : _bullet_normal_cirno) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_icicleFall_cirno) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_perfectFreeze_cirno) {
+			b->_isActive = false;
+		}
+		break;
+	}
+	case 3:
+	{
+		for (auto b : _bullet_normal_suwako) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_ironRingOfMoriya_suwako) {
+			b->_isActive = false;
+		}
+		for (auto b : _bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+			b->_isActive = false;
+		}
+		break;
+	}
+	}
 }
-
 
 
 void ScenePlay::InitPlayersBombCount(const std::string& selected_difficulty)
@@ -162,32 +209,19 @@ void ScenePlay::InitPlayersBombCount(const std::string& selected_difficulty)
 }
 
 
-
 // 弾幕（ボスの弾）-----------------------------------------------------------------------------------------------------------------------------
 void ScenePlay::CheckDoInit_FirstStageBulletHellLists()
 {
 	if (_STAGE_ID != 1) return;
 
-	_bullet_normal_patchouli = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Patchouli);
-	for (auto& bullet : _bullet_normal_patchouli) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_; // 弾の初期生成位置
-	}
+	_bullet_normal_patchouli =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Patchouli);
 
-	_bullet_metalFatigue_patchouli = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::MetalFatigue_Patchouli);
-	for (auto& bullet : _bullet_metalFatigue_patchouli) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_metalFatigue_patchouli =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::MetalFatigue_Patchouli);
 
-	_bullet_silentSerena_patchouli = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::SilentSerena_Patchouli);
-	for (auto& bullet : _bullet_silentSerena_patchouli) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_silentSerena_patchouli =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::SilentSerena_Patchouli);
 }
 
 
@@ -213,8 +247,8 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 		for (auto blt : _bullet_normal_patchouli) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_normal_patchouli.size());
-		DrawFormatString(1000, 50, -1, "%s個 normal", s.c_str());
+		//std::string s = std::to_string(_bullet_normal_patchouli.size());
+		//DrawFormatString(1000, 50, -1, "%s個 normal", s.c_str());
 	}
 
 	if (_isUsingBullet_metalFatigue_patchouli) {
@@ -222,8 +256,8 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 		for (auto blt : _bullet_metalFatigue_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());
-		DrawFormatString(1000, 50, -1, "%s個 metalFatigue", s.c_str());
+		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());
+		//DrawFormatString(1000, 50, -1, "%s個 metalFatigue", s.c_str());
 	}
 
 	if (_isUsingBullet_silentSerena_patchouli) {
@@ -231,8 +265,8 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 		for (auto blt : _bullet_silentSerena_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_silentSerena_patchouli.size());
-		DrawFormatString(1000, 50, -1, "%s個 silentSerena", s.c_str());
+		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());
+		//DrawFormatString(1000, 50, -1, "%s個 silentSerena", s.c_str());
 	}
 }
 
@@ -280,26 +314,14 @@ void ScenePlay::CheckDoInit_SecondStageBulletHellLists()
 {
 	if (_STAGE_ID != 2) return;
 
-	_bullet_normal_cirno = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Cirno);
-	for (auto& bullet : _bullet_normal_cirno) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_normal_cirno =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Cirno);
 
-	_bullet_icicleFall_cirno = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::IcicleFall_Cirno);
-	for (auto& bullet : _bullet_icicleFall_cirno) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_icicleFall_cirno =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::IcicleFall_Cirno);
 
-	_bullet_perfectFreeze_cirno = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::Perfect_Freeze_Cirno);
-	for (auto& bullet : _bullet_perfectFreeze_cirno) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_perfectFreeze_cirno =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Perfect_Freeze_Cirno);
 }
 
 
@@ -324,8 +346,8 @@ void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 		for (auto blt : _bullet_normal_cirno) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_normal_cirno.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_normal_cirno.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
 	if (_isUsingBullet_icicleFall_cirno) {
@@ -333,8 +355,8 @@ void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 		for (auto blt : _bullet_icicleFall_cirno) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_icicleFall_cirno.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_icicleFall_cirno.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
 	if (_isUsingBullet_perfectFreeze_cirno) {
@@ -342,8 +364,8 @@ void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 		for (auto blt : _bullet_perfectFreeze_cirno) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_perfectFreeze_cirno.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_perfectFreeze_cirno.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 }
 
@@ -393,27 +415,14 @@ void ScenePlay::CheckDoInit_ThirdStageBulletHellLists() {
 
 	if (_STAGE_ID != 3) return;
 
-	_bullet_normal_suwako = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Suwako);
-	for (auto& bullet : _bullet_normal_suwako) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_; // 弾の初期生成位置
-	}
+	_bullet_normal_suwako =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Suwako);
 
-	_bullet_ironRingOfMoriya_suwako = _bltHellFactory->CreateBulletHell(BulletHell::TYPE::IronRingOfMoriya_Suwako);
-	for (auto& bullet : _bullet_ironRingOfMoriya_suwako) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
+	_bullet_ironRingOfMoriya_suwako =
+		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::IronRingOfMoriya_Suwako);
 
 	_bullet_keroChanStandsFirmAgainstTheStorm_suwako =
 		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::KeroChan_StandsFirm_AgainstTheStorm_Suwako);
-	for (auto& bullet : _bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
-		int id = bullet->_id;
-		SpawnedBossBulletInfo info;
-		info.originPos = bullet->_mesh->pos_;
-	}
 }
 
 
@@ -437,8 +446,8 @@ void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 		for (auto blt : _bullet_normal_suwako) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_normal_suwako.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_normal_suwako.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
 	if (_isUsingBullet_ironRingOfMoriya_suwako) {
@@ -446,8 +455,8 @@ void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 		for (auto blt : _bullet_ironRingOfMoriya_suwako) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_ironRingOfMoriya_suwako.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_ironRingOfMoriya_suwako.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
 	if (_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
@@ -455,8 +464,8 @@ void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 		for (auto blt : _bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		std::string s = std::to_string(_bullet_keroChanStandsFirmAgainstTheStorm_suwako.size());
-		DrawFormatString(1000, 50, -1, "%s個", s.c_str());
+		//std::string s = std::to_string(_bullet_keroChanStandsFirmAgainstTheStorm_suwako.size());
+		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 }
 
@@ -528,9 +537,10 @@ void ScenePlay::RenderEnemyRadarOnMiniMap() {
 		DrawCircleAA(
 			(float)std::clamp((int)screen_pos.x, miniMap_center_pos.x, 160),
 			(float)std::clamp((int)screen_pos.y, miniMap_center_pos.y, 660),
-			2, 10, GetColor(0, 255, 0));
+			2, 10, _radarColor);
 	}
 }
+
 
 void ScenePlay::RenderPauseMenu()
 {
@@ -593,7 +603,7 @@ void ScenePlay::Render() {
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// ミニマップ
-	DrawRotaGraph(miniMap_center_pos.x, miniMap_center_pos.y, 0.035, 0, miniMap_hdl, 1);
+	DrawRotaGraph(miniMap_center_pos.x, miniMap_center_pos.y, 0.035, 0, _miniMap_hdl, 1);
 	RenderEnemyRadarOnMiniMap();
 
 	RenderPauseMenu();
@@ -632,7 +642,7 @@ void ScenePlay::MoveToNextStage(const int stage, const std::string difficulty) {
 float ScenePlay::_showBeginText_timer;
 float ScenePlay::_deltaTime_ref;
 
-void ScenePlay::UpdateShowBeginTextTimer(float deltaTime)
+void ScenePlay::UpdateShowBeginTextTimer(const float deltaTime)
 {
 	_showBeginText_timer += deltaTime;
 

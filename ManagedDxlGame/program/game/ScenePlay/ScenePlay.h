@@ -17,7 +17,6 @@ class BulletHellFactory;
 class StraightBullet;
 class HomingBullet;
 
-struct SpawnedBossBulletInfo;
 
 class ScenePlay : public SceneBase
 {
@@ -44,13 +43,11 @@ public:
 	static void TurnOff_SecondStageBulletHellLists();
 	static void TurnOff_ThirdStageBulletHellLists();
 
-
 	static float GetDeltaTime() { return _deltaTime_ref; };
 
 private:
 
 	void SetDeltaTime(const float deltaTime) { _deltaTime_ref = deltaTime; };
-
 
 	// 1
 	void CheckDoRender_FirstStageBulletHellLists();
@@ -63,14 +60,13 @@ private:
 	void CheckDoUpdate_ThirdStageBulletHellLists();
 
 	void RenderBeginText();
-	void UpdateShowBeginTextTimer(float deltaTime);
+	void UpdateShowBeginTextTimer(const float deltaTime);
 	void InitPlayersBombCount(const std::string& selected_difficulty);
 	void RenderEnemyRadarOnMiniMap();
 	void RenderPauseMenu();
 
 	void Render() override;
 	void Update(const float deltaTime) override;
-
 
 public:
 
@@ -133,18 +129,17 @@ public:
 
 	static bool _isShowBeginGameText;
 
+	static int _STAGE_ID;
 
 private:
 
 	int _bgAlpha_when_call_pauseMenu = 255;
+	int _radarColor = GetColor(0, 255, 0);
+	int _miniMap_hdl{};
 
 	static float _showBeginText_timer;
 
 	static float _deltaTime_ref;
-
-	int miniMap_hdl{};
-	int _STAGE_ID;
-
 
 	tnl::Vector2i miniMap_center_pos = { 120,600 };
 };
