@@ -10,15 +10,16 @@ class Player
 {
 public:
 
-	Player();
+	Player(){}
 	explicit Player(const Shared<FreeLookCamera> camera_ref);
 
 	// ƒvƒŒƒCƒ„[ŠÖŒW
-	void SetPlayerRef(const Shared<Player> player_ref) { _player_ref = player_ref; }
+	void SetPlayerRef(const Shared<Player>& player_ref) { _player_ref = player_ref; }
 	void SetBombCount(const int count) { _current_bomb_stock_count = count; }
-	bool DecreaseHP(int damage);
+	bool DecreaseHP(const int damage);
 	const tnl::Vector3 GetPos() const { return _mesh->pos_; }
 	void SetPos(const tnl::Vector3 pos) { _mesh->pos_ = pos; }
+	static void PlayDamageHitSE();
 
 	// “GŠÖŒW
 	void SetEnemyZakoListRef(const std::vector<Shared<EnemyZakoBase>>& enemy_list_ref);
@@ -52,6 +53,7 @@ private:
 	// ƒJƒƒ‰ŠÖŒW
 	void AssignTargetEnemy_ForDarkSoulsCamera(tnl::Vector3& target_enemy_pos);
 	void ActivateDarkSoulsCamera();
+	void ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3& target_enemy_pos);
 	void ControlCameraWithoutEnemyFocus();
 	void NormalizeCameraSpeed(const float speed);
 	void UpdateStraightBullet(float delta_time);
@@ -90,6 +92,7 @@ public:
 private:
 
 	int   _enemy_index{};
+	static int   _getDamageSE_hdl;
 
 	float _forward_velocity = 1.0f;
 
