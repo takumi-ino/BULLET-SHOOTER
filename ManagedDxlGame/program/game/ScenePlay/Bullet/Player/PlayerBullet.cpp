@@ -1,12 +1,22 @@
-#include "PlayerBullet.h"
 #include "../../Character/Player/Player.h"
-#include "../../../../dxlib_ext/dxlib_ext.h"
+#include "PlayerBullet.h"
 
-PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction, Shared<Player> player_ref)  {
 
-	_player_ref = player_ref;
-	_mesh = dxe::Mesh::CreateSphereMV(10);
-	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/colorTexture/red.bmp"));
+float PlayerBullet::_bulletPowerRate;
+
+
+PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction, const PlayerBullet::COLOR color, const float size)  {
+
+	_mesh = dxe::Mesh::CreateSphereMV(size);
+
+	std::map<PlayerBullet::COLOR, std::string> colorMap = {
+
+	   {PlayerBullet::COLOR::Red,    "graphics/colorTexture/red.bmp"},
+	   {PlayerBullet::COLOR::White,  "graphics/colorTexture/white.bmp"},
+	};
+
+
+	_mesh->setTexture(dxe::Texture::CreateFromFile(colorMap[color]));
 	_mesh->pos_ = spawn_pos;
 	_moveDirection = direction; 
 	_moveDirection.normalize();
@@ -15,7 +25,7 @@ PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& di
 
 
 void PlayerBullet::Render(Shared<dxe::Camera> _mainCamera) {
-
+	
 	_mesh->render(_mainCamera);
 }
 
@@ -32,6 +42,5 @@ void PlayerBullet::Update(float delta_time) {
 
 	float current_distance = sqrt(dx * dx + dy * dy + dz * dz);
 
-	// ”ò‹——£‚ª900‚ð’´‚¦‚½‚çÁ‹Ž
 	if (abs(current_distance) > 1200) _isActive = false;	
 }

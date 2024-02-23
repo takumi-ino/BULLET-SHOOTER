@@ -2,6 +2,7 @@
 #include "../../../DxLibEngine.h"
 
 class PlayerBullet;
+class Gunport;
 class EnemyZakoBase;
 class EnemyBossBase;
 class FreeLookCamera;
@@ -10,16 +11,18 @@ class Player
 {
 public:
 
-	Player(){}
+	Player() {}
 	explicit Player(const Shared<FreeLookCamera> camera_ref);
 
 	// ÉvÉåÉCÉÑÅ[ä÷åW
 	void SetPlayerRef(const Shared<Player>& player_ref) { _player_ref = player_ref; }
-	void SetBombCount(const int count) { _current_bomb_stock_count = count; }
+	void SetBombCount(const int count) { _currentBomb_stockCount = count; }
 	bool DecreaseHP(const int damage);
 	const tnl::Vector3 GetPos() const { return _mesh->pos_; }
 	void SetPos(const tnl::Vector3 pos) { _mesh->pos_ = pos; }
 	static void PlayDamageHitSE();
+
+	const tnl::Vector3& GetPlayerPosition() const { return _player_ref->_mesh->pos_; }
 
 	// ìGä÷åW
 	void SetEnemyZakoListRef(const std::vector<Shared<EnemyZakoBase>>& enemy_list_ref);
@@ -36,19 +39,28 @@ private:
 	void ControlPlayerMoveByInput(const float delta_time);
 	void AdjustPlayerVelocity();
 	void ControlRotationByPadOrMouse();
-	void RenderPlayerHp();
 	void WatchInvincibleTimer(const float delta_time);
-	void ShotPlayerBullet();
+	void ShotPlayerBullet(const float deltaTime);
+	void ShotGunportBullet();
 	void UseBomb();
 	void ValidateBombEffect();
 	void InvalidateBombEffect(const float delta_time);
 	void RenderBombRemainCount();
+	void RenderBulletPowerRate();
+	void RenderPlayerHp();
+	void RenderGunport(const Shared<FreeLookCamera> camera);
+	void UpdateGunport();
+	void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords);
+	void UpdateStraightBullet(float delta_time);
+	bool IsShooting();
 
 	// ìGä÷åW
 	const tnl::Vector3 GetTargetsScreenCoordinates(const float& x, const float& y, const float& z);
 	void ChangeTarget_ByMouseWheel();
 	void RenderFollowPointer();
 	bool IsEnemyInCapturableRange();
+	const tnl::Vector3& GetEnemyPosition();
+
 
 	// ÉJÉÅÉâä÷åW
 	void AssignTargetEnemy_ForDarkSoulsCamera(tnl::Vector3& target_enemy_pos);
@@ -56,52 +68,62 @@ private:
 	void ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3& target_enemy_pos);
 	void ControlCameraWithoutEnemyFocus();
 	void NormalizeCameraSpeed(const float speed);
-	void UpdateStraightBullet(float delta_time);
+
 
 public:
 
-	Shared<dxe::Mesh> _mesh = nullptr;
-	std::list<Shared<PlayerBullet>> _straight_bullets_player;
+	Shared<dxe::Mesh>                  _mesh = nullptr;
 
-	static Shared<dxe::Particle> _bomb_particle;
+	std::list<Shared<PlayerBullet>>    _straightBullets_player{};
+
+	std::vector<Shared<Gunport>>       _gunportVec{};
+
+	static Shared<dxe::Particle>       _bombParticle;
 
 private:
 
-	Shared<Player> _player_ref = nullptr;
-	Shared<FreeLookCamera> _mainCamera_ref = nullptr;
+	Shared<Gunport>                    _playerGunport = nullptr;
 
-	Shared<EnemyZakoBase> _enemyZako_ref = nullptr;
-	Shared<EnemyBossBase> _enemyBoss_ref = nullptr;
+	Shared<Player>                     _player_ref = nullptr;
+	Shared<FreeLookCamera>             _mainCamera_ref = nullptr;
 
-	std::vector<Shared<EnemyZakoBase>> _enemyZako_list_ref{};
-	std::vector<Shared<EnemyBossBase>> _enemyBoss_list_ref{};
+	Shared<EnemyZakoBase>              _enemyZako_ref = nullptr;
+	Shared<EnemyBossBase>              _enemyBoss_ref = nullptr;
+
+	std::vector<Shared<EnemyZakoBase>> _enemyZakoList_ref{};
+	std::vector<Shared<EnemyBossBase>> _enemyBossList_ref{};
 
 public:
 
-	tnl::Vector3 _collide_size{};
-	static bool _isInvincible;
+	tnl::Vector3 _collideSize{};
+	static bool  _isInvincible;
 
 	static int   _hp;
 	static int   _MAX_HP;
 	static int   _at;
 	static int   _def;
+	static int   _currentBomb_stockCount;
 	static float _moveSpeed;
-
-	static int  _current_bomb_stock_count;
 
 private:
 
-	int   _enemy_index{};
+
+
+	std::vector<Shared<EnemyZakoBase>>::iterator _it_zako_ref{};
+	std::vector<Shared<EnemyBossBase>>::iterator _it_boss_ref{};
+	tnl::Vector3 _enemyPos_ref{};
+
+	int          _enemyIndex{};
 	static int   _getDamageSE_hdl;
 
-	float _forward_velocity = 1.0f;
+	float        _forwardVelocity = 1.0f;
 
-	bool _isDead{};
+	bool         _isDead{};
 
-	static float _invincible_timer;
-	const float _INVINCIBLE_TIME_LIMIT = 3.0f;
+	static float _invincibleTimer;
+	const float  _INVINCIBLE_TIME_LIMIT = 3.0f;
 
-	static float _bomb_timer;
+	static float _bombTimer;
 
 
 	float centroid_radius_ = 100; // èdêS
