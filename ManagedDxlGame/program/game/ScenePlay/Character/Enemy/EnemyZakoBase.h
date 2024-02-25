@@ -1,13 +1,15 @@
 #pragma once
+#include <random>
 #include "EnemyBase.h"
 
 class Player;
 class CsvLoader;
-class EnemyBullet;
 class EnemyManager;
 class StraightBullet;
 class HomingBullet;
+class EnemyBullet;
 class BulletFactory;
+class Collision;
 struct EnemyZakoInfo;
 
 class EnemyZakoBase : public EnemyBase
@@ -25,37 +27,54 @@ public:
 
 	EnemyZakoBase() {}
 
-	EnemyZakoBase(const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera);
+	EnemyZakoBase(
+		const EnemyZakoInfo& data, 
+		const Shared<Player>& player,
+		const Shared<dxe::Camera>& camera,
+		const Shared<Collision>& _collision
+	);
 
 	bool DecreaseHP(int damage, Shared<dxe::Camera> camera);
 
-	virtual bool ShowHpGage_EnemyZako();
+	bool ShowHpGage_EnemyZako();
 
 	virtual void InitBulletFactoryInstance() {}
 
+	void Render(Shared<dxe::Camera> camera) override;
+	bool Update(const float delta_time) override;
+	
 protected:
 
 	// 直行弾
-	virtual void ShotStraightBullet(std::list<Shared<EnemyBullet>> bullet) {};
-	virtual void UpdateStraightBullet(const float delta_time) {}
-	virtual void UpdateHomingBullet(const float delta_time) {}
-	virtual const std::list<Shared<StraightBullet>>& GetStraightBullets() { return std::list<Shared<StraightBullet>>(); }
+	void ShotStraightBullet(const float& delta_time);
+	void UpdateStraightBullet(const float delta_time);
+	void ReloadStraightBulletByTimer(const float& delta_time);
 
-	// 追跡弾
-	virtual void ShotHomingBullet() {}
+	// 追尾弾
+	void ShotHomingBullet(const float& delta_time);
+	void ReloadHomingBulletByTimer(const float& delta_time);
+	void UpdateHomingBullet(const float delta_time);
+
+	void AttackPlayer(const float& delta_time);
 
 	void SearchPlayerMovementState(const float delta_time);
 	void MoveToRandomInvestigatePos(const float& delta_time);
 
 	void ChasePlayer(const float delta_time);
+	void DoRoutineMoves(const float& delta_time);
+
+private:
+
+	const int GetIdleDistance() const { return _IDLE_DISTANCE; }
+	const int GetAttackDistance() const { return _ATTACK_DISTANCE; }
 
 public:
 
-	std::list<Shared<EnemyZakoBase>>       _enemy_list_ref{};
+	std::list<Shared<EnemyZakoBase>>       _enemyList_ref{};
 
 protected:
 
-	Shared<EnemyManager>                   _enemyManager = nullptr;
+	Shared<Collision>                      _collision_ref = nullptr;
 
 	Shared<BulletFactory>                  _bulletFactory = nullptr;
 
@@ -69,41 +88,59 @@ public:
 
 	static Shared<dxe::Particle> _explode_particle;
 
-	bool     _isAllDead = false; //敵クラス(最大生成数分)の死亡フラグ
-	bool     _canShotStraightBullet = true;   // 直行弾が撃てる状態か
-	bool     _canShotHomingBullet = true;   // 直行弾が撃てるようになったか
-	bool     _isReachedToInvestigatePos = false;
+	bool      _isAllDead = false; //敵クラス(最大生成数分)の死亡フラグ
+	bool      _canShot_straightBullet = true;   // 直行弾が撃てる状態か
+	bool      _canShot_HomingBullet = true;   // 直行弾が撃てるようになったか
+	bool      _isReached_toInvestigatePos = false;
 
 	static bool     _isNoticedPlayer;
 
-	float   _timeFrom_noticedPlayer{};
+	float       _timeCountFrom_noticedPlayer{};
 
 	// CSVからロード-----------------------
-	int      _hp{};
-	int      _maxTotalEnemySpawnCount{};
-	int      _bulletFireInterval{};
-	int      _bulletMoveSpeed{};
-	float    _reloadTimeInterval{};
+	int         _hp{};
+	int         _maxTotalEnemy_SpawnCount{};
+	int         _bullet_FireInterval{};
+	float       _bullet_MoveSpeed{};
+	float       _bullet_reloadTimeInterval{};
 
 protected:
 
-	int   _shotSE_hdl{};
+	int         _shotSE_hdl{};
+		       
+	int         _straightBullet_count{};
+	int         _homingBullet_count{};
+		      
+	float       _randomInvestigateRange_x{};
+	float       _randomInvestigateRange_y{};
+	float       _randomInvestigateRange_z{};
+		       
+	float       _minTimeToReach = 2.0f; // 弾のプレイヤーまでの最小到達時間
+	float       _maxTimeToReach = 3.0f; // 弾のプレイヤーまでの最大到達時間
+	float       _bulletTurnDelayRate{};
 
-	int   _straight_bullet_count{};
-	int   _homing_bullet_count{};
+	float       _IDLE_DISTANCE{};       // 直接の使用は禁止  Getterを通して値を取得する
+	float       _ATTACK_DISTANCE{};     // 直接の使用は禁止  Getterを通して値を取得する
+	float       _NOTICE_LIMIT_DURATION{};
+	float       _CHANGE_NEXT_BEHAVE_DURATION{};
+		
+	bool        _isShotStraightBullet = true;
+	bool        _isShotHomingBullet = false;
+	bool        _isAttacking = false;
 
-	float _randomInvestigateRange_x{};
-	float _randomInvestigateRange_y{};
-	float _randomInvestigateRange_z{};
-
-	bool  _isShotStraightBullet = true;
-	bool  _isShotHomingBullet = false;
-
-	tnl::Vector3 prev_pos;
 	// 巡回状態のときに目指す地点
 	tnl::Vector3 _investigatePos{};
 
 private:
 
-	bool _isTurning = false;
+	std::random_device mt;
+
+	float       _reloadStraightBullet_timeCounter{}; // リロード時間を追跡
+	float       _reloadHomingBullet_timeCounter{};
+
+	const float _ROTATION_MAX_RANGE = 180.0f;
+	const float _STRAIGHTBULLET_LIFETIME_LIMIT = 3.0f;
+	const float _HOMINGBULLET_LIFETIME_LIMIT = 5.0f;
+
+	bool        _isTurning = false;
 };
