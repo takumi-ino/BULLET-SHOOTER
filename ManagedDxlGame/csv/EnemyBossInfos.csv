@@ -1,0 +1,4 @@
+ID,Stage,Scale,Name,Easy_HP,Normal_HP,Hard_HP,Lunatic_HP,Easy_MaxBulletSpawnCount,Normal_MaxBulletSpawnCount,Hard_MaxBulletSpawnCount,Luntaic_MaxBulletSpawnCount,Easy_CharaMoveSpeed,Normal_CharaMoveSpeed,Hard_CharaMoveSpeed,Lunatic_CharaMoveSpeed,FirstSpawnPos
+0,1,50,Patchouli Knowledge,100,450,900,1500,10,20,30,40,125,150,175,200,"0,0,0"
+1,2,50,Cirno,400,450,900,1500,10,20,30,40,125,150,175,200,"0,0,0"
+2,3,50,Moriya Suwako ,100,450,900,1500,10,20,30,40,125,150,175,200,"0,0,0"

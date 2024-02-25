@@ -1,0 +1,4 @@
+ID,Type,Easy_MaxBulletSpawnCount,Normal_MaxBulletSpawnCount,Hard_MaxBulletSpawnCount,Luntaic_MaxBulletSpawnCount,Easy_BulletSpawnRate,Normal_BulletSpawnRate,Hard_BulletSpawnRate,Luntaic_BulletSpawnRate
+0,サイレント・セレナ,5,10,15,20,5,10,15,20
+1,パーフェクト・フリーズ,4,10,15,20,4,10,15,20
+2,ケロちゃん風雨に負けず,7,10,15,20,7,10,15,20
