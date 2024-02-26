@@ -3,9 +3,10 @@
 
 class PlayerBullet;
 class Gunport;
-class EnemyZakoBase;
-class EnemyBossBase;
+class EnemyManager;
 class FreeLookCamera;
+class CsvLoader;
+
 
 class Player
 {
@@ -14,118 +15,156 @@ public:
 	Player() {}
 	explicit Player(const Shared<FreeLookCamera> camera_ref);
 
-	// プレイヤー関係
-	void SetPlayerRef(const Shared<Player>& player_ref) { _player_ref = player_ref; }
-	void SetBombCount(const int count) { _currentBomb_stockCount = count; }
-	bool DecreaseHP(const int damage);
+	~Player() { DeleteSoundMem(_getDamageSE_hdl); }
+		
+
+	// Init--------------------------------------------------------------------------------------------
+	void InitBombCount(const int count) { _currentBomb_stockCount = count; }
+
+	// Getter--------------------------------------------------------------------------------------------
+	int GetHP() const { return _hp; }
+	int GetMaxHP() const { return _MAX_HP; }
+	int GetAT() const { return _at; }
+	int GetDEF() const { return _def; }
 	const tnl::Vector3 GetPos() const { return _mesh->pos_; }
-	void SetPos(const tnl::Vector3 pos) { _mesh->pos_ = pos; }
-	static void PlayDamageHitSE();
+	bool GetIsTriggeredBombEffect() const { return _isTriggered_playersBombEffect; }
 
-	const tnl::Vector3& GetPlayerPosition() const { return _player_ref->_mesh->pos_; }
+	// Setter--------------------------------------------------------------------------------------------
+	void SetHP(int val) { _hp = val; }
+	void SetIsInvincible(const bool flag) { _isInvincible = flag; }
+	void SetEnemyManagerRef(const Shared<EnemyManager>& enemyMgr) { _enemyManager_ref = enemyMgr; };
+	void SetPlayerRef(const Shared<Player>& player_ref) { _player_ref = player_ref; }
 
-	// 敵関係
-	void SetEnemyZakoListRef(const std::vector<Shared<EnemyZakoBase>>& enemy_list_ref);
-	void SetEnemyBossListRef(const std::vector<Shared<EnemyBossBase>>& enemyBoss_ref);
-	void EraseEnemyZakoListRef(Shared<EnemyZakoBase>& enemy_list_ref);
-	void EraseEnemyBossListRef(Shared<EnemyBossBase>& enemyBoss_ref);
+	// UpdateStatus--------------------------------------------------------------------------------------------
+	void HealHP(int heal) { _hp += heal; }
+	bool DecreaseHP(int damage);
+	void AddAT(int val) { _at += val; }
+	void AddDEF(int val) { _def += val; }
+	void AddBombStockCount() { _currentBomb_stockCount++; }
+	void AddSpeed(int val) { _moveSpeed += val; }
+
+	// Others--------------------------------------------------------------------------------------------		
+	void PlayDamageHitSE();
 
 	void Update(const float delta_time);
 	void Render(const Shared<FreeLookCamera> playerCamera);
 
 private:
 
-	// プレイヤー関係
-	void ControlPlayerMoveByInput(const float delta_time);
-	void AdjustPlayerVelocity();
-	void ControlRotationByPadOrMouse();
-	void WatchInvincibleTimer(const float delta_time);
-	void ShotPlayerBullet(const float deltaTime);
+	// プレイヤー－-----------------------－-----------------------－------------------------------
+	void InitPlayerStatus(const std::string difficulty);       // HP、AT、DEFなどのステータス初期化
+	void RenderPlayerHp();
+	void WatchInvincibleTimer(const float delta_time);         // 無敵時間
+	void TriggerInvincible(const Shared<FreeLookCamera>& camera);
+
+	void ControlPlayerMoveByInput(const float delta_time);   // 移動操作
+	void AdjustPlayerVelocity();                             // 速度調整
+	void ControlRotationByPadOrMouse();                      // 視点操作
+
+	bool IsShooting() {
+		return 
+			tnl::Input::IsMouseDown(eMouse::LEFT) ||
+			tnl::Input::IsPadDown(ePad::KEY_1);
+	}
+
+	void ShotPlayerBullet(const float deltaTime);            // 弾
+	void UpdateStraightBullet(float delta_time);
+	void RenderBulletPowerRate();
+	const tnl::Vector3& GetBulletMoveDirection();
+
+	void RenderGunport(const Shared<FreeLookCamera> camera); // 連装砲
+	void UpdateGunport();
+	void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords);
 	void ShotGunportBullet();
-	void UseBomb();
+
+	void UseBomb();                                          // ボム
 	void ValidateBombEffect();
 	void InvalidateBombEffect(const float delta_time);
 	void RenderBombRemainCount();
-	void RenderBulletPowerRate();
-	void RenderPlayerHp();
-	void RenderGunport(const Shared<FreeLookCamera> camera);
-	void UpdateGunport();
-	void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords);
-	void UpdateStraightBullet(float delta_time);
-	bool IsShooting();
 
-	// 敵関係
-	const tnl::Vector3 GetTargetsScreenCoordinates(const float& x, const float& y, const float& z);
-	void ChangeTarget_ByMouseWheel();
+	void ChangeTarget_ByMouseWheel();	                     // 敵位置
 	void RenderFollowPointer();
 	bool IsEnemyInCapturableRange();
-	const tnl::Vector3& GetEnemyPosition();
+	void AssignEnemyPosition(tnl::Vector3& enemy_pos);
 
-
-	// カメラ関係
-	void AssignTargetEnemy_ForDarkSoulsCamera(tnl::Vector3& target_enemy_pos);
+	// カメラ－-----------------------－-----------------------－----------------------－-----------------------－--
 	void ActivateDarkSoulsCamera();
 	void ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3& target_enemy_pos);
 	void ControlCameraWithoutEnemyFocus();
 	void NormalizeCameraSpeed(const float speed);
 
-
 public:
 
-	Shared<dxe::Mesh>                  _mesh = nullptr;
+	Shared<dxe::Mesh>               _mesh = nullptr;
 
-	std::list<Shared<PlayerBullet>>    _straightBullets_player{};
+	std::list<Shared<PlayerBullet>> _straightBullets_player{};
 
-	std::vector<Shared<Gunport>>       _gunportVec{};
+	std::vector<Shared<Gunport>>    _gunportVec{};
 
-	static Shared<dxe::Particle>       _bombParticle;
+	static Shared<dxe::Particle>    _bombParticle;
 
 private:
 
-	Shared<Gunport>                    _playerGunport = nullptr;
+	Shared<EnemyManager>            _enemyManager_ref = nullptr;
 
-	Shared<Player>                     _player_ref = nullptr;
-	Shared<FreeLookCamera>             _mainCamera_ref = nullptr;
+	Shared<Gunport>                 _playerGunport = nullptr;
 
-	Shared<EnemyZakoBase>              _enemyZako_ref = nullptr;
-	Shared<EnemyBossBase>              _enemyBoss_ref = nullptr;
+	Shared<CsvLoader>               _csvLoader = nullptr;
 
-	std::vector<Shared<EnemyZakoBase>> _enemyZakoList_ref{};
-	std::vector<Shared<EnemyBossBase>> _enemyBossList_ref{};
+	Shared<Player>                  _player_ref = nullptr;
+
+	Shared<FreeLookCamera>          _mainCamera_ref = nullptr;
 
 public:
 
-	tnl::Vector3 _collideSize{};
-	static bool  _isInvincible;
-
-	static int   _hp;
-	static int   _MAX_HP;
-	static int   _at;
-	static int   _def;
-	static int   _currentBomb_stockCount;
-	static float _moveSpeed;
+	tnl::Vector3 _collideSize{ 20, 20, 20 };
 
 private:
 
+	// プレイヤーステータス
+	int                _hp{};                      // CSV
+	int                _MAX_HP{};
+	int                _at{};                      // CSV
+	int                _def{};                     // CSV
+	float              _moveSpeed{ 0.4f };
+	float              _forwardVelocity{ 150.0f };
+	float              _hp_posX{ 60 };
+	float              _hp_posY{ 50 };
+	const tnl::Vector3 _START_POSITION{ 0, 100, -300 };
+	bool               _isDead{};
 
+	// ボム
+	int          _currentBomb_stockCount{};
+	float        _bombTimer{};
+	const float  _BOMBEFFECT_TIME_LIMIT{ 3.0f };
+	bool         _isTriggered_playersBombEffect{}; // 描画フラグ
 
-	std::vector<Shared<EnemyZakoBase>>::iterator _it_zako_ref{};
-	std::vector<Shared<EnemyBossBase>>::iterator _it_boss_ref{};
-	tnl::Vector3 _enemyPos_ref{};
+	// 無敵時間
+	float        _invincibleTimer{};
+	const float  _INVINCIBLE_TIME_LIMIT{ 3.0f };
+	bool         _isInvincible = false;
 
-	int          _enemyIndex{};
-	static int   _getDamageSE_hdl;
+	// ダメージSE	
+	int          _getDamageSE_hdl{};
 
-	float        _forwardVelocity = 1.0f;
+	// 敵情報　
+	int          _enemyIndex{}; // レーダーポインター使用時に使用
+	float        _capturableEnemyRange{ 500.0f };
 
-	bool         _isDead{};
+	// カメラ
+	const tnl::Vector3 _DEFAULT_CAMERA_POSITION{ 0, 100, -150 };
+	const tnl::Vector3 _CAMERA_OFFSET{ 0, -50, 20 };
 
-	static float _invincibleTimer;
-	const float  _INVINCIBLE_TIME_LIMIT = 3.0f;
+	// 視点操作
+	float _viewpoint_lerpRate_h{ 0.05f };
+	float _viewpoint_lerpRate_v{ 0.01f };
 
-	static float _bombTimer;
+	float _cameraMove_delayRate{ 0.05f };
 
+	// プレイヤーとの距離のオフセット
+	float _distance_offset{ 300.0f };
 
+	// プレイヤー操作
 	float centroid_radius_ = 100; // 重心
 	float mass_ = 100;            // 質量
 	float friction_ = 0.6f;       // 摩擦
