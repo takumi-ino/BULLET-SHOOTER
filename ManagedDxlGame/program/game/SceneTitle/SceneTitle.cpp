@@ -14,7 +14,7 @@ SceneTitle::SceneTitle() {
 	_screenEffect->loadStatus("screenEffect/titleSceneEffect.bin");
 
 	_backGround_hdl = LoadGraph("graphics/Scene/titleBackGround.png");
-	_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo_star.png");
+	_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo.png");
 
 	_tapSE_hdl = LoadSoundMem("sound/se/tap.mp3");
 
@@ -30,12 +30,12 @@ void SceneTitle:: Render() {
 	_screenEffect->renderBegin();
 
 	// ”wŒi‰æ‘œ
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 80);
-	DrawRotaGraph(640, 250, 1, 0, _backGround_hdl, true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
+	DrawRotaGraph(_BACKGROUND_POS_X, _BACKGROUND_POS_Y, 1, 0, _backGround_hdl, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// ƒƒS
-	DrawRotaGraph(630, 230, 1.4f, 0, _titleLogo_hdl, true);
+	DrawRotaGraph(_TITLELOGO_POS_X, _TITLELOGO_POS_Y, _TITLELOGO_EXTEND_RATE, 0, _titleLogo_hdl, true);
 
 	_screenEffect->renderEnd();
 	_shadowMap->reserveEnd();
@@ -47,55 +47,30 @@ void SceneTitle:: Render() {
 }
 
 
-void SceneTitle::Update(float deltaTime) {
 
-	_sequence.update(deltaTime);
-
-	GameStartFadeOut(deltaTime);
-	
-	MakeBackGround_MonoTransition(deltaTime);
-
-	MakeTitleLogo_FlushEffect(deltaTime);
-}
-
-
-
-void SceneTitle::MakeTitleLogo_FlushEffect(float deltaTime)
+void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime)
 {
-	trans_time_logo_lights += deltaTime;
+	_transTime_logoLights += deltaTime;
 
-	//@tnl::SingleOscillationy“à‚Å
+	// tnl::SingleOscillationy“à‚Å
 	// U“®ŠJŽnˆÊ’u‚É + 1.5f‚Ì•ÏX‚ð‰Á‚¦‚Ä‚¢‚é‚½‚ß‘¼‚ÌêŠ‚ÅŽg—p‚·‚éÛ‚É‚Í’ˆÓ
-	float bloom = tnl::SingleOscillationy(tnl::eOscStart::STOK, 0, 1.3f, trans_time_logo_lights);
-	_screenEffect->setBloomThreshold(bloom * 70);
+	float bloom = tnl::SingleOscillationy(tnl::eOscStart::STOK, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_logoLights);
+
+	_screenEffect->setBloomThreshold(bloom * _TITLELOGO_EFFECT_OSCILLATE_SPEED);
 }
 
 
 
-void SceneTitle::MakeBackGround_MonoTransition(float deltaTime)
+void SceneTitle::MakeMonoTransition_BackGround(float deltaTime)
 {
-	trans_time_cb += deltaTime;
-	trans_time_cr -= deltaTime;
+	_transTime_cb += deltaTime;
+	_transTime_cr -= deltaTime;
 
-	float cb = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, 1.25f, trans_time_cb);
-	float cr = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, 1.25f, trans_time_cr);
+	float cb = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_cb);
+	float cr = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_cr);
 
-	_screenEffect->setMonoCb(cb * 30);
-	_screenEffect->setMonoCr(cr * 30);
-}
-
-
-
-void SceneTitle::GameStartFadeOut(float deltaTime)
-{
-	_blur_timer += deltaTime;
-	if (_blur_timer >= 0.125f) {
-
-		_blur_alpha -= (_sequence.getProgressTime() / 0.01f * 1.0f);
-		_blur_timer = 0.0f;
-	}
-	if (_blur_alpha <= 0) _blur_alpha = 0;
-	_screenEffect->setBlurAlpha(_blur_alpha);
+	_screenEffect->setMonoCb(cb * _BACKGROUND_EFFECT_OSCILLATE_SPEED);
+	_screenEffect->setMonoCr(cr * _BACKGROUND_EFFECT_OSCILLATE_SPEED);
 }
 
 
@@ -111,4 +86,15 @@ bool SceneTitle::SeqIdle(float deltaTime) {
 		mgr->ChangeScene(new SceneSelectDifficulty());
 	}
 	return true;
+}
+
+
+
+void SceneTitle::Update(float deltaTime) {
+
+	_sequence.update(deltaTime);
+
+	MakeMonoTransition_BackGround(deltaTime);
+
+	MakeFlushEffect_TitleLogo(deltaTime);
 }

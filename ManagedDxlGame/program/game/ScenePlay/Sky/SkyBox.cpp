@@ -1,14 +1,15 @@
-#include "SkyBox.h"
+#include "../game/ScenePlay/ScenePlay.h"
 #include "../Camera/FreeLookCamera.h"
+#include "SkyBox.h"
 
-SkyBox::SkyBox(int stage_id) {
+SkyBox::SkyBox() {
 
 	ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f));
 	SetDefaultLightParameter("directional_light_parameter.bin");
 
 	skybox = dxe::Mesh::CreateCubeMV(50000, 20, 20);
 
-	switch (stage_id)
+	switch (ScenePlay::GetStageID())
 	{
 	case 1:
 		skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_c.png"));

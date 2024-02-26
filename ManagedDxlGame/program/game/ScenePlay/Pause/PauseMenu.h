@@ -1,15 +1,15 @@
 #pragma once
+#include "../game/DxLibEngine.h"
 
 class ScenePlay;
-
-
+class Player;
 
 class PauseMenu
 {
 public:
 
 	PauseMenu(){}
-	PauseMenu(const int stage_id, const std::string level);
+	PauseMenu(const Shared<Player>& player);
 
 	void Update();
 	void Render();
@@ -24,9 +24,12 @@ private:
 
 	void PickPauseMenuItemByInput();
 
+	void ResetGame();
+
 private:
 
 	Shared<ScenePlay> _scenePlay = nullptr;
+	Shared<Player>    _player_ref = nullptr;
 
 public:
 
@@ -34,12 +37,8 @@ public:
 
 private:
 
-	int MENU_INDEX_COUNT = 4;
-
-	int _menuIndex{};
-	int _currentStage{};
-
-	bool _isShowConfigInfo = false;
-
-	std::string _selectedLevel{};
+	int         _MENU_INDEX_COUNT = 4;		        
+	int         _menuIndex{};
+		        
+	bool        _isShowConfigInfo = false;
 };

@@ -1,27 +1,25 @@
 #include "EventNoticeText.h"
 
-std::deque<Shared<EventNoticeText>> EventNoticeText::_message_queue;
+std::deque<Shared<EventNoticeText>> EventNoticeText::_messageQueue;
 
-
-EventNoticeText::EventNoticeText(const std::string text, const int color, const int fontSize) {
+EventNoticeText::EventNoticeText(const std::string text, const int color, const int fontSize, const int margin) 
+ : _startTextPos_X(60), _startTextPos_Y(400), _duration(10.0f) {
 
 	_color = color;
 	_fontSize = fontSize;
 	_messageText = text;
+	_margin = margin;
 }
 
-bool EventNoticeText::IsExpired() const {
-
-	return _duration <= 0.0f;
-}
 
 void EventNoticeText::Render(int index) {
 
 	SetFontSize(_fontSize);
-	int y = 250 - index * 30;
+	int y = _startTextPos_Y - index * _margin;
 
-	DrawFormatString(90, y, _color, _messageText.c_str());
+	DrawFormatString(_startTextPos_X, y, _color, _messageText.c_str());
 }
+
 
 void EventNoticeText::Update(const float deltaTime) {
 

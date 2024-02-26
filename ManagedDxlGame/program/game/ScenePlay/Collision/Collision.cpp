@@ -19,7 +19,7 @@ bool Collision::CheckCollision_PlayerBulletAndEnemyZako(const Shared<PlayerBulle
 
 	if (!enemy->_mesh) return false;
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, enemy->_mesh->pos_, enemy->_collide_size)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, enemy->_mesh->pos_, enemy->_collideSize)) {
 		return true;
 	}
 	return false;
@@ -30,37 +30,37 @@ bool Collision::CheckCollision_PlayerBulletAndEnemyBoss(const Shared<PlayerBulle
 
 	if (!enemy->_mesh) return false;
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, enemy->_mesh->pos_, enemy->_collide_size)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, enemy->_mesh->pos_, enemy->_collideSize)) {
 		return true;
 	}
 	return false;
 }
 
 
-bool Collision::CheckCollision_EnemyStraightBulletAndPlayer(const Shared<StraightBullet> bullet, const Shared<Player> player) {
+bool Collision::CheckCollision_EnemyStraightBulletAndPlayer(const Shared<StraightBullet>& bullet, const Shared<Player>& player) {
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collide_size)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collideSize)) {
 		return true;
 	}
 	return false;
 }
 
 
-bool Collision::CheckCollision_EnemyHomingBulletAndPlayer(const Shared<HomingBullet> bullet, const Shared<Player> player) {
+bool Collision::CheckCollision_EnemyHomingBulletAndPlayer(const Shared<HomingBullet>& bullet, const Shared<Player>& player) {
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collide_size)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collideSize)) {
 		return true;
 	}
 	return false;
 }
 
 
-bool Collision::CheckCollision_BulletHellBulletsAndPlayer(
-	const Shared<EnemyBullet> bullet, const Shared<Player> player, const tnl::Vector3 collisionSize, const tnl::Vector3 prev_pos) {
+bool Collision::CheckCollision_BulletHellBulletsAndPlayer(const Shared<EnemyBullet>& bullet, const Shared<Player>& player) {
 
-	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, collisionSize, player->_mesh->pos_, collisionSize)) {
+	if (tnl::IsIntersectAABB(bullet->_mesh->pos_, bullet->_collisionSize, player->_mesh->pos_, player->_collideSize)) {
 		return true;
 	}
+
 	return false;
 }
 
@@ -87,7 +87,7 @@ bool Collision::CheckCollision_PlayerAndEnemyZako(
 
 
 bool Collision::CheckCollision_PlayerAndEnemyBoss(
-	Shared<Player> player, Shared<EnemyBossBase> enemy, tnl::Vector3 prevPos_player, tnl::Vector3 prevPos_enemy) {
+	Shared<Player>& player, Shared<EnemyBossBase>& enemy, tnl::Vector3 prevPos_player, tnl::Vector3 prevPos_enemy) {
 
 	if (!enemy->_mesh) return false;
 
@@ -107,18 +107,18 @@ bool Collision::CheckCollision_PlayerAndEnemyBoss(
 
 
 void Collision::CheckCollision_EnemyAndEnemy(
-	Shared<EnemyZakoBase>& enemy_type1, Shared<EnemyZakoBase>& enemy_type2,const tnl::Vector3 prev_pos_e1,const tnl::Vector3 prev_pos_e2) {
+	Shared<EnemyZakoBase>& enemy_type1, Shared<EnemyZakoBase>& enemy_type2, const tnl::Vector3 prev_pos_e1, const tnl::Vector3 prev_pos_e2) {
 
 	if (!enemy_type1->_mesh || !enemy_type2->_mesh) return;
 
 	tnl::Vector3 prevChord_e1 = prev_pos_e1;
 	tnl::Vector3 prevChord_e2 = prev_pos_e2;
 
-	if (tnl::IsIntersectAABB(enemy_type1->_mesh->pos_, enemy_type1->_collide_size, enemy_type2->_mesh->pos_, enemy_type2->_collide_size)) {
+	if (tnl::IsIntersectAABB(enemy_type1->_mesh->pos_, enemy_type1->_collideSize, enemy_type2->_mesh->pos_, enemy_type2->_collideSize)) {
 
 		tnl::CorrectPositionAABB(
-			prevChord_e1, prevChord_e2, 
-			enemy_type1->_mesh->scl_, enemy_type2->_mesh->scl_, 
+			prevChord_e1, prevChord_e2,
+			enemy_type1->_mesh->scl_, enemy_type2->_mesh->scl_,
 			enemy_type1->_mesh->pos_, enemy_type2->_mesh->pos_,
 			tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH,
 			30.0f);

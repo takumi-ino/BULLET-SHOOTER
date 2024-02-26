@@ -6,21 +6,24 @@ class EventNoticeText
 public:
 
 	EventNoticeText() {}
-	EventNoticeText(const std::string text, const int color, const int fontSize);
+	EventNoticeText(const std::string text, const int color, const int fontSize, const int margin);
 
-	bool IsExpired() const;
+	bool IsExpired() const { return _duration <= 0.0f; };
 
 	void Render(int index);
 	void Update(const float deltaTime);
 
 public:
 
-	static std::deque<Shared<EventNoticeText>> _message_queue;
+	static std::deque<Shared<EventNoticeText>> _messageQueue;
 
 private:
 
 	int          _color{};
 	int          _fontSize{};
-	float        _duration = 9.0f;
+	int          _margin{};
+	int          _startTextPos_X{};
+	int          _startTextPos_Y{};
+	float        _duration{};
 	std::string  _messageText{};
 };

@@ -8,6 +8,7 @@ class SceneSelectDifficulty : public SceneBase
 public:
 
 	SceneSelectDifficulty();
+	~SceneSelectDifficulty() { DeleteGraph(_backGround_hdl); }
 
 	void Render() override;
 	void Update(const float deltaTime) override;
@@ -24,14 +25,21 @@ private:
 
 private:
 
-	int _backGround_hdl{};
+	// 背景
+	int         _backGround_hdl{};
+	const int   _BACKGROUND_ALPHA{ 150 };
 
-	const int _LEVEL_POS_X = 560;
-	const int _LEVEL_POS_Y = 110;
+	// テキストオフセット
+	const int   _TEXT_OFFSET_X{ 40 };
+	const int   _TEXT_OFFSET_Y{ 140 };
 
-	const int ANNOTATION_POS_X = 540;
-	const int ANNOTATION_POS_Y = 180;
+	// 難易度
+	const int   _DIFFICULTY_TEXT_POS_X{ 570 };
+	const int   _DIFFICULTY_TEXT_POS_Y{ 110 };
+	const int   _DIFFICULTY_COUNT{ 4 };
+	int         _difficultyItemIndex{};
 
-	const int _LELVEL_COUNT = 4;
-	int _levelIndex = 0;
+	// 注釈
+	const int   _ANNOTATION_POS_X{ 540 };
+	const int   _ANNOTATION_POS_Y{ 180 };
 };

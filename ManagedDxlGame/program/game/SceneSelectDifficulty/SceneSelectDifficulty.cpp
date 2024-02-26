@@ -12,52 +12,58 @@ SceneSelectDifficulty::SceneSelectDifficulty() {
 }
 
 
-
 void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
 	{
-		_levelIndex--;
-		if (_levelIndex < 0) _levelIndex = _LELVEL_COUNT - 1; // 末尾へ
+		_difficultyItemIndex--;
+
+		if (_difficultyItemIndex < 0) 
+			_difficultyItemIndex = _DIFFICULTY_COUNT - 1; // 末尾へ
 	}
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))  // 下キー
 	{
-		_levelIndex++;
-		if (_levelIndex >= _LELVEL_COUNT) _levelIndex = 0;	  // 先頭へ
+		_difficultyItemIndex++;
+
+		if (_difficultyItemIndex >= _DIFFICULTY_COUNT) 
+			_difficultyItemIndex = 0;	  // 先頭へ
 	}
 }
-
 
 
 void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() {
 
-	int r = 1, g = 1, b = 1, SummonBoss = 1;
+	int colors[] = { 1,1,1,1 };
+	colors[_difficultyItemIndex] = -1;
 
-	for (int i = 0; i < _LELVEL_COUNT; i++) {
+	const char* difficulties[] =
+	{ "Easy", "Normal", "Hard", "Lunatic" };
 
-		if (i == _levelIndex && _levelIndex == 0)	r = -1;
-		else if (i == _levelIndex && _levelIndex == 1)	g = -1;
-		else if (i == _levelIndex && _levelIndex == 2)	b = -1;
-		else if (i == _levelIndex && _levelIndex == 3)	SummonBoss = -1;
+	const char* annotations[] = 
+	{ "もっとも易しい難易度です", "もっとも標準の難易度です", "ちょっと高めの難易度です", "奇特な難易度です" };
 
+	for (int i = 0; i < _DIFFICULTY_COUNT; i++) {
+
+		// 難易度表示--------------------------------------------
 		SetFontSize(66);
-		DrawStringEx(_LEVEL_POS_X, _LEVEL_POS_Y, r, "Easy");
-		DrawStringEx(_LEVEL_POS_X - 40, _LEVEL_POS_Y + 140, g, "Normal");
-		DrawStringEx(_LEVEL_POS_X - 80, _LEVEL_POS_Y + 280, b, "Hard");
-		DrawStringEx(_LEVEL_POS_X - 120, _LEVEL_POS_Y + 420, SummonBoss, "Lunatic");
 
-		SetFontSize(20);
-		DrawStringEx(ANNOTATION_POS_X, ANNOTATION_POS_Y, r,
-			"もっとも易しい難易度です。\nシューティングゲームは若干苦手、\nもしくはノーマルでは難しすぎる、という方向けです。");
-		DrawStringEx(ANNOTATION_POS_X - 40, ANNOTATION_POS_Y + 140, g,
-			"もっとも標準の難易度です。\nシューティングが普通な方向け難易度です。");
-		DrawStringEx(ANNOTATION_POS_X - 80, ANNOTATION_POS_Y + 280, b, 
-			"ちょっと高めの難易度です。\nアーケードでシューティングをプレイする方には、\n丁度いいくらいになっています。");
-		DrawStringEx(ANNOTATION_POS_X - 120, ANNOTATION_POS_Y + 420, SummonBoss,
-			"奇特な難易度です。");
+		DrawStringEx(
+			_DIFFICULTY_TEXT_POS_X - (_TEXT_OFFSET_X * i),
+			_DIFFICULTY_TEXT_POS_Y + (_TEXT_OFFSET_Y * i),
+			colors[i],
+			difficulties[i]
+		);
+		// 注釈表示----------------------------------------------
+		SetFontSize(DEFAULT_FONT_SIZE);
+
+		DrawStringEx(
+			_ANNOTATION_POS_X - (_TEXT_OFFSET_X * i),
+			_ANNOTATION_POS_Y + (_TEXT_OFFSET_Y * i),
+			colors[i],
+			annotations[i]
+		);
 	}
 }
-
 
 
 void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
@@ -66,26 +72,26 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
-		int start_stage = 1;
+		int startStage = 1;
 
-		if (_levelIndex == 0) {
+		if (_difficultyItemIndex == 0) {
 
 			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Easy", start_stage));
+			mgr->ChangeScene(new ScenePlay("Easy", startStage));
 		}
-		if (_levelIndex == 1) {
+		if (_difficultyItemIndex == 1) {
 
 			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Normal", start_stage));
+			mgr->ChangeScene(new ScenePlay("Normal", startStage));
 		}
-		if (_levelIndex == 2) {
+		if (_difficultyItemIndex == 2) {
 			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Hard", start_stage));
+			mgr->ChangeScene(new ScenePlay("Hard", startStage));
 		}
-		if (_levelIndex == 3) {
+		if (_difficultyItemIndex == 3) {
 
 			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Lunatic", start_stage));
+			mgr->ChangeScene(new ScenePlay("Lunatic", startStage));
 		}
 	}
 }
@@ -95,13 +101,15 @@ void SceneSelectDifficulty::RenderBackGround() {
 	DrawRotaGraph(600, 360, 1, 0, _backGround_hdl, false);
 }
 
+
 void SceneSelectDifficulty::Render() {
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
 	RenderBackGround();
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	RenderDifficultiesAndAnnotation();
 }
+
 
 void SceneSelectDifficulty::Update(float deltaTime) {
 

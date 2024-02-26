@@ -7,8 +7,7 @@ class SkyBox
 {
 public:
 
-	SkyBox(){}
-	explicit SkyBox(int stage_id);
+	SkyBox();
 
 	Shared<dxe::Mesh> skybox = nullptr;
 
