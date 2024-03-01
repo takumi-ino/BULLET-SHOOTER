@@ -21,8 +21,11 @@
 
 ■ ライブラリ
 
-　DxLib
+・Dxライブラリ（program/dxlib_ext)
 
+・講師配布の専用ライブラリ（program/library)
+
+（私が書いたコードは program/game の中にあります）
 
 
 ■ アピールポイント
