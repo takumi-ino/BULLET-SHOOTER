@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../DxLibEngine.h"
+#include "../Character.h"
 
 class PlayerBullet;
 class Gunport;
@@ -8,7 +8,7 @@ class FreeLookCamera;
 class CsvLoader;
 
 
-class Player
+class Player : public Character
 {
 public:
 
@@ -16,7 +16,7 @@ public:
 	explicit Player(const Shared<FreeLookCamera> camera_ref);
 
 	~Player() { DeleteSoundMem(_getDamageSE_hdl); }
-		
+
 
 	// Init--------------------------------------------------------------------------------------------
 	void InitBombCount(const int count) { _currentBomb_stockCount = count; }
@@ -41,7 +41,7 @@ public:
 	void AddAT(int val) { _at += val; }
 	void AddDEF(int val) { _def += val; }
 	void AddBombStockCount() { _currentBomb_stockCount++; }
-	void AddSpeed(int val) { _moveSpeed += val; }
+	void AddSpeed(int val) { _playerMoveSpeed += val; }
 
 	// Others--------------------------------------------------------------------------------------------		
 	void PlayDamageHitSE();
@@ -95,8 +95,6 @@ private:
 
 public:
 
-	Shared<dxe::Mesh>               _mesh = nullptr;
-
 	std::list<Shared<PlayerBullet>> _straightBullets_player{};
 
 	std::vector<Shared<Gunport>>    _gunportVec{};
@@ -111,67 +109,57 @@ private:
 
 	Shared<CsvLoader>               _csvLoader = nullptr;
 
-	Shared<Player>                  _player_ref = nullptr;
-
-	Shared<FreeLookCamera>          _mainCamera_ref = nullptr;
-
-public:
-
-	tnl::Vector3 _collideSize{ 20, 20, 20 };
+	Shared<FreeLookCamera>          _playerCamera = nullptr;
 
 private:
 
 	// プレイヤーステータス
-	int                _hp{};                      // CSV
-	int                _MAX_HP{};
-	int                _at{};                      // CSV
-	int                _def{};                     // CSV
-	float              _moveSpeed{ 0.4f };
+	int                _hp{};          // CSV
+	float              _playerMoveSpeed{ 0.4f };
 	float              _forwardVelocity{ 150.0f };
 	float              _hp_posX{ 60 };
 	float              _hp_posY{ 50 };
 	const tnl::Vector3 _START_POSITION{ 0, 100, -300 };
-	bool               _isDead{};
 
 	// ボム
-	int          _currentBomb_stockCount{};
-	float        _bombTimer{};
-	const float  _BOMBEFFECT_TIME_LIMIT{ 3.0f };
-	bool         _isTriggered_playersBombEffect{}; // 描画フラグ
+	int                _currentBomb_stockCount{};
+	float              _bombTimer{};
+	const float        _BOMBEFFECT_TIME_LIMIT{ 3.0f };
+	bool               _isTriggered_playersBombEffect{}; // 描画フラグ
 
 	// 無敵時間
-	float        _invincibleTimer{};
-	const float  _INVINCIBLE_TIME_LIMIT{ 3.0f };
-	bool         _isInvincible = false;
+	float              _invincibleTimer{};
+	const float        _INVINCIBLE_TIME_LIMIT{ 3.0f };
+	bool               _isInvincible{ false };
 
 	// ダメージSE	
-	int          _getDamageSE_hdl{};
+	int                _getDamageSE_hdl{};
 
 	// 敵情報　
-	int          _enemyIndex{}; // レーダーポインター使用時に使用
-	float        _capturableEnemyRange{ 500.0f };
+	int                _enemyIndex{}; // レーダーポインター使用時に使用
+	float              _capturable_enemyRange{ 500.0f };
 
 	// カメラ
 	const tnl::Vector3 _DEFAULT_CAMERA_POSITION{ 0, 100, -150 };
 	const tnl::Vector3 _CAMERA_OFFSET{ 0, -50, 20 };
 
 	// 視点操作
-	float _viewpoint_lerpRate_h{ 0.05f };
-	float _viewpoint_lerpRate_v{ 0.01f };
+	float              _viewpoint_lerpRate_h{ 0.05f };
+	float              _viewpoint_lerpRate_v{ 0.01f };
 
-	float _cameraMove_delayRate{ 0.05f };
+	float              _cameraMove_delayRate{ 0.05f };
 
 	// プレイヤーとの距離のオフセット
-	float _distance_offset{ 300.0f };
+	float              _distance_offset{ 300.0f };
 
 	// プレイヤー操作
-	float centroid_radius_ = 100; // 重心
-	float mass_ = 100;            // 質量
-	float friction_ = 0.6f;       // 摩擦
-	tnl::Vector3 move_vel_{};
-	tnl::Vector3 past_move_vel_{};
-	tnl::Vector3 center_of_gravity_{};
-	tnl::Quaternion rot_y_{};
-	tnl::Quaternion rot_x_{};
-	tnl::Quaternion rot_xz_{};
+	float              _centroidRadius{ 100 };  // 重心
+	float              _mass{ 100 };            // 質量
+	float              _friction{ 0.6f };       // 摩擦
+	tnl::Vector3       _moveVelocity{};
+	tnl::Vector3       _past_moveVelocity{};
+	tnl::Vector3       _centerOfGravity{};
+	tnl::Quaternion    _rotY{};
+	tnl::Quaternion    _rotX{};
+	tnl::Quaternion    _rotXZ{};
 };

@@ -1,10 +1,9 @@
 #pragma once
-#include "../../../DxLibEngine.h"
-
-class Player;
+#include "../Character.h"
 
 
-class EnemyBase {
+class EnemyBase : public Character
+{
 public:
 
 	EnemyBase(){}
@@ -31,26 +30,25 @@ protected:
 
 	tnl::Vector3 GetRandomPosition_Mt19337() const;
 
-public:
+protected:
 
-	Shared<Player>            _player_ref = nullptr;
-
-	Shared<dxe::Mesh>         _mesh = nullptr;
-
-	Shared<dxe::Camera>       _mainCamera_ref = nullptr;
+	Shared<dxe::Camera>  _enemyCamera = nullptr;
 
 public:
 
-	tnl::Vector3 _collide_size{};
-
-	bool _isDead = false;    //敵単体の死亡フラグ
+	bool           _isDead = false; //敵単体の死亡フラグ
 
 	// CSVからロード-----------------------
 
 	int            _id{};
-	float          _charaMoveSpeed{};
+	float          _enemyMoveSpeed{};
 	float          _scale{};
 	std::string    _name{};
-	int _MAX_HP{};
-	int      _maxBulletSpawnCount{};
+	int            _maxBulletSpawnCount{};
+
+private:
+
+	const float _RANDOM_SPAWN_RANGE_RANGE_X = 800.0f;
+	const float _RANDOM_SPAWN_RANGE_RANGE_Y = 100.0f;
+	const float _RANDOM_SPAWN_RANGE_RANGE_Z = 500.0f;
 };
