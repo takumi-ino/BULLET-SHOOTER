@@ -31,9 +31,9 @@ public:
 public:
 
 	BulletHell() {}
-	BulletHell(const Shared<dxe::Mesh>& bossMesh, const Shared<Player>& player) : _bossMesh_ref(bossMesh) {
-		_player_ref = player;
-	}
+	BulletHell(const Shared<dxe::Mesh>& bossMesh, const Shared<Player>& player)
+		: _bossMesh_ref(bossMesh) {	_player_ref = player; }
+
 
 	// 1. 機能
 	// 2. スペル（弾幕名）
@@ -43,36 +43,40 @@ public:
 	void ShotBulletHell_Normal_Patchouli(const float& delta_time);
 	void ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time);
 	void ShotBulletHell_SilentSerena_Patchouli(const float& delta_time);
+
 	// ステージ2ボス（チルノ）---------------------------------------------
 	void ShotBulletHell_Normal_Cirno(const float& delta_time);
 	void ShotBulletHell_IcicleFall_Cirno(const float& delta_time);
 	void ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time);
+
 	// ステージ3ボス（諏訪子）---------------------------------------------
 	void ShotBulletHell_Normal_Suwako(const float& delta_time);
 	void ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time);
 	void ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(const float& delta_time);
-	// ---------------------------------------------
 
 private:
 
-	// ステージ1ボス（パチュリー）-------------------------------------
+	// 似た処理が多い場合に補助関数を使用（ WaveAssist ）など
 
-	void Wave_MetalFatigue_Patchouli(
-		Shared<EnemyBullet> bullet, 
-		tnl::Vector3& bossPosition, 
-		const float& delta_time, 
-		float angle_origin, 
-		float radius_origin, 
-		float startMoveTime);
+	// ステージ1ボス（パチュリー）-------------------------------------
+	void WaveAssist_MetalFatigue_Patchouli(
+		Shared<EnemyBullet>& bullet,
+		tnl::Vector3& bossPosition,
+		const float& delta_time,
+		float angle_origin,
+		float radius_origin,
+		float startMoveTime
+	);
 
 	// ステージ3ボス（諏訪子）---------------------------------------------
-	void Wave_IronRingOfMoriya_Suwako(
-		Shared<EnemyBullet> bullet,
+	void WaveAssist_IronRingOfMoriya_Suwako(
+		Shared<EnemyBullet>& bullet,
 		float circle_radius,
 		float angle,
-		float delta_time, 
-		float bullet_speed, 
-		float startMove_time);
+		float delta_time,
+		float bullet_speed,
+		int startMove_time
+	);
 
 private:
 

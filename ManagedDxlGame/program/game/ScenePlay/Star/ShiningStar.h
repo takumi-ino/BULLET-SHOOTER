@@ -1,11 +1,13 @@
 #pragma once
 
-class ShiningStar {
-
-
-struct S_ShiningStar
+class ShiningStar
 {
-	float x, y, z;};
+private:
+
+	struct S_ShiningStar
+	{
+		float x, y, z;
+	};
 
 public:
 

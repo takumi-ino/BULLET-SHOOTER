@@ -3,19 +3,28 @@
 #include "../EnemyBossBase.h"
 #include "EnemyBoss_Cirno.h"
 
-int EnemyBoss_Cirno::_at;
 
-EnemyBoss_Cirno::EnemyBoss_Cirno(const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera)
-	: EnemyBossBase(info, player, camera) {
+std::vector<Shared<EnemyBullet>> EnemyBoss_Cirno::_bullet_normal_cirno;
+std::vector<Shared<EnemyBullet>> EnemyBoss_Cirno::_bullet_icicleFall_cirno;
+std::vector<Shared<EnemyBullet>> EnemyBoss_Cirno::_bullet_perfectFreeze_cirno;
+bool EnemyBoss_Cirno::_isUsingBullet_normal_cirno;
+bool EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno;
+bool EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno;
 
-	_collide_size = { 50,50,50 };
-	_at = 4;
 
+EnemyBoss_Cirno::EnemyBoss_Cirno(
+	const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
+	: EnemyBossBase(info, player, camera, collision) {
+
+	_collideSize = { 50,50,50 };
+	_at = 6;
+
+	_WARPING_DURATION = 8.0f;
 }
 
 
 void EnemyBoss_Cirno::SetMeshInfo() {
-	_mesh = dxe::Mesh::CreateSphereMV(50);
+	_mesh = dxe::Mesh::CreateCubeMV(100);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/bossTexture/Cirno.png"));
 
 	_mesh->pos_ = { 0, 0, 0 };
@@ -29,40 +38,39 @@ void EnemyBoss_Cirno::InitBulletHellInstance() {
 }
 
 
-
-
 void EnemyBoss_Cirno::AttackPlayer(const float& delta_time) {
-
-	if (EnemyBossBase::_bossHp.empty()) {
-		ScenePlay::TurnOff_SecondStageBulletHellLists();
-		return;
-	}
 
 	if (!_bulletHell) return;
 
 	if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
-		ScenePlay::_isUsingBullet_normal_cirno = true;
+		_isUsingBullet_normal_cirno = true;
 		_bulletHell->ShotBulletHell_Normal_Cirno(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_normal_cirno);
 	}
 	else {
-		ScenePlay::_isUsingBullet_normal_cirno = false;
+		_isUsingBullet_normal_cirno = false;
 	}
 
-	//if (4 == EnemyBossBase::_bossHp.size()) {
-	//	ScenePlay::_isUsingBullet_icicleFall_cirno = true;
-	//	_bulletHell->ShotBulletHell_IcicleFall_Cirno(delta_time);
-	//}
-	//else {
-	//	ScenePlay::_isUsingBullet_icicleFall_cirno = false;
-	//}
+	if (3 == EnemyBossBase::_bossHp.size()) {
+		_isUsingBullet_icicleFall_cirno = true;
+		_bulletHell->ShotBulletHell_IcicleFall_Cirno(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_icicleFall_cirno);
+	}
+	else {
+		_isUsingBullet_icicleFall_cirno = false;
+	}
 
 	if (1 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_perfectFreeze_cirno = true;
+		_isUsingBullet_perfectFreeze_cirno = true;
 		_bulletHell->ShotBulletHell_PerfectFreeze_Cirno(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_perfectFreeze_cirno);
 	}
 	else {
-		ScenePlay::_isUsingBullet_perfectFreeze_cirno = false;
+		_isUsingBullet_perfectFreeze_cirno = false;
 	}
 }
 
@@ -96,7 +104,7 @@ void EnemyBoss_Cirno::RenderBossSpellCardName() {
 	case 1:
 		DrawFormatString(x, y, -1, "%sPerfectFreeze", spell.c_str()); break;
 	}
-	SetFontSize(22);
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 

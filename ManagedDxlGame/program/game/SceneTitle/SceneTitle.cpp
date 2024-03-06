@@ -6,6 +6,24 @@
 #include "SceneTitle.h"
 
 
+namespace {
+
+	// 背景画像
+	const int _BACKGROUND_POS_X{ 650 };
+	const int _BACKGROUND_POS_Y{ 250 };
+	const int _BACKGROUND_ALPHA{ 80 };
+	const int _BACKGROUND_EFFECT_OSCILLATE_SPEED{ 30 };
+
+	// ロゴ
+	const int   _TITLELOGO_POS_X{ 635 };
+	const int   _TITLELOGO_POS_Y{ 230 };
+	const int   _TITLELOGO_EFFECT_OSCILLATE_SPEED{ 70 };
+	const float _TITLELOGO_EXTEND_RATE{ 1.4f };
+
+	// エフェクトの振幅速度
+	const float _EFFECT_TRANS_OSCILLATE_RATE{ 1.3f };
+}
+
 
 SceneTitle::SceneTitle() {
 
@@ -13,18 +31,18 @@ SceneTitle::SceneTitle() {
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 	_screenEffect->loadStatus("screenEffect/titleSceneEffect.bin");
 
-	_backGround_hdl = LoadGraph("graphics/Scene/titleBackGround.png");
-	_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo.png");
+	_backGround_hdl = LoadGraph("graphics/Scene/titleBackGround.jpg");
+	_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo_star.png");
 
 	_tapSE_hdl = LoadSoundMem("sound/se/tap.mp3");
 
-	//SoundManager::GetInstance().LoadBGM("sound/bgm/title.mp3");
-	//SoundManager::GetInstance().PlayBGM();
+	SoundManager::GetInstance().LoadBGM("sound/bgm/title.mp3");
+	SoundManager::GetInstance().PlayBGM();
 }
 
 
 
-void SceneTitle:: Render() {
+void SceneTitle::Render() {
 
 	_shadowMap->reserveBegin();
 	_screenEffect->renderBegin();

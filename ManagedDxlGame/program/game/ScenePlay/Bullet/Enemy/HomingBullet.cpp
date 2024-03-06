@@ -8,6 +8,7 @@ HomingBullet::HomingBullet() {
 
 	_mesh = dxe::Mesh::CreateSphereMV(sphereSize);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/colorTexture/yellow.jpg"));
+	_mesh->setMtrlEmissive({ 1,1,1 });
 
 	_collisionSize = { sphereSize ,sphereSize ,sphereSize };
 }
@@ -15,9 +16,4 @@ HomingBullet::HomingBullet() {
 
 void HomingBullet::Render(Shared<dxe::Camera> _mainCamera) {
 	_mesh->render(_mainCamera);
-}
-
-
-
-void HomingBullet::Update(float delta_time) {
 }

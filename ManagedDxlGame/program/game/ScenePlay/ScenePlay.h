@@ -25,46 +25,64 @@ public:
 	ScenePlay() {}
 	ScenePlay(const std::string selected_difficulty, const int stage);
 
+	// ステージ移動----------------------------------------------------------------------
 	void MoveToNextStage(const int stage, const std::string difficulty);
 
-	// プレイヤーのボム効果による弾の無効化・有効化
+	// 弾幕初期化（プレイ開始前に該当のステージのボスの弾幕のみ生成）--------------------
+	void CheckDoInit_FirstStageBulletHellLists();   // ステージ１
+	void CheckDoInit_SecondStageBulletHellLists();  // ステージ２
+	void CheckDoInit_ThirdStageBulletHellLists();   // ステージ３
+
+	// プレイヤーのボム効果による弾の無効化・有効化--------------------------------------
 	static void ReactivateEnemyBullets();
 	static void DeactivateAllEnemyBullets();
 
-	void CheckDoInit_FirstStageBulletHellLists();   // 1
-	void CheckDoInit_SecondStageBulletHellLists();  // 2
-	void CheckDoInit_ThirdStageBulletHellLists();   // 3
-
-	void DestroyFirstStageBulletHellLists();
-	void DestroySecondStageBulletHellLists();
+	// リザルトに飛ぶときに最終ステージの弾幕を解放--------------------------------------
 	static void DestroyThirdStageBulletHellLists();
 
-	static void TurnOff_FirstStageBulletHellLists();
-	static void TurnOff_SecondStageBulletHellLists();
-	static void TurnOff_ThirdStageBulletHellLists();
-
-	static float GetDeltaTime() { return _deltaTime_ref; };
+	// Getter ----------------------------------------------------------------------
+	static const int GetStageID() { return _STAGE_ID; }                       // ステージID
+	static const std::string GetGameDifficulty() { return _GAME_DIFFICULTY; } // 選択難易度
+	static const float GetDeltaTime() { return _deltaTime; };                 // デルタタイム
 
 private:
 
-	void SetDeltaTime(const float deltaTime) { _deltaTime_ref = deltaTime; };
+	// Setter ----------------------------------------------------------
+	void SetDeltaTime(const float deltaTime) { _deltaTime = deltaTime; };
 
-	// 1
+	//　各弾幕のアクティブ状態を false に一括リセット-------------------
+	void TurnOff_FirstStageBulletHellLists();
+	void TurnOff_SecondStageBulletHellLists();
+	void TurnOff_ThirdStageBulletHellLists();
+
+	//　弾幕描画。現在使用中のもののみ----------------------------------
 	void CheckDoRender_FirstStageBulletHellLists();
-	void CheckDoUpdate_FirstStageBulletHellLists();
-	// 2
 	void CheckDoRender_SecondStageBulletHellLists();
-	void CheckDoUpdate_SecondStageBulletHellLists();
-	// 3
 	void CheckDoRender_ThirdStageBulletHellLists();
+
+	//　弾幕更新。現在使用中のもののみ----------------------------------
+	void CheckDoUpdate_FirstStageBulletHellLists();
+	void CheckDoUpdate_SecondStageBulletHellLists();
 	void CheckDoUpdate_ThirdStageBulletHellLists();
 
+	//　弾幕を解放------------------------------------------------------
+	void DestroyFirstStageBulletHellLists();
+	void DestroySecondStageBulletHellLists();
+
+	// Beginテキスト----------------------------------------------------
 	void RenderBeginText();
 	void UpdateShowBeginTextTimer(const float deltaTime);
+
+	// ボム-------------------------------------------------------------
 	void InitPlayersBombCount(const std::string& selected_difficulty);
+
+	// ミニマップ-------------------------------------------------------
 	void RenderEnemyRadarOnMiniMap();
+
+	// ポーズメニュー---------------------------------------------------
 	void RenderPauseMenu();
 
+	// 描画・更新ー---------------------------------------------------
 	void Render() override;
 	void Update(const float deltaTime) override;
 
@@ -86,60 +104,26 @@ private:
 
 	Shared<Score>             _score = nullptr;
 
-	Shared<dxe::ScreenEffect> _screen_effect = nullptr;
+	Shared<dxe::ScreenEffect> _screenEffect = nullptr;
 
 	Shared<BulletHellFactory> _bltHellFactory = nullptr;
 
 	Shared<PauseMenu>         _pauseMenu = nullptr;
 
-public:
-
-	// ステージ1
-	static std::vector<Shared<EnemyBullet>> _bullet_normal_patchouli;
-	static std::vector<Shared<EnemyBullet>> _bullet_metalFatigue_patchouli;
-	static std::vector<Shared<EnemyBullet>> _bullet_silentSerena_patchouli;
-
-	// ステージ2
-	static std::vector<Shared<EnemyBullet>> _bullet_normal_cirno;
-	static std::vector<Shared<EnemyBullet>> _bullet_icicleFall_cirno;
-	static std::vector<Shared<EnemyBullet>> _bullet_perfectFreeze_cirno;
-
-	// ステージ3
-	static std::vector<Shared<EnemyBullet>> _bullet_normal_suwako;
-	static std::vector<Shared<EnemyBullet>> _bullet_ironRingOfMoriya_suwako;
-	static std::vector<Shared<EnemyBullet>> _bullet_keroChanStandsFirmAgainstTheStorm_suwako;
-
-public:
-
-	// ステージ1
-	static bool _isUsingBullet_normal_patchouli;
-	static bool _isUsingBullet_metalFatigue_patchouli;
-	static bool _isUsingBullet_silentSerena_patchouli;
-	// ステージ2
-	static bool _isUsingBullet_normal_cirno;
-	static bool _isUsingBullet_icicleFall_cirno;
-	static bool _isUsingBullet_perfectFreeze_cirno;
-	// ステージ3
-	static bool _isUsingBullet_normal_suwako;
-	static bool _isUsingBullet_ironRingOfMoriya_suwako;
-	static bool _isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako;
-
-	// プレイヤーのボム描画フラグ
-	static bool _isRenderPlayersBombEffect;
-
-	static bool _isShowBeginGameText;
-
-	static int _STAGE_ID;
-
 private:
 
-	int _bgAlpha_when_call_pauseMenu = 255;
-	int _radarColor = GetColor(0, 255, 0);
-	int _miniMap_hdl{};
+	// Getterで使用する値----------------------------------------------
+	static int          _STAGE_ID;
+	static std::string  _GAME_DIFFICULTY;
+	static float        _deltaTime;
 
-	static float _showBeginText_timer;
+	// ポーズ画面表示中に調整する背景の明暗度---------------------------
+	int                 _bgAlpha_whenCall_pauseMenu{ 255 };
 
-	static float _deltaTime_ref;
+	// 画面左下のミニマップ --------------------------------------------
+	int                 _miniMap_hdl{};
 
-	tnl::Vector2i miniMap_center_pos = { 120,600 };
+	// ゲーム開始時に表示する「 Begin 」テキスト-------------------------
+	float               _show_beginTextTimer{};
+	bool                _isShow_beginGameText{};
 };

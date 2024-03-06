@@ -19,38 +19,38 @@ std::unordered_map<int, EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(const std::
 		if (_SELECTED_DIFFICULTY == "Easy") {
 			data._hp = csv[i][4].getInt();
 			data._maxBulletSpawnCount = csv[i][8].getInt();
-			data._maxTotalEnemy_SpawnCount = csv[i][12].getInt();
-			data._charaMoveSpeed = csv[i][16].getFloat();
+			data._maxTotalEnemy_spawnCount = csv[i][12].getInt();
+			data._enemyMoveSpeed = csv[i][16].getFloat();
 			data._bullet_reloadTimeInterval = csv[i][20].getFloat();
-			data._bullet_FireInterval = csv[i][24].getInt();
-			data._bullet_MoveSpeed = csv[i][28].getFloat();
+			data._bullet_fireInterval = csv[i][24].getInt();
+			data._bullet_moveSpeed = csv[i][28].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Normal") {
 			data._hp = csv[i][5].getInt();
 			data._maxBulletSpawnCount = csv[i][9].getInt();
-			data._maxTotalEnemy_SpawnCount = csv[i][13].getInt();
-			data._charaMoveSpeed = csv[i][17].getFloat();
+			data._maxTotalEnemy_spawnCount = csv[i][13].getInt();
+			data._enemyMoveSpeed = csv[i][17].getFloat();
 			data._bullet_reloadTimeInterval = csv[i][21].getFloat();
-			data._bullet_FireInterval = csv[i][25].getInt();
-			data._bullet_MoveSpeed = csv[i][29].getFloat();
+			data._bullet_fireInterval = csv[i][25].getInt();
+			data._bullet_moveSpeed = csv[i][29].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Hard") {
 			data._hp = csv[i][6].getInt();
 			data._maxBulletSpawnCount = csv[i][10].getInt();
-			data._maxTotalEnemy_SpawnCount = csv[i][14].getInt();
-			data._charaMoveSpeed = csv[i][18].getFloat();
+			data._maxTotalEnemy_spawnCount = csv[i][14].getInt();
+			data._enemyMoveSpeed = csv[i][18].getFloat();
 			data._bullet_reloadTimeInterval = csv[i][22].getFloat();
-			data._bullet_FireInterval = csv[i][26].getInt();
-			data._bullet_MoveSpeed = csv[i][30].getFloat();
+			data._bullet_fireInterval = csv[i][26].getInt();
+			data._bullet_moveSpeed = csv[i][30].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Lunatic") {
 			data._hp = csv[i][7].getInt();
 			data._maxBulletSpawnCount = csv[i][11].getInt();
-			data._maxTotalEnemy_SpawnCount = csv[i][15].getInt();
-			data._charaMoveSpeed = csv[i][19].getFloat();
+			data._maxTotalEnemy_spawnCount = csv[i][15].getInt();
+			data._enemyMoveSpeed = csv[i][19].getFloat();
 			data._bullet_reloadTimeInterval = csv[i][23].getFloat();
-			data._bullet_FireInterval = csv[i][27].getInt();
-			data._bullet_MoveSpeed = csv[i][31].getFloat();
+			data._bullet_fireInterval = csv[i][27].getInt();
+			data._bullet_moveSpeed = csv[i][31].getFloat();
 		}
 
 		infos[data._id] = data;
@@ -79,22 +79,22 @@ std::unordered_map<int, EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(const std::
 		if (_SELECTED_DIFFICULTY == "Easy") {
 			data._hp = csv[i][4].getInt();
 			data._maxBulletSpawnCount = csv[i][8].getInt();
-			data._charaMoveSpeed = csv[i][12].getFloat();
+			data._enemyMoveSpeed = csv[i][12].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Normal") {
 			data._hp = csv[i][5].getInt();
 			data._maxBulletSpawnCount = csv[i][9].getInt();
-			data._charaMoveSpeed = csv[i][13].getFloat();
+			data._enemyMoveSpeed = csv[i][13].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Hard") {
 			data._hp = csv[i][6].getInt();
 			data._maxBulletSpawnCount = csv[i][10].getInt();
-			data._charaMoveSpeed = csv[i][14].getFloat();
+			data._enemyMoveSpeed = csv[i][14].getFloat();
 		}
 		else if (_SELECTED_DIFFICULTY == "Lunatic") {
 			data._hp = csv[i][7].getInt();
 			data._maxBulletSpawnCount = csv[i][11].getInt();
-			data._charaMoveSpeed = csv[i][15].getFloat();
+			data._enemyMoveSpeed = csv[i][15].getFloat();
 		}
 
 		infos[data._id] = data;

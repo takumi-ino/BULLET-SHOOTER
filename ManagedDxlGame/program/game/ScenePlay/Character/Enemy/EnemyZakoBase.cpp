@@ -1,6 +1,5 @@
 #include "../Player/Player.h"
 #include "../../../Manager/Score/ScoreManager.h"
-#include "../../../Loader/CsvLoader.h"
 #include "../../../Manager/Enemy/EnemyManager.h"
 #include "../game/ScenePlay/Bullet/Enemy/EnemyBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/StraightBullet.h"
@@ -11,8 +10,16 @@
 
 Shared<dxe::Particle> EnemyZakoBase::_explode_particle;
 
-
 bool EnemyZakoBase::_isNoticedPlayer;
+
+
+namespace {
+
+	const float _ROTATION_MAX_RANGE{ 180.0f };
+	const float _STRAIGHTBULLET_LIFETIME_LIMIT{ 3.0f };
+	const float _HOMINGBULLET_LIFETIME_LIMIT{ 5.0f };
+}
+
 
 // 雑魚エネミーデータ読み取り
 EnemyZakoBase::EnemyZakoBase(
@@ -23,16 +30,16 @@ EnemyZakoBase::EnemyZakoBase(
 	_scale = data._scale;
 	_hp = data._hp;
 	_MAX_HP = data._hp;
-	_charaMoveSpeed = data._charaMoveSpeed;
+	_enemyMoveSpeed = data._enemyMoveSpeed;
 
 	_maxBulletSpawnCount = data._maxBulletSpawnCount;
-	_maxTotalEnemy_SpawnCount = data._maxTotalEnemy_SpawnCount;
-	_bullet_MoveSpeed = data._bullet_MoveSpeed;
-	_bullet_FireInterval = data._bullet_FireInterval;
+	_maxTotalEnemy_spawnCount = data._maxTotalEnemy_spawnCount;
+	_bullet_moveSpeed = data._bullet_moveSpeed;
+	_bullet_fireInterval = data._bullet_fireInterval;
 	_bullet_reloadTimeInterval = data._bullet_reloadTimeInterval;
 
 	_player_ref = player;
-	_mainCamera_ref = camera;
+	_enemyCamera = camera;
 	_collision_ref = collision;
 
 	_shotSE_hdl = LoadSoundMem("sound/se/shot.wav");
@@ -46,7 +53,7 @@ void EnemyZakoBase::ChasePlayer(const float delta_time) {
 
 	direction.Normalize(direction);
 
-	_mesh->pos_ += direction * delta_time * _charaMoveSpeed;
+	_mesh->pos_ += direction * delta_time * _enemyMoveSpeed;
 }
 
 
@@ -171,7 +178,7 @@ void EnemyZakoBase::MoveToRandomInvestigatePos(const float& delta_time)
 
 	tnl::Vector3 direction = _investigatePos - _mesh->pos_;
 	direction.Normalize(direction);
-	_mesh->pos_ += direction * delta_time * _charaMoveSpeed;
+	_mesh->pos_ += direction * delta_time * _enemyMoveSpeed;
 
 	// 目的地に近づいたら停止する
 	if ((_investigatePos - _mesh->pos_).length() < FLT_DIG) { // == 6
@@ -219,8 +226,8 @@ bool EnemyZakoBase::ShowHpGage_EnemyZako() {
 		_mesh->pos_,
 		DXE_WINDOW_WIDTH,
 		DXE_WINDOW_HEIGHT,
-		_mainCamera_ref->view_,
-		_mainCamera_ref->proj_
+		_enemyCamera->view_,
+		_enemyCamera->proj_
 	);
 
 	float x1 = hpGage_pos.x - 30;
@@ -263,8 +270,8 @@ void EnemyZakoBase::ShotStraightBullet(const float& delta_time) {
 
 	_straightBullet_count++;
 
-	// 撃った弾の間隔を空けるための処理
-	if (_straightBullet_count % _bullet_FireInterval == 0 && !_straightBullet_queue.empty()) {
+	//_straightBullet_count が　_bullet_fireIntervalの倍数になった時
+	if (_straightBullet_count % _bullet_fireInterval == 0 && !_straightBullet_queue.empty()) {
 
 		Shared<StraightBullet> bullet = _straightBullet_queue.front();
 		_straightBullet_queue.pop_front();
@@ -327,7 +334,7 @@ void EnemyZakoBase::UpdateStraightBullet(float delta_time)
 			tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 }, _mesh->rot_);
 			move_dir.normalize();
 
-			(*it_blt)->_mesh->pos_ += move_dir * _bullet_MoveSpeed * delta_time;
+			(*it_blt)->_mesh->pos_ += move_dir * _bullet_moveSpeed * delta_time;
 
 
 			if ((*it_blt)->_timer > _STRAIGHTBULLET_LIFETIME_LIMIT) {
@@ -351,7 +358,7 @@ void EnemyZakoBase::ShotHomingBullet(const float& delta_time) {
 	_homingBullet_count++;
 
 	// 撃った弾の間隔を空けるための処理
-	if (_homingBullet_count % _bullet_FireInterval == 0 && !_homingBullet_queue.empty()) {
+	if (_homingBullet_count % _bullet_fireInterval == 0 && !_homingBullet_queue.empty()) {
 
 		Shared<HomingBullet> bullet = _homingBullet_queue.front();
 		_homingBullet_queue.pop_front();
@@ -417,14 +424,15 @@ void EnemyZakoBase::UpdateHomingBullet(const float delta_time) {
 			tnl::Vector3 targetDir = _player_ref->GetPos() - (*it_blt)->_mesh->pos_;
 			targetDir.normalize();
 
-			(*it_blt)->_moveDirection =	tnl::Vector3::UniformLerp(
+			(*it_blt)->_moveDirection = tnl::Vector3::UniformLerp(
 				(*it_blt)->_moveDirection,
 				targetDir * _bulletTurnDelayRate,
-				timeToReachPlayer, (*it_blt)->_timer
+				timeToReachPlayer,
+				(*it_blt)->_timer
 			);
 
-			(*it_blt)->_mesh->pos_ += 
-				(*it_blt)->_moveDirection * delta_time * _bullet_MoveSpeed / 1.5f;
+			(*it_blt)->_mesh->pos_ +=
+				(*it_blt)->_moveDirection * delta_time * _bullet_moveSpeed / 1.5f;
 
 
 			(*it_blt)->_timer += delta_time;

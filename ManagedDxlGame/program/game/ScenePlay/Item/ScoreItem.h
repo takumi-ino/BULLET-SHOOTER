@@ -2,7 +2,7 @@
 #include "ItemBase.h"
 
 
-// ランダム発生、もしくは雑魚敵を倒したときに一定確率で発生するスコアアイテム
+// 雑魚敵を倒したときに一定確率で発生するスコアアイテム
 class ScoreItem : public ItemBase
 {
 public:
@@ -15,7 +15,6 @@ public:
 	};
 
 	ScoreItem() {}
-	explicit ScoreItem(Shared<ScoreItem> item) {}
 	explicit ScoreItem(const ScoreItem::TYPE item_type);
 
 	bool Update(Shared<ScoreItem>& item);

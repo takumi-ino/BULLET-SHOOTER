@@ -40,16 +40,17 @@ void LockCursorToWindow() {
 // ÉQÅ[ÉÄãNìÆéûÇ…ÇPìxÇæÇØé¿çsÇ≥ÇÍÇ‹Ç∑
 void gameStart() {
 
-	srand(time(0));
-	//// ÉfÉBÉåÉNÉVÉáÉiÉãÉâÉCÉg
-	ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f));
-	 //îwåiêF
-	SetBackgroundColor(64, 64, 64);
+    srand(time(0));
 
-	//SetMouseDispFlag(false);
- //   LockCursorToWindow();
+    //îwåiêF
+    SetBackgroundColor(64, 64, 64);
 
-	SceneManager::GetInstance(new SceneTitle());
+    SetDefaultFontState("ÇlÇr Çoñæí©", 20, 2);
+
+    SetMouseDispFlag(false);
+    LockCursorToWindow();
+
+    SceneManager::GetInstance(new SceneTitle());
 }
 
 
@@ -58,18 +59,16 @@ bool isFullScreen = true;
 // ñàÉtÉåÅ[ÉÄé¿çsÇ≥ÇÍÇ‹Ç∑
 void gameMain(float delta_time) {
 
-	SceneManager::GetInstance()->Update(delta_time);
+    SceneManager::GetInstance()->Update(delta_time);
 
-    //ChangeFont("Half Font", DX_CHARSET_DEFAULT);
+    //if (tnl::Input::IsKeyDown(eKeys::KB_ESCAPE)) isFullScreen = !isFullScreen;
 
-	//if (tnl::Input::IsKeyDown(eKeys::KB_ESCAPE)) isFullScreen = !isFullScreen;
+    //if (isFullScreen) ChangeWindowMode(false);
+    //else              ChangeWindowMode(true);
 
-	//if (isFullScreen) ChangeWindowMode(false);
-	//else              ChangeWindowMode(true);
+    if (tnl::Input::IsKeyDownTrigger(eKeys::KB_ESCAPE)) exit(1);
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_ESCAPE)) exit(1);
-
-	DrawFpsIndicator({ 10, DXE_WINDOW_HEIGHT - 10, 0 }, delta_time);
+    //DrawFpsIndicator({ 10, DXE_WINDOW_HEIGHT - 10, 0 }, delta_time);
 }
 
 
@@ -82,7 +81,7 @@ void gameMain(float delta_time) {
 //------------------------------------------------------------------------------------------------------------
 // ÉQÅ[ÉÄèIóπéûÇ…ÇPìxÇæÇØé¿çsÇ≥ÇÍÇ‹Ç∑
 void gameEnd() {
-	EnemyZakoBase::_explode_particle.reset();
-	ScenePlay::_weather_particle.reset();
-	Player::_bomb_particle.reset();
+    EnemyZakoBase::_explode_particle.reset();
+    ScenePlay::_weather_particle.reset();
+    Player::_bombParticle.reset();
 }

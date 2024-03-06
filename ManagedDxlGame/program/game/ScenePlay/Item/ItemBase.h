@@ -1,9 +1,6 @@
 #pragma once
 #include "../../DxLibEngine.h"
 
-class ScoreItem;
-class PowerUpItem;
-
 class ItemBase
 {
 public:
@@ -17,13 +14,17 @@ public:
 
 public:
 
-	float _lifeTimer{};
+	float        _lifeTimer{};
 
-	bool _isActive = false;
-	bool _hasSpawned = false;
+	bool         _isActive{ false };
+	bool         _hasSpawned{ false };
 
 	tnl::Vector3 _velocity{ 0,150,0 };
 	tnl::Vector3 _gravity{ 0, -9.8f, 0 };
 	tnl::Vector3 _collisionSize{};
 	tnl::Vector3 _position{};
+
+protected:
+
+	float _lifeTime{};  // Žõ–½
 };

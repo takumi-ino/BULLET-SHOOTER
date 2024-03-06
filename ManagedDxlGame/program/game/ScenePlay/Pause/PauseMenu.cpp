@@ -122,7 +122,7 @@ void PauseMenu::RenderConfigStateInfo() {
 	const char* descriptions[] = {
 
 		 "移動　      キーボードWASDキー、ゲームパッド十字キー",
-         "前進　      キーボードSpaceキー、ゲームパッドL1、LB",
+		 "前進　      キーボードSpaceキー、ゲームパッドL1、LB",
 		 "スロー移動  キーボードShiftキー、ゲームパッド△、Y",
 		 "弾発射　    マウス左、ゲームパッド〇、B",
 		 "カメラ固定　マウス右、ゲームパッドR1、RB",

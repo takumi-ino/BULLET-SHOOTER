@@ -39,8 +39,8 @@ public:
 
 	BulletHellFactory();
 
+	// 初期化-------------------------------------------------------------------
 	void InitBulletHellInfo();
-
 	std::vector<Shared<EnemyBullet>> CreateBulletHell(const BulletHell::TYPE type);
 
 private:
@@ -84,8 +84,12 @@ private:
 	/// <param name="split_one_into_eight_WAVE1"></param>
 	/// <param name="split_one_into_eight_bullet"></param>
 	//// <param name="enemyBullet"></param>
-	void InitSplitOneIntoEightBullet(
-		int split_one_into_eight_WAVE1, int id, Shared<EnemyBullet>& split_one_into_eight_bullet, std::vector<Shared<EnemyBullet>>& enemyBullet, EnemyBullet::SPECIFICTYPE wave);
+	void InitAssist_MetalFatigue_Patchouli(
+		int split_one_into_eight_WAVE1, 
+		int id, Shared<EnemyBullet>& split_one_into_eight_bullet, 
+		std::vector<Shared<EnemyBullet>>& enemyBullet,
+		EnemyBullet::SPECIFICTYPE wave
+	);
 
 	//// <summary>
     //  ※ (パチュリー専用)　「サイレント・セレナ」

@@ -51,47 +51,58 @@ public:
 
 private:
 
-	// プレイヤー－-----------------------－-----------------------－------------------------------
-	void InitPlayerStatus(const std::string difficulty);       // HP、AT、DEFなどのステータス初期化
-	void RenderPlayerHp();
-	void WatchInvincibleTimer(const float delta_time);         // 無敵時間
+	// カメラ--------------------------------------------------------------------------------------------------------------
+	void ActivateDarkSoulsCamera();               // ダークソウルのようなカメラワークに近づけた処理
+	void NormalizeCameraSpeed(const float speed); // スピード調整
+	void ControlCameraWithoutEnemyFocus();
+	void ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& targetEnemyPos);
+
+	// プレイヤー ----------------------------------------------------------------------------------------------------------
+
+	// HP、AT、DEFなどのステータス初期化----------------------
+	void InitPlayerStatus();
+
+	// 無敵時間-----------------------------------------------
+	void WatchInvincibleTimer(const float deltaTime);
 	void TriggerInvincible(const Shared<FreeLookCamera>& camera);
 
-	void ControlPlayerMoveByInput(const float delta_time);   // 移動操作
+	// HP -----------------------------------------------------
+	void RenderPlayerHp();
+
+	// 移動 ---------------------------------------------------
+	void ControlPlayerMoveByInput(const float deltaTime);    // 移動操作
 	void AdjustPlayerVelocity();                             // 速度調整
 	void ControlRotationByPadOrMouse();                      // 視点操作
 
+	// 弾 --------------------------------------------------------------------------------------------------------------------
+	void ShotPlayerBullet();                        // 弾を撃つ処理
+	void UpdateStraightBullet(float deltaTime);     // 弾の更新処理
+	const tnl::Vector3& GetBulletMoveDirection();   // 弾の移動方向取得
+
 	bool IsShooting() {
-		return 
+		return
 			tnl::Input::IsMouseDown(eMouse::LEFT) ||
 			tnl::Input::IsPadDown(ePad::KEY_1);
 	}
 
-	void ShotPlayerBullet(const float deltaTime);            // 弾
-	void UpdateStraightBullet(float delta_time);
-	void RenderBulletPowerRate();
-	const tnl::Vector3& GetBulletMoveDirection();
+	// 連装砲------------------------------------------------------------------------------------------------------------------
+	void ShotGunportBullet();                                  // 発射処理
+	void RenderBulletPowerRate();                              // 弾の現在のパワーを表示
+	void RenderGunport(const Shared<FreeLookCamera> camera);   // 描画
+	void UpdateGunport();                                      // 更新
+	void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords); // DRY原則につき、同じ処理をまとめて実行
 
-	void RenderGunport(const Shared<FreeLookCamera> camera); // 連装砲
-	void UpdateGunport();
-	void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords);
-	void ShotGunportBullet();
+	// ボム--------------------------------------------------------------------------------------------------------------------
+	void UseBomb();                                            // 使用
+	void ValidateBombEffect();                                 // エフェクト有効化
+	void InvalidateBombEffect(const float deltaTime);          // エフェクト無効化
+	void RenderBombRemainCount();                              // ボム残数描画
 
-	void UseBomb();                                          // ボム
-	void ValidateBombEffect();
-	void InvalidateBombEffect(const float delta_time);
-	void RenderBombRemainCount();
-
-	void ChangeTarget_ByMouseWheel();	                     // 敵位置
-	void RenderFollowPointer();
-	bool IsEnemyInCapturableRange();
-	void AssignEnemyPosition(tnl::Vector3& enemy_pos);
-
-	// カメラ－-----------------------－-----------------------－----------------------－-----------------------－--
-	void ActivateDarkSoulsCamera();
-	void ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3& target_enemy_pos);
-	void ControlCameraWithoutEnemyFocus();
-	void NormalizeCameraSpeed(const float speed);
+	// 敵位置------------------------------------------------------------------------------------------------------------------
+	void ChangeTarget_ByMouseWheel();                          // マウスホイールでターゲット変更処理
+	void RenderFollowPointer();                                // ターゲット位置に合わせて描画するポインター
+	void AssignEnemyPosition(tnl::Vector3& enemyPos);          // ローカル変数に敵座標位置を割り当てる
+	bool IsEnemyInCapturableRange();                           // 敵がカメラ固定機能が使用可能な範囲内にいるか
 
 public:
 
@@ -113,52 +124,29 @@ private:
 
 private:
 
-	// プレイヤーステータス
-	int                _hp{};          // CSV
+	// プレイヤーステータス -------------------------------------------------
+	int                _hp{};                    // CSV
 	float              _playerMoveSpeed{ 0.4f };
-	float              _forwardVelocity{ 150.0f };
-	float              _hp_posX{ 60 };
-	float              _hp_posY{ 50 };
-	const tnl::Vector3 _START_POSITION{ 0, 100, -300 };
 
-	// ボム
+	// ボム------------------------------------------------------------------
 	int                _currentBomb_stockCount{};
 	float              _bombTimer{};
-	const float        _BOMBEFFECT_TIME_LIMIT{ 3.0f };
 	bool               _isTriggered_playersBombEffect{}; // 描画フラグ
 
-	// 無敵時間
+	// 無敵時間--------------------------------------------------------------
 	float              _invincibleTimer{};
-	const float        _INVINCIBLE_TIME_LIMIT{ 3.0f };
 	bool               _isInvincible{ false };
 
-	// ダメージSE	
+	// ダメージSE -----------------------------------------------------------
 	int                _getDamageSE_hdl{};
 
-	// 敵情報　
+	// 敵情報　--------------------------------------------------------------
 	int                _enemyIndex{}; // レーダーポインター使用時に使用
-	float              _capturable_enemyRange{ 500.0f };
 
-	// カメラ
-	const tnl::Vector3 _DEFAULT_CAMERA_POSITION{ 0, 100, -150 };
-	const tnl::Vector3 _CAMERA_OFFSET{ 0, -50, 20 };
-
-	// 視点操作
-	float              _viewpoint_lerpRate_h{ 0.05f };
-	float              _viewpoint_lerpRate_v{ 0.01f };
-
-	float              _cameraMove_delayRate{ 0.05f };
-
-	// プレイヤーとの距離のオフセット
-	float              _distance_offset{ 300.0f };
-
-	// プレイヤー操作
-	float              _centroidRadius{ 100 };  // 重心
-	float              _mass{ 100 };            // 質量
-	float              _friction{ 0.6f };       // 摩擦
-	tnl::Vector3       _moveVelocity{};
-	tnl::Vector3       _past_moveVelocity{};
-	tnl::Vector3       _centerOfGravity{};
+	// プレイヤー操作-------------------------------------------------------
+	tnl::Vector3       _moveVelocity{};         // 移動ベクトル
+	tnl::Vector3       _past_moveVelocity{};    // 前回の移動ベクトル
+	tnl::Vector3       _centerOfGravity{};      // 重心座標
 	tnl::Quaternion    _rotY{};
 	tnl::Quaternion    _rotX{};
 	tnl::Quaternion    _rotXZ{};

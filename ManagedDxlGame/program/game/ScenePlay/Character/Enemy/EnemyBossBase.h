@@ -4,7 +4,7 @@
 class Player;
 class BulletHell;
 class EnemyBullet;
-class CsvLoader;
+class Collision;
 struct EnemyBossInfo;
 
 class EnemyBossBase : public EnemyBase
@@ -13,41 +13,54 @@ public:
 
 	EnemyBossBase() {}
 
-	EnemyBossBase(const EnemyBossInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera);
+	EnemyBossBase(
+		const EnemyBossInfo& data,
+		const Shared<Player>& player,
+		const Shared<dxe::Camera>& camera,
+		const Shared<Collision>& collision
+	);
 
-	/*　派生クラスで使用する際、BulletHellインスタンスの引数には
-	ボスのメッシュ情報と、プレイヤーのインスタンス情報を引数に渡す*/
+	// INIT----------------------------------------------------------
 	virtual void InitBulletHellInstance() {}
 
+	// DAMAGE--------------------------------------------------------
 	void DecreaseBossHP(int damage);
 
 protected:
 
-	virtual bool ShowHpGage_EnemyBoss();
+	// HP------------------------------------------------------------
+	bool ShowHpGage_EnemyBoss();
+	void RenderBossRemainLife();
 
+	// NAME-----------------------------------------------------------
+	void RenderBossName();
 	virtual void RenderBossSpellCardName() {}
 
+	// HIT------------------------------------------------------------
+	void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
+
+	// ACT------------------------------------------------------------
 	void ActKeepDistanceToPlayer(const float& delta_time);
-
-	void RenderBossName();
-
-	void RenderBossRemainLife();
 
 public:
 
-	static std::deque<int> _bossHp;
+	std::deque<int>                  _bossHp{};
+	Shared<BulletHell>               _bulletHell = nullptr;
 
 protected:
 
-	std::list<Shared<EnemyBossBase>> _enemyBoss_list_ref;
-
-	Shared<BulletHell> _bulletHell = nullptr;
+	Shared<Collision>                _collision_ref = nullptr;
 
 protected:
 
-	int _MAX_HP{};
+	int       _MAX_HP{};
+	float     _WARPING_DURATION{};
 
 private:
 
-	std::stack<std::deque<int>> _remaining_life_indicator;
+	// ボス残りHP。4つの赤い ダイヤの形をしたもの-------------------------
+	std::stack<std::deque<int>> _remainingLife_indicator;
+
+	// ワープするタイミングをタイマーで制御-------------------------------
+	float _warpToRandPosTimer{};
 };

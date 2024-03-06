@@ -8,6 +8,7 @@ StraightBullet::StraightBullet() {
 
 	_mesh = dxe::Mesh::CreateSphereMV(sphereSize);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/colorTexture/purple.jpg"));
+	_mesh->setMtrlEmissive({ 1,1,1 });
 
 	_collisionSize = { sphereSize ,sphereSize ,sphereSize };
 }
@@ -15,9 +16,4 @@ StraightBullet::StraightBullet() {
 
  void StraightBullet::Render(Shared<dxe::Camera> _mainCamera) {
 	_mesh->render(_mainCamera);
-}
-
-
-void StraightBullet::Update(float delta_time) {
-
 }

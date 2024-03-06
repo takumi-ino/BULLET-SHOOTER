@@ -3,8 +3,6 @@
 #include "EnemyBase.h"
 
 class Player;
-class CsvLoader;
-class EnemyManager;
 class StraightBullet;
 class HomingBullet;
 class EnemyBullet;
@@ -16,6 +14,7 @@ class EnemyZakoBase : public EnemyBase
 {
 public:
 
+	// Enum------------------------------------------------------------------
 	enum class BEHAVE {
 
 		Stop,
@@ -23,54 +22,55 @@ public:
 		Turn
 	};
 
-	BEHAVE _behave = EnemyZakoBase::BEHAVE::Moving;
-
+	// コンストラクタ・デストラクタ------------------------------------------
 	EnemyZakoBase() {}
 
 	EnemyZakoBase(
-		const EnemyZakoInfo& data, 
+		const EnemyZakoInfo& data,
 		const Shared<Player>& player,
 		const Shared<dxe::Camera>& camera,
 		const Shared<Collision>& _collision
 	);
 
-	bool DecreaseHP(int damage, Shared<dxe::Camera> camera);
-
-	bool ShowHpGage_EnemyZako();
-
+	// Init ------------------------------------------------------------------
 	virtual void InitBulletFactoryInstance() {}
 
+	// HP ------------------------------------------------------------------
+	bool DecreaseHP(int damage, Shared<dxe::Camera> camera);
+
+	// 描画・更新 ------------------------------------------------------------
 	void Render(Shared<dxe::Camera> camera) override;
 	bool Update(const float delta_time) override;
-	
+
 protected:
 
-	// 直行弾
+	// 直行弾 ------------------------------------------------------------
 	void ShotStraightBullet(const float& delta_time);
-	void UpdateStraightBullet(const float delta_time);
 	void ReloadStraightBulletByTimer(const float& delta_time);
+	void UpdateStraightBullet(const float delta_time);
 
-	// 追尾弾
+	// 追尾弾 ------------------------------------------------------------
 	void ShotHomingBullet(const float& delta_time);
 	void ReloadHomingBulletByTimer(const float& delta_time);
 	void UpdateHomingBullet(const float delta_time);
 
+	// プレイヤーへ攻撃 ---------------------------------------------------
 	void AttackPlayer(const float& delta_time);
 
-	void SearchPlayerMovementState(const float delta_time);
-	void MoveToRandomInvestigatePos(const float& delta_time);
+	// 挙動	----------------------------------------------------------------------------------
+	void DoRoutineMoves(const float& delta_time);             // 追跡、攻撃、待機を使い分ける
 
-	void ChasePlayer(const float delta_time);
-	void DoRoutineMoves(const float& delta_time);
+	void SearchPlayerMovementState(const float delta_time);   // 待機状態中、STOP・ MOVE・ TURNのステートによって行動
+	void MoveToRandomInvestigatePos(const float& delta_time); // 待機状態中、ランダム移動
+
+	void ChasePlayer(const float delta_time);                 // プレイヤー追跡
 
 private:
 
+	bool ShowHpGage_EnemyZako();
+
 	const int GetIdleDistance() const { return _IDLE_DISTANCE; }
 	const int GetAttackDistance() const { return _ATTACK_DISTANCE; }
-
-public:
-
-	std::list<Shared<EnemyZakoBase>>       _enemyList_ref{};
 
 protected:
 
@@ -79,68 +79,75 @@ protected:
 	Shared<BulletFactory>                  _bulletFactory = nullptr;
 
 	std::list<Shared<StraightBullet>>      _straight_bullets{};
-	std::list<Shared<HomingBullet>>        _homing_bullets{};
-
 	std::deque<Shared<StraightBullet>>     _straightBullet_queue{};
+
+	std::list<Shared<HomingBullet>>        _homing_bullets{};
 	std::deque<Shared<HomingBullet>>       _homingBullet_queue{};
 
 public:
 
+	// 敵を撃破したときに発生する爆発エフェクト---------------------------------------------
 	static Shared<dxe::Particle> _explode_particle;
 
-	bool      _isAllDead = false; //敵クラス(最大生成数分)の死亡フラグ
-	bool      _canShot_straightBullet = true;   // 直行弾が撃てる状態か
-	bool      _canShot_HomingBullet = true;   // 直行弾が撃てるようになったか
-	bool      _isReached_toInvestigatePos = false;
+	// ランダムに決定した調査地点に辿り着いたか---------------------------------------------
+	bool                         _isReached_toInvestigatePos{ false };
 
-	static bool     _isNoticedPlayer;
-
-	float       _timeCountFrom_noticedPlayer{};
+	// プレイヤーに気付いた状態 ------------------------------------------------------------
+	static bool                  _isNoticedPlayer;
+	float                        _timeCountFrom_noticedPlayer{};
 
 	// CSVからロード-----------------------
-	int         _hp{};
-	int         _maxTotalEnemy_SpawnCount{};
-	int         _bullet_FireInterval{};
-	float       _bullet_MoveSpeed{};
-	float       _bullet_reloadTimeInterval{};
+	int         _hp{};                         // HP
+	int         _maxTotalEnemy_spawnCount{};   // 敵の総数
+	int         _bullet_fireInterval{};        // 弾の発射間隔
+	float       _bullet_moveSpeed{};           // 弾の移動スピード
+	float       _bullet_reloadTimeInterval{};  // リロード間隔
 
 protected:
 
+	//　発射SE---------------------------------
 	int         _shotSE_hdl{};
-		       
+
+	//　弾を撃つ間隔を管理するためのカウンター----------------------------------
 	int         _straightBullet_count{};
 	int         _homingBullet_count{};
-		      
-	float       _randomInvestigateRange_x{};
-	float       _randomInvestigateRange_y{};
-	float       _randomInvestigateRange_z{};
-		       
-	float       _minTimeToReach = 2.0f; // 弾のプレイヤーまでの最小到達時間
-	float       _maxTimeToReach = 3.0f; // 弾のプレイヤーまでの最大到達時間
-	float       _bulletTurnDelayRate{};
 
+	//　追尾弾で使用する値---------------------------------------------------------------------
+	const float _minTimeToReach{ 2.0f }; // 弾のプレイヤーまでの最小到達時間
+	const float _maxTimeToReach{ 3.0f }; // 弾のプレイヤーまでの最大到達時間
+	float       _bulletTurnDelayRate{};  // 弾の軌道修正の遅延率
+
+	//　距離や期間などの固定値（派生クラスで使用）----------------------------------------------
 	float       _IDLE_DISTANCE{};       // 直接の使用は禁止  Getterを通して値を取得する
 	float       _ATTACK_DISTANCE{};     // 直接の使用は禁止  Getterを通して値を取得する
 	float       _NOTICE_LIMIT_DURATION{};
 	float       _CHANGE_NEXT_BEHAVE_DURATION{};
-		
-	bool        _isShotStraightBullet = true;
-	bool        _isShotHomingBullet = false;
-	bool        _isAttacking = false;
 
-	// 巡回状態のときに目指す地点
+	//　ランダムに決定した調査地点のベクトル成分------------------------------------------------
+	float       _randomInvestigateRange_x{};
+	float       _randomInvestigateRange_y{};
+	float       _randomInvestigateRange_z{};
+
+	//　フラグ----------------------------------------------------------------------------------
+	bool        _isShotStraightBullet{ true }; // 直行弾を撃っているか
+	bool        _isShotHomingBullet{ false };  // 追尾弾を撃っているか
+	bool        _isAttacking{ false };         // 攻撃中か
+
+	// 巡回状態のときに目指す地点---------------------------------------------------------------
 	tnl::Vector3 _investigatePos{};
 
 private:
 
+	// Enum変数----------------------------------------
+	BEHAVE _behave = EnemyZakoBase::BEHAVE::Moving;  //敵の挙動管理
+
+	// ランダムデバイス--------------------------------
 	std::random_device mt;
 
-	float       _reloadStraightBullet_timeCounter{}; // リロード時間を追跡
+	// リロード時間を追跡------------------------------
+	float       _reloadStraightBullet_timeCounter{};
 	float       _reloadHomingBullet_timeCounter{};
 
-	const float _ROTATION_MAX_RANGE = 180.0f;
-	const float _STRAIGHTBULLET_LIFETIME_LIMIT = 3.0f;
-	const float _HOMINGBULLET_LIFETIME_LIMIT = 5.0f;
-
-	bool        _isTurning = false;
+	//　-----------------------------------------
+	bool        _isTurning{ false }; // 旋回中か
 };

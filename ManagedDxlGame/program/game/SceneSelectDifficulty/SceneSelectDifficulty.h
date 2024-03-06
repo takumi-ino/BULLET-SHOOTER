@@ -15,31 +15,18 @@ public:
 
 private:
 
+	//　難易度選択入力（上下）
 	void UpdateSelectDifficultyCursor_ByInput();
-
+	//　難易度項目描画
 	void RenderDifficultiesAndAnnotation();
-
+	//　背景描画
 	void RenderBackGround();
-
+	//　難易度決定（ScenePlayへ飛ぶ）
 	void DecideSelectedLevel_ByInput();
 
 private:
 
 	// 背景
 	int         _backGround_hdl{};
-	const int   _BACKGROUND_ALPHA{ 150 };
-
-	// テキストオフセット
-	const int   _TEXT_OFFSET_X{ 40 };
-	const int   _TEXT_OFFSET_Y{ 140 };
-
-	// 難易度
-	const int   _DIFFICULTY_TEXT_POS_X{ 570 };
-	const int   _DIFFICULTY_TEXT_POS_Y{ 110 };
-	const int   _DIFFICULTY_COUNT{ 4 };
 	int         _difficultyItemIndex{};
-
-	// 注釈
-	const int   _ANNOTATION_POS_X{ 540 };
-	const int   _ANNOTATION_POS_Y{ 180 };
 };

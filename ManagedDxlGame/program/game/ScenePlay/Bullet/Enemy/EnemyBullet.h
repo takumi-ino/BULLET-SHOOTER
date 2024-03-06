@@ -10,6 +10,7 @@ class EnemyBullet : public Bullet
 {
 public:
 
+	// Enum----------------------------------------------------------------------------------------------
 	enum class SHAPE {
 
 		None,
@@ -54,46 +55,30 @@ public:
 		// シリンダー(全方位)
 		Cylinder_Round_Red,
 		Cylinder_Round_Blue,
-
 	};
 
-
-	SHAPE shape = EnemyBullet::SHAPE::None;
-	SPECIFICTYPE specificType = EnemyBullet::SPECIFICTYPE::None;
-
-
+	//　コンストラクタ-----------------------------------------------------------------------------------
 	EnemyBullet(){}
-	explicit EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color , const float size);
-	explicit EnemyBullet(int){}
-	explicit EnemyBullet(Shared<EnemyBullet> enemy_bullet) {}
-	EnemyBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction) {}
-	EnemyBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction, Shared<Player> player_ref) {}
+	EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color , const float size);
 
-	// 弾幕専用
-	void Update(const float deltaTime) override;
-	// 弾幕専用
+	// 描画（弾幕用）-------------------------------------------------------------------------------------
 	void Render(Shared<dxe::Camera> camera) override;
-
-public:
-
-	Shared<Player> _player_ref;
 
 protected:
 
-	Shared<EnemyZakoBase> _enemy_ref;
-
-	tnl::Vector3 prev_pos;
+	Shared<Player>  _player_ref{};
 
 public:
 
-	int _id{};
-	float _speed{};
-	float _radius{};
-	float _angle{};
+	SPECIFICTYPE    specificType = EnemyBullet::SPECIFICTYPE::None;
 
-	bool _isActive = false;
-
-	tnl::Vector3 _moveDirection{};
-	tnl::Vector3 _startPosition{};
-	tnl::Vector3 _collisionSize{};
+	int             _id{};
+	float           _speed{};
+	float           _radius{};
+	float           _angle{};
+				   
+	bool            _isActive{ false };
+				   
+	tnl::Vector3    _moveDirection{};
+	tnl::Vector3    _collisionSize{};
 };

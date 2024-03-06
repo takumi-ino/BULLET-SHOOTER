@@ -9,7 +9,7 @@ public:
 
 	SkyBox();
 
-	Shared<dxe::Mesh> skybox = nullptr;
+	Shared<dxe::Mesh> _skybox = nullptr;
 
 	void Update();
 	void Render(const Shared<FreeLookCamera> camera);

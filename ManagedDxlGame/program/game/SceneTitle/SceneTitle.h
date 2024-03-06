@@ -23,8 +23,8 @@ private:
 	tnl::Sequence<SceneTitle> _sequence = tnl::Sequence<SceneTitle>(this, &SceneTitle::SeqIdle);
 	bool SeqIdle(float deltaTime);
 
-	void MakeMonoTransition_BackGround(const float deltaTime);
-	void MakeFlushEffect_TitleLogo(const float deltaTime);
+	void MakeMonoTransition_BackGround(const float deltaTime); // 背景エフェクト
+	void MakeFlushEffect_TitleLogo(const float deltaTime);     // タイトルロゴエフェクト
 
 private:
 
@@ -37,27 +37,8 @@ private:
 	int   _backGround_hdl{};
 	int   _tapSE_hdl{};
 
-	float _blurAlpha = 1.0f;
-	float _blurTimer = 0.0f;
-
-	// 背景画像
-	const int _BACKGROUND_POS_X{ 640 };
-	const int _BACKGROUND_POS_Y{ 250 };
-	const int _BACKGROUND_ALPHA{ 80 };
-	const int _BACKGROUND_EFFECT_OSCILLATE_SPEED{ 30 };
-
-	// ロゴ
-	const int   _TITLELOGO_POS_X{ 630 };
-	const int   _TITLELOGO_POS_Y{ 230 };
-	const int   _TITLELOGO_EFFECT_OSCILLATE_SPEED{ 70 };
-	const float _TITLELOGO_EXTEND_RATE{ 1.4f };
-
-
-
-
-	float _transTime_cb{};
-	float _transTime_cr{};
+	//　YCbCr・・・色を輝度と色相で表現したもの
+	float _transTime_cb{};      // 青系統
+	float _transTime_cr{};      // 赤系統
 	float _transTime_logoLights{};
-
-	const float _EFFECT_TRANS_OSCILLATE_RATE{ 1.3f };
 };

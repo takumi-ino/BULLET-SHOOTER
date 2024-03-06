@@ -11,12 +11,13 @@ Gunport::Gunport() {
 }
 
 
-
 void Gunport::ManageGunportCount(std::vector<Shared<Gunport>>& gunPort) {
 
-	if (PlayerBullet::_bulletPowerRate < 1.0f) return;
+	auto currentBulletPower = PlayerBullet::_bulletPowerRate;
 
-	if (PlayerBullet::_bulletPowerRate >= 1.0f && PlayerBullet::_bulletPowerRate < 2.0f) {
+	if (currentBulletPower < 1.0f) return;
+
+	if (currentBulletPower >= 1.0f && currentBulletPower < 2.0f) {
 
 		if (0 == _bulletPowerPhase) {
 
@@ -24,7 +25,7 @@ void Gunport::ManageGunportCount(std::vector<Shared<Gunport>>& gunPort) {
 			_bulletPowerPhase++;
 		}
 	}
-	if (PlayerBullet::_bulletPowerRate >= 2.0f && PlayerBullet::_bulletPowerRate < 3.0f) {
+	if (currentBulletPower >= 2.0f && currentBulletPower < 3.0f) {
 
 		if (1 == _bulletPowerPhase) {
 
@@ -32,7 +33,7 @@ void Gunport::ManageGunportCount(std::vector<Shared<Gunport>>& gunPort) {
 			_bulletPowerPhase++;
 		}
 	}
-	if (PlayerBullet::_bulletPowerRate >= 3.0f && PlayerBullet::_bulletPowerRate < 4.0f) {
+	if (currentBulletPower >= 3.0f && currentBulletPower < 4.0f) {
 
 		if (2 == _bulletPowerPhase) {
 
@@ -40,7 +41,7 @@ void Gunport::ManageGunportCount(std::vector<Shared<Gunport>>& gunPort) {
 			_bulletPowerPhase++;
 		}
 	}
-	if (PlayerBullet::_bulletPowerRate >= 4.0f && PlayerBullet::_bulletPowerRate < 5.0f) {
+	if (currentBulletPower >= 4.0f && currentBulletPower < 5.0f) {
 
 		if (3 == _bulletPowerPhase) {
 
@@ -48,17 +49,16 @@ void Gunport::ManageGunportCount(std::vector<Shared<Gunport>>& gunPort) {
 			_bulletPowerPhase++;
 		}
 	}
-	if (PlayerBullet::_bulletPowerRate > 4.98f) {
+	if (currentBulletPower > 4.99f) {
 
 		if (4 == _bulletPowerPhase) {
 
 			gunPort.emplace_back(std::make_shared<Gunport>());
 			_bulletPowerPhase++;
 		}
-		PlayerBullet::_bulletPowerRate = 5.0f;
+		currentBulletPower = 5.0f;
 	}
 }
-
 
 
 void Gunport::Render(const Shared<dxe::Camera> playerCamera) {

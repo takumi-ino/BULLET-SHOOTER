@@ -65,5 +65,5 @@ void ScoreManager::RenderTotalScore() {
 
 	std::string score_str = std::to_string(GetTotalScore());
 	DrawFormatString(1000, 80, -1, "Score %s", score_str.c_str());
-	SetFontSize(20);
+	SetFontSize(DEFAULT_FONT_SIZE);
 }

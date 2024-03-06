@@ -4,6 +4,27 @@
 #include "SceneResult.h"
 
 
+namespace {
+
+	const int   _backGround_posX{ 640 };
+	const int   _backGround_posY{ 380 };
+	const int   _backGround_baseAlpha{ 220 };
+	const float _backGround_extendRate{ 0.8f };
+
+	// Result
+	const int   _resultText_posX{ 530 };
+	const int   _resultText_posY{ 150 };
+
+	// “ïˆÕ“x
+	const int   _difficultyText_posX{ 320 };
+	const int   _difficultyText_posY{ 250 };
+
+	// TotalScore
+	const int   _totalScoreText_posX{ 800 };
+	const int   _totalScoreText_posY{ 270 };
+}
+
+
 SceneResult::SceneResult(const std::string difficulty, const int totalScore)
 	: _totalScore(totalScore), _difficulty(difficulty) {
 
@@ -33,7 +54,7 @@ void SceneResult::Render() {
 }
 
 
-void SceneResult::Update(float deltaTime) {	
+void SceneResult::Update(float deltaTime) {
 	_sequence.update(deltaTime);
 }
 

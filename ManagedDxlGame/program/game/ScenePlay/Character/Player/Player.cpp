@@ -15,6 +15,44 @@
 
 Shared<dxe::Particle> Player::_bombParticle;
 
+
+namespace {
+
+	// プレイヤーステータス -------------------------------------------------
+	const float           _forwardVelocity{ 150.0f };
+	const float           _HP_POS_X{ 60 };
+	const float           _HP_POS_Y{ 50 };
+	const tnl::Vector3    _START_POSITION{ 0, 100, -300 };
+
+	// ボム------------------------------------------------------------------
+	const float           _BOMBEFFECT_TIME_LIMIT{ 3.0f };
+	
+	// 無敵時間--------------------------------------------------------------
+
+	const float           _INVINCIBLE_TIME_LIMIT{ 3.0f };
+
+	// カメラ固定における敵補足可能範囲--------------------------------------
+	const float           _CAPTURABLE_RANGE_ENEMY{ 500.0f };
+
+	// カメラ----------------------------------------------------------------
+	const tnl::Vector3    _DEFAULT_CAMERA_POSITION{ 0, 100, -150 };
+	const tnl::Vector3    _CAMERA_OFFSET{ 0, -50, 20 };
+
+	// 視点操作--------------------------------------------------------------
+	const float           _VIEWPOINT_LERP_RATE_H{ 0.05f };
+	const float           _VIEWPOINT_LERP_RATE_V{ 0.01f };
+	const float           _CAMERAMOVE_DELAY_RATE{ 0.05f };
+
+	// プレイヤーとの距離のオフセット---------------------------------------
+	const float          _DISTANCE_OFFSET{ 300.0f };
+
+	// プレイヤー操作-------------------------------------------------------
+	const float          _CENTROID_RADIUS{ 100 };  // 重心
+	const float          _MASS{ 100 };             // 質量
+	const float          _FRICTION{ 0.6f };        // 摩擦
+}
+
+
 Player::Player(const Shared<FreeLookCamera> camera_ref) {
 
 	_mesh = dxe::Mesh::CreateSphereMV(20, 10, 10, false);
@@ -22,7 +60,7 @@ Player::Player(const Shared<FreeLookCamera> camera_ref) {
 	_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
 	_mesh->pos_ = _START_POSITION;
 
-	InitPlayerStatus(ScenePlay::GetGameDifficulty());
+	InitPlayerStatus();
 
 	_getDamageSE_hdl = LoadSoundMem("sound/se/getHit.mp3");
 
@@ -33,9 +71,9 @@ Player::Player(const Shared<FreeLookCamera> camera_ref) {
 }
 
 
-void Player::InitPlayerStatus(const std::string difficulty) {
+void Player::InitPlayerStatus() {
 
-	_csvLoader = std::make_shared<CsvLoader>(difficulty);
+	_csvLoader = std::make_shared<CsvLoader>();
 	auto status = _csvLoader->LoadPlayerStatus("csv/PlayerStatus.csv");
 
 	_hp = status._hp;
@@ -98,7 +136,7 @@ bool Player::IsEnemyInCapturableRange() {
 
 	float dis_playerAndEnemy = (enemyPos - _mesh->pos_).length();
 
-	if (dis_playerAndEnemy < _capturable_enemyRange) {
+	if (dis_playerAndEnemy < _CAPTURABLE_RANGE_ENEMY) {
 		return true;
 	}
 
@@ -170,7 +208,7 @@ const tnl::Vector3& Player::GetBulletMoveDirection() {
 }
 
 // 操作－-----------------------－-----------------------－-------------------------------------------------------------------
-void Player::ShotPlayerBullet(const float deltaTime) {
+void Player::ShotPlayerBullet() {
 
 	if (IsShooting()) {
 
@@ -201,7 +239,7 @@ void Player::ShotGunportBullet() {
 }
 
 
-void Player::ControlPlayerMoveByInput(const float delta_time) {
+void Player::ControlPlayerMoveByInput(const float deltaTime) {
 
 	float speed = 4.f;
 
@@ -245,7 +283,7 @@ void Player::ControlPlayerMoveByInput(const float delta_time) {
 	// 前方向　ゲームパッドの場合はL1
 	if (tnl::Input::IsKeyDown(eKeys::KB_SPACE) || tnl::Input::IsPadDown(ePad::KEY_4)) {
 
-		_mesh->pos_ += tnl::Vector3::TransformCoord({ 0,0,2 }, _mesh->rot_) * _forwardVelocity * delta_time;
+		_mesh->pos_ += tnl::Vector3::TransformCoord({ 0,0,2 }, _mesh->rot_) * _forwardVelocity * deltaTime;
 	}
 }
 
@@ -284,7 +322,7 @@ void Player::ControlRotationByPadOrMouse() {
 		// 上下視点
 		tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
 		_rotX *= tnl::Quaternion::RotationAxis(
-			tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _viewpoint_lerpRate_v));
+			tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V));
 	}
 
 	// マウス
@@ -296,12 +334,12 @@ void Player::ControlRotationByPadOrMouse() {
 		tnl::Vector3 vel = tnl::Input::GetMouseVelocity();
 
 		// 左右視点
-		_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x * _viewpoint_lerpRate_h));
+		_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x * _VIEWPOINT_LERP_RATE_H));
 
 		// 上下視点
 		tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
 		_rotX *= tnl::Quaternion::RotationAxis(
-			tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _viewpoint_lerpRate_v));
+			tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V));
 	}
 }
 
@@ -309,13 +347,13 @@ void Player::ControlRotationByPadOrMouse() {
 void Player::AdjustPlayerVelocity() {
 
 	// Time.deltaTimeのようなもの。これがないとプレイヤーが吹っ飛ぶ
-	tnl::EasyAdjustObjectVelocity(_centroidRadius, _mass, _friction, _past_moveVelocity, _moveVelocity, _centerOfGravity);
+	tnl::EasyAdjustObjectVelocity(_CENTROID_RADIUS, _MASS, _FRICTION, _past_moveVelocity, _moveVelocity, _centerOfGravity);
 
 	_mesh->pos_ += _moveVelocity;
 
 	if (_centerOfGravity.length() > FLT_EPSILON) {
 		// 重心位置を利用して傾いてほしいアッパーベクトルを作成
-		tnl::Vector3 upper = tnl::Vector3::Normalize({ _centerOfGravity.x, _centroidRadius, _centerOfGravity.z });
+		tnl::Vector3 upper = tnl::Vector3::Normalize({ _centerOfGravity.x, _CENTROID_RADIUS, _centerOfGravity.z });
 		// 傾きの角度を計算
 		float angle = upper.angle({ 0, 1, 0 });
 		// 傾きベクトルと真上ベクトルの外積から回転軸を計算し、傾き角度を調整して回転クォータニオンを作成
@@ -363,14 +401,14 @@ void Player::ControlCameraWithoutEnemyFocus()
 	// カメラの動きの遅延処理
 	tnl::Vector3 fixPos =
 		playerPos + tnl::Vector3::TransformCoord(_DEFAULT_CAMERA_POSITION, _mesh->rot_);
-	_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * _cameraMove_delayRate;
+	_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * _CAMERAMOVE_DELAY_RATE;
 
 	// 追従ポインターOFF
 	_playerCamera->isShowTargetPointer = false;
 }
 
 
-void Player::ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3& target_enemy_pos)
+void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& targetEnemyPos)
 {
 	// 追従ポインターON（描画）
 	_playerCamera->isShowTargetPointer = true;
@@ -379,16 +417,16 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3&
 	RenderFollowPointer();
 
 	tnl::Vector3 tmp{};
-	tmp.y = player_pos.y + 100;
+	tmp.y = playerPos.y + 100;
 	// カメラをプレイヤーと敵の中間地点に固定
-	_playerCamera->target_ = (tmp + target_enemy_pos) / 2;
+	_playerCamera->target_ = (tmp + targetEnemyPos) / 2;
 
 	tnl::Quaternion q = tnl::Quaternion::RotationAxis({ 0,1,0 }, _playerCamera->axis_y_angle_);
 	tnl::Vector3 xz = tnl::Vector3::TransformCoord({ 0,0,1 }, q);
 	tnl::Vector3 localAxis_x = tnl::Vector3::Cross({ 0,1,0 }, xz);
 	q *= tnl::Quaternion::RotationAxis(localAxis_x, _playerCamera->axis_x_angle_);
 
-	_mesh->rot_ = tnl::Quaternion::LookAt(player_pos, target_enemy_pos, localAxis_x);
+	_mesh->rot_ = tnl::Quaternion::LookAt(playerPos, targetEnemyPos, localAxis_x);
 
 	float y = 0;
 
@@ -396,7 +434,7 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3&
 	if (tnl::Input::IsKeyDown(eKeys::KB_A) || tnl::Input::IsPadDown(ePad::KEY_LEFT)) {
 
 		tnl::Vector3 newPos =
-			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _distance_offset, 0, _distance_offset }, q);
+			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 		newPos.y = _mesh->pos_.y;
 
@@ -409,7 +447,7 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3&
 	if (tnl::Input::IsKeyDown(eKeys::KB_D) || tnl::Input::IsPadDown(ePad::KEY_RIGHT)) {
 
 		tnl::Vector3 newPos =
-			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _distance_offset, 0, _distance_offset }, q);
+			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 		newPos.y = _mesh->pos_.y;
 
@@ -419,7 +457,7 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& player_pos, tnl::Vector3&
 	}
 
 	// カメラの動きの遅延処理
-	tnl::Vector3 fixPos = player_pos + tnl::Vector3::TransformCoord({ 50, y, -140 }, _mesh->rot_);
+	tnl::Vector3 fixPos = playerPos + tnl::Vector3::TransformCoord({ 50, y, -140 }, _mesh->rot_);
 	_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * 0.1f;
 }
 
@@ -448,10 +486,10 @@ void Player::UseBomb() {
 }
 
 
-void Player::InvalidateBombEffect(const float delta_time) {
+void Player::InvalidateBombEffect(const float deltaTime) {
 
 	if (_isTriggered_playersBombEffect) {
-		_bombTimer += delta_time;
+		_bombTimer += deltaTime;
 		ValidateBombEffect();
 
 		if (_bombTimer > _BOMBEFFECT_TIME_LIMIT) {
@@ -519,16 +557,16 @@ void Player::RenderPlayerHp() {
 
 	if (_hp <= 0) return;
 
-	float x2 = _hp_posX + 150;
+	float x2 = _HP_POS_X + 150;
 
-	float gageWidth = abs(x2 - _hp_posX);
+	float gageWidth = abs(x2 - _HP_POS_X);
 
 	float average = (_MAX_HP > 0) ? gageWidth / _MAX_HP : 0;
 
-	x2 = _hp_posX + static_cast<int>(average * _hp);
+	x2 = _HP_POS_X + static_cast<int>(average * _hp);
 
-	DrawBoxAA(_hp_posX, _hp_posY, 210, 65, GetColor(150, 150, 150), true);
-	DrawBoxAA(_hp_posX, _hp_posY, x2, 65, GetColor(0, 255, 0), true);
+	DrawBoxAA(_HP_POS_X, _HP_POS_Y, 210, 65, GetColor(150, 150, 150), true);
+	DrawBoxAA(_HP_POS_X, _HP_POS_Y, x2, 65, GetColor(0, 255, 0), true);
 
 	SetFontSize(16);
 	DrawString(30, 50, "HP:", -1);
@@ -574,13 +612,13 @@ void Player::TriggerInvincible(const Shared<FreeLookCamera>& camera)
 
 
 // 更新－-----------------------－-----------------------－-----------------------－-----------------------－-----------------------
-void Player::UpdateStraightBullet(float delta_time)
+void Player::UpdateStraightBullet(float deltaTime)
 {
 	auto it_blt = _straightBullets_player.begin();
 
 	while (it_blt != _straightBullets_player.end()) {
 
-		(*it_blt)->Update(delta_time);
+		(*it_blt)->Update(deltaTime);
 
 		if (!(*it_blt)->_isActive) {
 			it_blt = _straightBullets_player.erase(it_blt);
@@ -591,10 +629,10 @@ void Player::UpdateStraightBullet(float delta_time)
 }
 
 
-void Player::WatchInvincibleTimer(const float delta_time) {
+void Player::WatchInvincibleTimer(const float deltaTime) {
 
 	if (_isInvincible) {
-		_invincibleTimer += delta_time;
+		_invincibleTimer += deltaTime;
 
 		if (_invincibleTimer >= _INVINCIBLE_TIME_LIMIT) {
 			_invincibleTimer = 0.0f;
@@ -665,13 +703,13 @@ void Player::UpdateGunport() {
 }
 
 
-void Player::Update(const float delta_time) {
+void Player::Update(const float deltaTime) {
 
 	ActivateDarkSoulsCamera();
 
-	ControlPlayerMoveByInput(delta_time);
+	ControlPlayerMoveByInput(deltaTime);
 	AdjustPlayerVelocity();
-	WatchInvincibleTimer(delta_time);
+	WatchInvincibleTimer(deltaTime);
 
 	// カメラを敵に固定するフラグを反転
 	// マウス右　ゲームパッドの場合はR1（RB)
@@ -680,15 +718,15 @@ void Player::Update(const float delta_time) {
 			_playerCamera->follow = !_playerCamera->follow;
 	}
 
-	_playerCamera->Update(delta_time);
+	_playerCamera->Update(deltaTime);
 
-	ShotPlayerBullet(delta_time);
+	ShotPlayerBullet();
 	ShotGunportBullet();
-	UpdateStraightBullet(delta_time);
+	UpdateStraightBullet(deltaTime);
 
 	_playerGunport->ManageGunportCount(_gunportVec);
 	UpdateGunport();
 
 	UseBomb();
-	InvalidateBombEffect(delta_time);
+	InvalidateBombEffect(deltaTime);
 }

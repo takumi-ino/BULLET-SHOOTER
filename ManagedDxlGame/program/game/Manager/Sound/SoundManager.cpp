@@ -30,6 +30,7 @@ void SoundManager::PlayStageBGM(const bool isBossBattle) {
 		PlaySoundMem(_BGM_hdl, DX_PLAYTYPE_LOOP);
 }
 
+
 void SoundManager::DestroyStageBGM(const bool isBossBattle) {
 
 	if (isBossBattle) {

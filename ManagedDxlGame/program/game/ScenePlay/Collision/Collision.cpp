@@ -14,7 +14,6 @@
 
 
 // キャラクターと弾----------------------------------------------------------------------------------------------------------------------------
-
 bool Collision::CheckCollision_PlayerBulletAndEnemyZako(const Shared<PlayerBullet> bullet, const Shared<EnemyZakoBase> enemy) {
 
 	if (!enemy->_mesh) return false;

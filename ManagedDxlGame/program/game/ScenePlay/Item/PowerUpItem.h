@@ -20,7 +20,7 @@ public:
 	PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
 
 	PowerUpItem() {}
-	explicit PowerUpItem(Shared<PowerUpItem> item) {}
+
 	explicit PowerUpItem(const PowerUpItem::TYPE item_type);
 
 	bool Update(Shared<PowerUpItem>& item);

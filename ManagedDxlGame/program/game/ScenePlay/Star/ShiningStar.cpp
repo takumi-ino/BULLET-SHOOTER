@@ -10,7 +10,7 @@ void ShiningStar::Render() {
 
 	std::uniform_real_distribution<float> rateDistribution_x(0, (float)DXE_WINDOW_HEIGHT);
 	std::uniform_real_distribution<float> rateDistribution_y(0, (float)DXE_WINDOW_WIDTH);
-	std::uniform_real_distribution<float> rateDistribution_z(0,1.0f);
+	std::uniform_real_distribution<float> rateDistribution_z(0, 1.0f);
 
 	float randomX = rateDistribution_x(gen);
 	float randomY = rateDistribution_y(gen);
@@ -26,6 +26,6 @@ void ShiningStar::Render() {
 		pos[i].x = star[i].x = randomX;
 		pos[i].y = star[i].y = randomY;
 
-		DrawCircleAA((pos[i].x / pos[i].z) * 2.0, (pos[i].y / pos[i].z) * 2.0, 1, 10, GetColor(255,255,0));
+		DrawCircleAA((pos[i].x / pos[i].z) * 2.0, (pos[i].y / pos[i].z) * 2.0, 1, 10, GetColor(255, 255, 0));
 	}
 }

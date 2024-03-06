@@ -2,20 +2,29 @@
 #include "../../../ScenePlay.h"
 #include "EnemyBoss_MoriyaSuwako.h"
 
-int EnemyBoss_MoriyaSuwako::_at;
+
+std::vector<Shared<EnemyBullet>> EnemyBoss_MoriyaSuwako::_bullet_normal_suwako;
+std::vector<Shared<EnemyBullet>> EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako;
+std::vector<Shared<EnemyBullet>> EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako;
+bool EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako;
+bool EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako;
+bool EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako;
 
 
-EnemyBoss_MoriyaSuwako::EnemyBoss_MoriyaSuwako(const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera)
-	: EnemyBossBase(info, player, camera)  {
+EnemyBoss_MoriyaSuwako::EnemyBoss_MoriyaSuwako(
+	const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
+	: EnemyBossBase(info, player, camera, collision)  {
 
-	_collide_size = { 50,50,50 };
-	_at = 3;
+	_collideSize = { 50,50,50 };
+	_at = 6;
+
+	_WARPING_DURATION = 8.0f;
 }
 
 
 void EnemyBoss_MoriyaSuwako::SetMeshInfo() {
 
-	_mesh = dxe::Mesh::CreateSphereMV(50);
+	_mesh = dxe::Mesh::CreateCubeMV(100);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/bossTexture/Suwako.jpg"));
 
 	_mesh->pos_ = { 0, 0, 0 };
@@ -32,35 +41,37 @@ void EnemyBoss_MoriyaSuwako::InitBulletHellInstance() {
 
 void EnemyBoss_MoriyaSuwako::AttackPlayer(const float& delta_time) {
 
-	if (EnemyBossBase::_bossHp.empty()) {
-		ScenePlay::TurnOff_ThirdStageBulletHellLists();	return;
-	}
-
 	if (!_bulletHell) return;
 
-	//if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
+	if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
-	//	ScenePlay::_isUsingBullet_normal_suwako = true;
-	//	_bulletHell->ShotBulletHell_Normal_Suwako(delta_time);
-	//}
-	//else {
-	//	ScenePlay::_isUsingBullet_normal_suwako = false;
-	//}
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = true;
+		_bulletHell->ShotBulletHell_Normal_Suwako(delta_time);
 
-	//if (3 == EnemyBossBase::_bossHp.size()) {
-	//	ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = true;
-	//	_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(delta_time);
-	//}
-	//else {
-	//	ScenePlay::_isUsingBullet_ironRingOfMoriya_suwako = false;
-	//}
-
-	if (4 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = true;
-		_bulletHell->ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(delta_time);
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_normal_suwako);
 	}
 	else {
-		ScenePlay::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = false;
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = false;
+	}
+
+	if (3 == EnemyBossBase::_bossHp.size()) {
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = true;
+		_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_ironRingOfMoriya_suwako);
+	}
+	else {
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = false;
+	}
+
+	if (1 == EnemyBossBase::_bossHp.size()) {
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = true;
+		_bulletHell->ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_keroChanStandsFirmAgainstTheStorm_suwako);
+	}
+	else {
+		EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = false;
 	}
 }
 

@@ -5,7 +5,12 @@
 float PlayerBullet::_bulletPowerRate;
 
 
-PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction, const PlayerBullet::COLOR color, const float size)  {
+PlayerBullet::PlayerBullet(
+	const tnl::Vector3& spawn_pos, 
+	const tnl::Vector3& direction,
+	const PlayerBullet::COLOR color, 
+	const float size) : _speed(1000.0f)
+{
 
 	_mesh = dxe::Mesh::CreateSphereMV(size);
 
@@ -15,12 +20,10 @@ PlayerBullet::PlayerBullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& di
 	   {PlayerBullet::COLOR::White,  "graphics/colorTexture/white.bmp"},
 	};
 
-
 	_mesh->setTexture(dxe::Texture::CreateFromFile(colorMap[color]));
 	_mesh->pos_ = spawn_pos;
 	_moveDirection = direction; 
 	_moveDirection.normalize();
-	_speed = 1000.0f;
 }
 
 

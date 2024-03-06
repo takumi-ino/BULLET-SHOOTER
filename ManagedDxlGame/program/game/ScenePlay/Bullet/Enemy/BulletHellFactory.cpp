@@ -127,19 +127,19 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_MetalFatigu
 	Shared<EnemyBullet> split_one_into_eight_bullet_wave2;
 	Shared<EnemyBullet> split_one_into_eight_bullet_wave3;
 
-	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+	InitAssist_MetalFatigue_Patchouli(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 		id, 
 		split_one_into_eight_bullet_wave1, 
 		enemyBullet,
 		EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
 	
-	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+	InitAssist_MetalFatigue_Patchouli(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 		id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 		split_one_into_eight_bullet_wave2,
 		enemyBullet,
 		EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
 
-	InitSplitOneIntoEightBullet(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
+	InitAssist_MetalFatigue_Patchouli(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 		id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI * 2,
 		split_one_into_eight_bullet_wave3,
 		enemyBullet,
@@ -150,7 +150,7 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_MetalFatigu
 }
 
 
-void BulletHellFactory::InitSplitOneIntoEightBullet(
+void BulletHellFactory::InitAssist_MetalFatigue_Patchouli(
 	int split_one_into_eight_wave, int id, Shared<EnemyBullet>& split_one_into_eight_bullet, std::vector<Shared<EnemyBullet>>& enemyBullet, EnemyBullet::SPECIFICTYPE wave)
 {
 	for (int i = 0; i < split_one_into_eight_wave; i++) {

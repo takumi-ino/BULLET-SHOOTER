@@ -18,7 +18,5 @@ public:
 
 	StraightBullet();
 
-
 	void Render(Shared<dxe::Camera> _mainCamera) override;
-	void Update(const float deltaTime) override;
 };

@@ -12,9 +12,11 @@ EnemyBullet::EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color, con
 		break;
 	case EnemyBullet::SHAPE::Sphere:
 		_mesh = dxe::Mesh::CreateSphereMV(size, 10);
+
 		break;
 	case EnemyBullet::SHAPE::Cylinder:
 		_mesh = dxe::Mesh::CreateCylinderMV(5, size);
+
 		break;
 	}
 
@@ -39,9 +41,4 @@ EnemyBullet::EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color, con
 void EnemyBullet::Render(Shared<dxe::Camera> camera) {
 
 	_mesh->render(camera);
-}
-
-
-void EnemyBullet::Update(float deltaTime) {
-
 }

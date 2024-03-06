@@ -6,6 +6,25 @@
 #include "SceneSelectDifficulty.h"
 
 
+namespace {
+
+	const int   _BACKGROUND_ALPHA{ 150 };
+
+	// テキストオフセット
+	const int   _TEXT_OFFSET_X{ 40 };
+	const int   _TEXT_OFFSET_Y{ 140 };
+
+	// 難易度
+	const int   _DIFFICULTY_TEXT_POS_X{ 570 };
+	const int   _DIFFICULTY_TEXT_POS_Y{ 110 };
+	const int   _DIFFICULTY_COUNT{ 4 };
+
+	// 注釈
+	const int   _ANNOTATION_POS_X{ 540 };
+	const int   _ANNOTATION_POS_Y{ 180 };
+}
+
+
 SceneSelectDifficulty::SceneSelectDifficulty() {
 
 	_backGround_hdl = LoadGraph("graphics/Scene/select.jpg");
@@ -18,15 +37,15 @@ void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() {
 	{
 		_difficultyItemIndex--;
 
-		if (_difficultyItemIndex < 0) 
-			_difficultyItemIndex = _DIFFICULTY_COUNT - 1; // 末尾へ
+		if (_difficultyItemIndex < 0)
+			_difficultyItemIndex = _DIFFICULTY_COUNT - 1;
 	}
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))  // 下キー
+	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
 	{
 		_difficultyItemIndex++;
 
-		if (_difficultyItemIndex >= _DIFFICULTY_COUNT) 
-			_difficultyItemIndex = 0;	  // 先頭へ
+		if (_difficultyItemIndex >= _DIFFICULTY_COUNT)
+			_difficultyItemIndex = 0;
 	}
 }
 
@@ -39,7 +58,7 @@ void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() {
 	const char* difficulties[] =
 	{ "Easy", "Normal", "Hard", "Lunatic" };
 
-	const char* annotations[] = 
+	const char* annotations[] =
 	{ "もっとも易しい難易度です", "もっとも標準の難易度です", "ちょっと高めの難易度です", "奇特な難易度です" };
 
 	for (int i = 0; i < _DIFFICULTY_COUNT; i++) {

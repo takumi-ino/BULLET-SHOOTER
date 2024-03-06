@@ -16,19 +16,19 @@ public:
 	// 各オブジェクト生成
 	void InitScoreInstance();
 
-	// スコア加算
-	void AddHitBulletScore(int points);
-	void AddScoreItemScore(int points);
-	void AddComboScore(int points);
-	void AddKillBonus(int points);
-	void AddSpellCardBonus(int points);
+	// スコア加算---------------------------------------------------------------------
+	void AddHitBulletScore(int points);  // 弾ヒット
+	void AddScoreItemScore(int points);  // アイテムゲット
+	void AddComboScore(int points);      // コンボ
+	void AddKillBonus(int points);       // キルボーナス
+	void AddSpellCardBonus(int points);  // スペルカードボーナス
 
-	// 現状のスコア取得
-	int GetHitBulletScore() const;
-	int GetScoreItemScore() const;
-	int GetComboScore() const;
-	int GetKillBonus() const;
-	int GetSpellCardBonus() const;
+	// 現状のスコア取得--------------------------------------------------------------
+	int GetHitBulletScore() const;       // 弾ヒット
+	int GetScoreItemScore() const;	     // アイテムゲット
+	int GetComboScore() const;		     // コンボ
+	int GetKillBonus() const;		     // キルボーナス
+	int GetSpellCardBonus() const;	     // スペルカードボーナス
 
 	// 全てのスコアの合計
 	void RenderTotalScore();

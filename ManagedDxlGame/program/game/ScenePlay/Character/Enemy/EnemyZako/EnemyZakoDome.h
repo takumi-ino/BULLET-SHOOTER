@@ -9,15 +9,20 @@ class StraightBullet;
 class HomingBullet;
 class BulletFactory;
 
-
 class EnemyZakoDome : public EnemyZakoBase
 {
 public:
 
 	EnemyZakoDome(){}
 
-	EnemyZakoDome(const EnemyZakoInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision);
-	
+	EnemyZakoDome(
+		const EnemyZakoInfo& info,
+		const Shared<Player>& player,
+		const Shared<dxe::Camera>& camera,
+		const Shared<Collision>& collision
+	);
+
+	// èâä˙âª---------------------------------------------------------------------------------
 	void InitBulletFactoryInstance() override;
 	void SetMeshInfo() override;
 };

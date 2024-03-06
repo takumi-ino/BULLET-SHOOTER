@@ -2,20 +2,28 @@
 #include "../../../ScenePlay.h"
 #include "EnemyBoss_PatchouliKnowledge.h"
 
-int EnemyBoss_PatchouliKnowledge::_at;
+std::vector<Shared<EnemyBullet>> EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli;
+std::vector<Shared<EnemyBullet>> EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli;
+std::vector<Shared<EnemyBullet>> EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli;
+bool EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli;
+bool EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli;
+bool EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli;
 
 
-EnemyBoss_PatchouliKnowledge::EnemyBoss_PatchouliKnowledge(const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera)
-	: EnemyBossBase(info, player, camera) {
+EnemyBoss_PatchouliKnowledge::EnemyBoss_PatchouliKnowledge(
+	const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
+	: EnemyBossBase(info, player, camera, collision) {
 
-	_collide_size = { 50,50,50 };
-	_at = 5;
+	_collideSize = { 50,50,50 };
+	_at = 6;
+
+	_WARPING_DURATION = 10.0f;
 }
 
 
 void EnemyBoss_PatchouliKnowledge::SetMeshInfo() {
 
-	_mesh = dxe::Mesh::CreateSphereMV(50);
+	_mesh = dxe::Mesh::CreateCubeMV(100);
 	_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/bossTexture/PatchouliKnowledge.jpg"));
 
 	_mesh->pos_ = { 0, 0, 0 };
@@ -30,38 +38,40 @@ void EnemyBoss_PatchouliKnowledge::InitBulletHellInstance() {
 
 
 
-
 void EnemyBoss_PatchouliKnowledge::AttackPlayer(const float& delta_time) {
-
-	if (EnemyBossBase::_bossHp.empty()) {
-		ScenePlay::TurnOff_FirstStageBulletHellLists();	return;
-	}
 
 	if (!_bulletHell) return;
 
+
 	if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
-		ScenePlay::_isUsingBullet_normal_patchouli = true;
+		_isUsingBullet_normal_patchouli = true;
 		_bulletHell->ShotBulletHell_Normal_Patchouli(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_normal_patchouli);
 	}
 	else {
-		ScenePlay::_isUsingBullet_normal_patchouli = false;
+		_isUsingBullet_normal_patchouli = false;
 	}
 
 	if (3 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_metalFatigue_patchouli = true;
+		_isUsingBullet_metalFatigue_patchouli = true;
 		_bulletHell->ShotBulletHell_MetalFatigue_Patchouli(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_metalFatigue_patchouli);
 	}
 	else {
-		ScenePlay::_isUsingBullet_metalFatigue_patchouli = false;
+		_isUsingBullet_metalFatigue_patchouli = false;
 	}
 
 	if (1 == EnemyBossBase::_bossHp.size()) {
-		ScenePlay::_isUsingBullet_silentSerena_patchouli = true;
+		_isUsingBullet_silentSerena_patchouli = true;
 		_bulletHell->ShotBulletHell_SilentSerena_Patchouli(delta_time);
+
+		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_silentSerena_patchouli);
 	}
 	else {
-		ScenePlay::_isUsingBullet_silentSerena_patchouli = false;
+		_isUsingBullet_silentSerena_patchouli = false;
 	}
 }
 

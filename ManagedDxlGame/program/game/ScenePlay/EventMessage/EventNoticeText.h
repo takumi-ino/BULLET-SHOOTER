@@ -24,6 +24,8 @@ private:
 	int          _margin{};
 	int          _startTextPos_X{};
 	int          _startTextPos_Y{};
+
 	float        _duration{};
+
 	std::string  _messageText{};
 };

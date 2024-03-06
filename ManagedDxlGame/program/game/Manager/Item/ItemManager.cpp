@@ -21,29 +21,34 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 	};
 
 	// Easyを基準とした各得点アイテムの総数
-	int s_cnt = 10;
-	int m_cnt = 5;
-	int l_cnt = 1;
+	int small_cnt = 10;
+	int medium_cnt = 5;
+	int large_cnt = 1;
 
 	std::map<std::string, std::vector<ItemSize>> itemCountSetting
 	{
 		// 各ステージごとに{}で分け、{}の中で s,m,l を設定
+
+		// 難易度　Easy
 		{"Easy",
-		{{s_cnt,    m_cnt, l_cnt},               //stage1 
-		{s_cnt,     m_cnt, l_cnt},                //stage2 
-		{s_cnt,     m_cnt, l_cnt},}},             //stage3
+		{{small_cnt,    medium_cnt,     large_cnt},        //stage1 
+		{small_cnt,     medium_cnt,     large_cnt},        //stage2 
+		{small_cnt,     medium_cnt,     large_cnt},}},     //stage3
+		// 難易度　Normal
 		{"Normal",
-		{{s_cnt - 2,m_cnt - 1, l_cnt * 2},   //stage1
-		{s_cnt - 2, m_cnt, l_cnt * 2},        //stage2
-		{s_cnt - 2, m_cnt, l_cnt * 2}}},      //stage3
+		{{small_cnt - 2,medium_cnt - 1, large_cnt * 2},    //stage1
+		{small_cnt - 2, medium_cnt,     large_cnt * 2},    //stage2
+		{small_cnt - 2, medium_cnt,     large_cnt * 2}}},  //stage3
+		// 難易度　Hard
 		{"Hard",
-		{{s_cnt - 4,m_cnt - 2, l_cnt * 3},   //stage1
-		{s_cnt - 4, m_cnt - 2, l_cnt * 3},	  //stage2
-		{s_cnt - 4, m_cnt - 2, l_cnt * 3}}},  //stage3
+		{{small_cnt - 4,medium_cnt - 2, large_cnt * 3},    //stage1
+		{small_cnt - 4, medium_cnt - 2, large_cnt * 3},	   //stage2
+		{small_cnt - 4, medium_cnt - 2, large_cnt * 3}}},  //stage3
+		// 難易度　Lunatic
 		{"Lunatic",
-		{{s_cnt - 6,m_cnt - 3, l_cnt * 4},   //stage1
-		{s_cnt - 6, m_cnt - 3, l_cnt * 4},	  //stage2
-		{s_cnt - 6, m_cnt - 3, l_cnt * 4}}}	  //stage3
+		{{small_cnt - 6,medium_cnt - 3, large_cnt * 4},    //stage1
+		{small_cnt - 6, medium_cnt - 3, large_cnt * 4},	   //stage2
+		{small_cnt - 6, medium_cnt - 3, large_cnt * 4}}}   //stage3
 	};
 
 	if (itemCountSetting.count(difficulty) > 0 && stage_id >= 1 && stage_id <= 3) {
@@ -54,10 +59,12 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Small);
 			_scoreItem_small.push_back(item);
 		}
+
 		for (int i = 0; i < size.m; i++) {
 			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Medium);
 			_scoreItem_medium.push_back(item);
 		}
+
 		for (int i = 0; i < size.l; i++) {
 			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Large);
 			_scoreItem_large.push_back(item);
@@ -67,29 +74,30 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 
 
 
-void ItemManager::SetScoreItem_CollisionPairLists_DRY(std::vector<Shared<ScoreItem>>& scoreItems, const ScoreItem::TYPE type) {
+void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<ScoreItem>>& scoreItems, const ScoreItem::TYPE type) {
 
 	for (auto it : scoreItems) {
 		if (it->_mesh != nullptr && it->_isActive) {
+
 			if (_collision_ref->CheckCollision_PlayerAndScoreItem(it, _player_ref)) {
 
 				switch (type)
 				{
 				case ScoreItem::TYPE::Small:
 				{
-					OnCaughtItem("得点アイテム小", "500ポイント加算。");
+					EventNotify_OnCaughtItem("得点アイテム小", "500ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(500);
 					break;
 				}
 				case ScoreItem::TYPE::Medium:
 				{
-					OnCaughtItem("得点アイテム中", "1000ポイント加算。");
+					EventNotify_OnCaughtItem("得点アイテム中", "1000ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(100);
 					break;
 				}
 				case ScoreItem::TYPE::Large:
 				{
-					OnCaughtItem("得点アイテム大", "1500ポイント加算。");
+					EventNotify_OnCaughtItem("得点アイテム大", "1500ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(1500);
 					break;
 				}
@@ -101,11 +109,12 @@ void ItemManager::SetScoreItem_CollisionPairLists_DRY(std::vector<Shared<ScoreIt
 	}
 }
 
-void ItemManager::SetScoreItem_CollisionPairLists()
+
+void ItemManager::EventHit_ScoreItemAndPlayer()
 {
-	SetScoreItem_CollisionPairLists_DRY(_scoreItem_small, ScoreItem::TYPE::Small);
-	SetScoreItem_CollisionPairLists_DRY(_scoreItem_medium, ScoreItem::TYPE::Medium);
-	SetScoreItem_CollisionPairLists_DRY(_scoreItem_large, ScoreItem::TYPE::Large);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_small, ScoreItem::TYPE::Small);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_medium, ScoreItem::TYPE::Medium);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_large, ScoreItem::TYPE::Large);
 }
 
 
@@ -120,6 +129,7 @@ void ItemManager::UpdateScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems
 		}
 	}
 }
+
 void ItemManager::UpdateScoreItem()
 {
 	UpdateScoreItem_DRY(_scoreItem_small);
@@ -198,7 +208,7 @@ void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int 
 }
 
 
-void ItemManager::SetPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems) {
+void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems) {
 
 	for (auto it : powerUpItems) {
 		if (it->_mesh != nullptr && it->_isActive) {
@@ -208,48 +218,48 @@ void ItemManager::SetPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<Power
 				{
 				case PowerUpItem::TYPE::Heal:
 				{
-					if (Player::_hp < Player::_MAX_HP) {
+					if (_player_ref->GetHP() < _player_ref->GetMaxHP()) {
 
-						OnCaughtItem("回復アイテム", "HPが上昇。");
+						EventNotify_OnCaughtItem("回復アイテム", "HPが上昇。");
 
-						Player::_hp += 10;
+						_player_ref->HealHP(10);
 
-						if (Player::_hp > Player::_MAX_HP)
-							Player::_hp = Player::_MAX_HP;
+						if (_player_ref->GetHP() > _player_ref->GetMaxHP()) {
+
+							_player_ref->SetHP(_player_ref->GetMaxHP());
+						}
 						break;
 					}
 					break;
 				}
 				case PowerUpItem::TYPE::Attack:
 				{
-					OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
+					EventNotify_OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
 
-					Player::_at += 2;
+					_player_ref->AddAT(2);
 					break;
 				}
 				case PowerUpItem::TYPE::Defense:
 				{
-					OnCaughtItem("防御強化アイテム", "防御力が上昇。");
+					EventNotify_OnCaughtItem("防御強化アイテム", "防御力が上昇。");
 
-					Player::_def += 2;
+					_player_ref->AddDEF(2); // 防御力が敵の攻撃力を上回らないように
 					break;
 				}
 				case PowerUpItem::TYPE::Speed:
 				{
-					OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
+					EventNotify_OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
 
-					Player::_moveSpeed += 0.1f;
+					_player_ref->AddSpeed(0.1f);
 					break;
-
 				}
 				case PowerUpItem::TYPE::Bomb:
 				{
-					OnCaughtItem("ボム", "");
+					EventNotify_OnCaughtItem("ボム", "");
 
-					Player::_current_bomb_stock_count += 1;
+					_player_ref->AddBombStockCount();
 					break;
 				}
-
 				}
 				it->_isActive = false;
 			}
@@ -257,12 +267,12 @@ void ItemManager::SetPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<Power
 	}
 }
 
-void ItemManager::SetPowerUpItem_CollisionPairLists() {
-	SetPowerUpItem_CollisionPairLists_DRY(_powerUpItem_heal);
-	SetPowerUpItem_CollisionPairLists_DRY(_powerUpItem_attack);
-	SetPowerUpItem_CollisionPairLists_DRY(_powerUpItem_defense);
-	SetPowerUpItem_CollisionPairLists_DRY(_powerUpItem_speed);
-	SetPowerUpItem_CollisionPairLists_DRY(_powerUpItem_bomb);
+void ItemManager::EventHit_PowerUpItemAndPlayer() {
+	EventHit_PowerUpItemAndPlayer_DRY(_powerUpItem_heal);
+	EventHit_PowerUpItemAndPlayer_DRY(_powerUpItem_attack);
+	EventHit_PowerUpItemAndPlayer_DRY(_powerUpItem_defense);
+	EventHit_PowerUpItemAndPlayer_DRY(_powerUpItem_speed);
+	EventHit_PowerUpItemAndPlayer_DRY(_powerUpItem_bomb);
 }
 
 
@@ -279,20 +289,20 @@ void ItemManager::DestroyAllItems() {
 }
 
 // イベント通知----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::OnCaughtItem(const std::string item_name, const std::string effect) {
+void ItemManager::EventNotify_OnCaughtItem(const std::string item_name, const std::string effect) {
 
 	std::string msg = item_name + "を獲得。 \n" + effect;
 
 	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(0, 255, 0), 16, 35);
 
-	EventNoticeText::_message_queue.push_back(event_msg);
+	EventNoticeText::_messageQueue.push_back(event_msg);
 }
 
 
 void ItemManager::RenderEventHitText() const {
 
 	int index = 0;
-	for (auto msg : EventNoticeText::_message_queue) {
+	for (auto msg : EventNoticeText::_messageQueue) {
 		msg->Render(index);
 		index++;
 	}
@@ -301,25 +311,24 @@ void ItemManager::RenderEventHitText() const {
 
 void ItemManager::UpdateEventHitText(const float& deltaTime) {
 
-	// イベント通知
-	for (auto msg : EventNoticeText::_message_queue) {
+	for (auto msg : EventNoticeText::_messageQueue) {
 		msg->Update(deltaTime);
 	}
-	// 表示時間が切れたメッセージを削除する
-	auto iter = EventNoticeText::_message_queue.begin();
-	while (iter != EventNoticeText::_message_queue.end()) {
 
-		if ((*iter)->IsExpired()) {
-			iter = EventNoticeText::_message_queue.erase(iter);
+	auto it = EventNoticeText::_messageQueue.begin();
+	while (it != EventNoticeText::_messageQueue.end()) {
+
+		if ((*it)->IsExpired()) {
+			it = EventNoticeText::_messageQueue.erase(it);
 		}
 		else {
-			++iter;
+			++it;
 		}
 	}
 }
 
 // 当たり判定-----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::ScoreItemCollisionPairLists_DRY(std::vector<Shared<ScoreItem>>& scoreItems_1, std::vector<Shared<ScoreItem>>& scoreItems_2) {
+void ItemManager::AvoidOverlap_ScoreItemAndScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems_1, std::vector<Shared<ScoreItem>>& scoreItems_2) {
 
 	for (auto it : scoreItems_1) {
 		for (auto& it2 : scoreItems_2) {
@@ -328,18 +337,18 @@ void ItemManager::ScoreItemCollisionPairLists_DRY(std::vector<Shared<ScoreItem>>
 	}
 }
 
-void ItemManager::ScoreItemCollisionPairLists()
+void ItemManager::AvoidOverlap_ScoreItemAndScoreItem()
 {
-	ScoreItemCollisionPairLists_DRY(_scoreItem_small, _scoreItem_small);    // 小と小
-	ScoreItemCollisionPairLists_DRY(_scoreItem_small, _scoreItem_medium);   // 小と中
-	ScoreItemCollisionPairLists_DRY(_scoreItem_small, _scoreItem_large);    // 小と大
-	ScoreItemCollisionPairLists_DRY(_scoreItem_medium, _scoreItem_medium);  // 中と中
-	ScoreItemCollisionPairLists_DRY(_scoreItem_medium, _scoreItem_large);   // 中と大
-	ScoreItemCollisionPairLists_DRY(_scoreItem_large, _scoreItem_large);    // 大と大
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_small);    // 小と小
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_medium);   // 小と中
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_large);    // 小と大
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_medium, _scoreItem_medium);  // 中と中
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_medium, _scoreItem_large);   // 中と大
+	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_large, _scoreItem_large);    // 大と大
 }
 
 
-void ItemManager::PowerUpItemCollisionPairLists_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems_1, std::vector<Shared<PowerUpItem>>& powerUpItems_2) {
+void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems_1, std::vector<Shared<PowerUpItem>>& powerUpItems_2) {
 
 	for (auto it : powerUpItems_1) {
 		for (auto& it2 : powerUpItems_2) {
@@ -348,30 +357,30 @@ void ItemManager::PowerUpItemCollisionPairLists_DRY(std::vector<Shared<PowerUpIt
 	}
 }
 
-void ItemManager::PowerUpItemCollisionPairLists() {
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_heal, _powerUpItem_heal);    // 回復と回復
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_heal, _powerUpItem_attack);  // 回復と攻撃
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_heal, _powerUpItem_defense); // 回復と防御
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_heal, _powerUpItem_speed);   // 回復とスピード
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_heal, _powerUpItem_bomb);    // 回復とボム
+void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem() {
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_heal);    // 回復と回復
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_attack);  // 回復と攻撃
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_defense); // 回復と防御
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_speed);   // 回復とスピード
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_bomb);    // 回復とボム
 
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_attack, _powerUpItem_attack);   // 攻撃と攻撃
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_attack, _powerUpItem_defense);  // 攻撃と防御
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_attack, _powerUpItem_speed);    // 攻撃とスピード
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_attack, _powerUpItem_bomb);     // 攻撃とボム
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_attack, _powerUpItem_attack);   // 攻撃と攻撃
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_attack, _powerUpItem_defense);  // 攻撃と防御
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_attack, _powerUpItem_speed);    // 攻撃とスピード
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_attack, _powerUpItem_bomb);     // 攻撃とボム
 
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_defense, _powerUpItem_defense); // 防御と防御
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_defense, _powerUpItem_speed);   // 防御とスピード
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_defense, _powerUpItem_bomb);    // 防御とボム
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_defense, _powerUpItem_defense); // 防御と防御
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_defense, _powerUpItem_speed);   // 防御とスピード
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_defense, _powerUpItem_bomb);    // 防御とボム
 
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_speed, _powerUpItem_speed);    // スピードとスピード
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_speed, _powerUpItem_bomb);     // スピードとボム
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_speed, _powerUpItem_speed);    // スピードとスピード
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_speed, _powerUpItem_bomb);     // スピードとボム
 
-	PowerUpItemCollisionPairLists_DRY(_powerUpItem_bomb, _powerUpItem_bomb);      // ボムとボム
+	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_bomb, _powerUpItem_bomb);      // ボムとボム
 }
 
 
-void ItemManager::ScoreItemAndPowerUpItem_CollisionPairLists_DRY(std::vector<Shared<ScoreItem>>& scoreItems, std::vector<Shared<PowerUpItem>>& powerUpItems) {
+void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems, std::vector<Shared<PowerUpItem>>& powerUpItems) {
 
 	for (auto it : scoreItems) {
 		for (auto& it2 : powerUpItems) {
@@ -381,24 +390,24 @@ void ItemManager::ScoreItemAndPowerUpItem_CollisionPairLists_DRY(std::vector<Sha
 }
 
 
-void ItemManager::ScoreItemAndPowerUpItem_CollisionPairLists() {
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_small, _powerUpItem_heal);    // 小アイテムと回復
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_small, _powerUpItem_attack);  // 小アイテムと攻撃
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_small, _powerUpItem_defense); // 小アイテムと防御
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_small, _powerUpItem_speed);   // 小アイテムとスピード
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_small, _powerUpItem_bomb);    // 小アイテムとボム
+void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem() {
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_heal);    // 小アイテムと回復
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_attack);  // 小アイテムと攻撃
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_defense); // 小アイテムと防御
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_speed);   // 小アイテムとスピード
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_bomb);    // 小アイテムとボム
 
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_medium, _powerUpItem_heal);   // 中アイテムと回復
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_medium, _powerUpItem_attack); // 中アイテムと攻撃
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_medium, _powerUpItem_defense);// 中アイテムと防御
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_medium, _powerUpItem_speed);  // 中アイテムとスピード
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_medium, _powerUpItem_bomb);   // 中アイテムとボム
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_medium, _powerUpItem_heal);   // 中アイテムと回復
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_medium, _powerUpItem_attack); // 中アイテムと攻撃
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_medium, _powerUpItem_defense);// 中アイテムと防御
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_medium, _powerUpItem_speed);  // 中アイテムとスピード
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_medium, _powerUpItem_bomb);   // 中アイテムとボム
 
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_large, _powerUpItem_heal);   // 大アイテムと回復
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_large, _powerUpItem_attack); // 大アイテムと攻撃
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_large, _powerUpItem_defense);// 大アイテムと防御
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_large, _powerUpItem_speed);  // 大アイテムとスピード
-	ScoreItemAndPowerUpItem_CollisionPairLists_DRY(_scoreItem_large, _powerUpItem_bomb);   // 大アイテムとボム
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_large, _powerUpItem_heal);   // 大アイテムと回復
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_large, _powerUpItem_attack); // 大アイテムと攻撃
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_large, _powerUpItem_defense);// 大アイテムと防御
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_large, _powerUpItem_speed);  // 大アイテムとスピード
+	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_large, _powerUpItem_bomb);   // 大アイテムとボム
 }
 
 
@@ -481,6 +490,7 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 	std::uniform_int_distribution<int> rnd_loop_count(0, 4);
 	int loop_count = rnd_loop_count(mt);
 
+
 	for (int i = 0; i < loop_count; ++i) {
 
 		tnl::Vector3 rnd_offset;
@@ -543,9 +553,9 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 		}
 	}
 
-	ScoreItemCollisionPairLists();
-	PowerUpItemCollisionPairLists();
-	ScoreItemAndPowerUpItem_CollisionPairLists();
+	AvoidOverlap_ScoreItemAndScoreItem();
+	AvoidOverlap_PowerUpItemAndPowerUpItem();
+	AvoidOverlap_ScoreItemAndPowerUpItem();
 }
 
 void ItemManager::Update(const float& deltaTime) {
@@ -555,6 +565,6 @@ void ItemManager::Update(const float& deltaTime) {
 
 	UpdateEventHitText(deltaTime);
 
-	SetScoreItem_CollisionPairLists();
-	SetPowerUpItem_CollisionPairLists();
+	EventHit_ScoreItemAndPlayer();
+	EventHit_PowerUpItemAndPlayer();
 }

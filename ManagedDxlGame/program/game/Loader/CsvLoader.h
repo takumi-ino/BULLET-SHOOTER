@@ -1,4 +1,5 @@
 #pragma once
+#include "../ScenePlay/ScenePlay.h"
 #include "../DxLibEngine.h"
 
 
@@ -9,14 +10,14 @@ struct EnemyZakoInfo
 	float _scale{};
 	int   _stageID{};
 	int   _hp{};
-	int   _maxTotalEnemy_SpawnCount{}; // ƒQ[ƒ€‘S‘Ì‚Å‘¶İ‚Å‚«‚éÀ‘Ì‚ÌÅ‘å”
-	float _charaMoveSpeed{};
+	int   _maxTotalEnemy_spawnCount{}; // ƒQ[ƒ€‘S‘Ì‚Å‘¶İ‚Å‚«‚éÀ‘Ì‚ÌÅ‘å”
+	float _enemyMoveSpeed{};
 	std::string _name{};
 
 	// ’e
 	int    _maxBulletSpawnCount{};
-	int    _bullet_FireInterval{};
-	float  _bullet_MoveSpeed{};
+	int    _bullet_fireInterval{};
+	float  _bullet_moveSpeed{};
 	float  _bullet_reloadTimeInterval{};
 };
 
@@ -27,7 +28,7 @@ struct EnemyBossInfo
 	float  _scale{};
 	int    _hp{};
 	int    _maxBulletSpawnCount{};
-	float  _charaMoveSpeed{};
+	float  _enemyMoveSpeed{};
 	std::string _name{};
 };
 
@@ -52,7 +53,6 @@ class CsvLoader
 public:
 
 	CsvLoader() {}
-	explicit CsvLoader(const std::string difficulty) : _SELECTED_DIFFICULTY(difficulty) {}
 
 	std::unordered_map<int, EnemyZakoInfo> LoadEnemyZakoInfos(const std::string enemy_csv);
 	std::unordered_map<int, EnemyBossInfo> LoadEnemyBossInfos(const std::string enemy_csv);
@@ -61,5 +61,5 @@ public:
 
 private:
 
-	const std::string _SELECTED_DIFFICULTY;
+	const std::string _SELECTED_DIFFICULTY = ScenePlay::GetGameDifficulty();
 };

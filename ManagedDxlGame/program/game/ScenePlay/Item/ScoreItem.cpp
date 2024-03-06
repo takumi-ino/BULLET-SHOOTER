@@ -34,6 +34,10 @@ ScoreItem::ScoreItem(const ScoreItem::TYPE item_type) {
 		break;
 	}
 	}
+
+
+
+	_lifeTime = 20.0f;
 }
 
 
@@ -42,11 +46,11 @@ bool ScoreItem::Update(Shared<ScoreItem>& item) {
 	if (item->_isActive) {
 		item->_lifeTimer += ScenePlay::GetDeltaTime();
 
-		_velocity += _gravity * ScenePlay::GetDeltaTime() * 2;
+		_velocity += _gravity * ScenePlay::GetDeltaTime() * 2.0f;
 		item->_mesh->pos_ += _velocity * ScenePlay::GetDeltaTime();
 
 
-		if (item->_lifeTimer > 20) {
+		if (item->_lifeTimer > _lifeTime) {
 			item->_lifeTimer = 0;
 			item->_isActive = false;
 			return false;
