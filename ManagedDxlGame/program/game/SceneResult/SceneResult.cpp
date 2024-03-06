@@ -1,6 +1,7 @@
 #include "../DxLibEngine.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../Manager/Scene/SceneManager.h"
+#include "../InputFuncTable.h"
 #include "SceneResult.h"
 
 
@@ -61,7 +62,7 @@ void SceneResult::Update(float deltaTime) {
 
 bool SceneResult::SeqIdle(float deltaTime) {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
+	if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneTitle());

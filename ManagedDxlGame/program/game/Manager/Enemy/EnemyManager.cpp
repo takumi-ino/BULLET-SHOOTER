@@ -23,6 +23,7 @@
 #include "../../SceneResult/SceneResult.h"
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
 #include"../../ScenePlay/Item/ItemBase.h"
+#include "../../InputFuncTable.h"
 
 
 // èâä˙âªèàóù-------------------------------------------------------------------------------------------------------------------------
@@ -521,7 +522,7 @@ bool EnemyManager::SeqMoveToNextStage(const float deltaTime) {
 		DrawString(480, 450, "Move to Next Stage!", GetColor(0, 255, 0));
 		SetFontSize(DEFAULT_FONT_SIZE);
 
-		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+		if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 			SoundManager::GetInstance().DestroyStageBGM(false);
 
@@ -548,7 +549,7 @@ bool EnemyManager::SeqMoveToResult(const float deltaTime) {
 		DrawString(480, 450, "Move to Result!", GetColor(0, 255, 0));
 
 
-		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+		if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 			SoundManager::GetInstance().DestroyStageBGM(false);
 

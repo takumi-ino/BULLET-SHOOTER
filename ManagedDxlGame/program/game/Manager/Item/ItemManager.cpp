@@ -77,6 +77,7 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<ScoreItem>>& scoreItems, const ScoreItem::TYPE type) {
 
 	for (auto it : scoreItems) {
+
 		if (it->_mesh != nullptr && it->_isActive) {
 
 			if (_collision_ref->CheckCollision_PlayerAndScoreItem(it, _player_ref)) {
@@ -121,7 +122,9 @@ void ItemManager::EventHit_ScoreItemAndPlayer()
 void ItemManager::UpdateScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems) {
 
 	if (!scoreItems.empty()) {
+
 		for (auto it_scrItm = scoreItems.begin(); it_scrItm != scoreItems.end();) {
+
 			if ((*it_scrItm)->Update((*it_scrItm)) == false)
 				it_scrItm = scoreItems.erase(it_scrItm);
 			else
@@ -211,7 +214,9 @@ void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int 
 void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems) {
 
 	for (auto it : powerUpItems) {
+
 		if (it->_mesh != nullptr && it->_isActive) {
+
 			if (_collision_ref->CheckCollision_PlayerAndPowerUpItem(it, _player_ref)) {
 
 				switch (it->type)

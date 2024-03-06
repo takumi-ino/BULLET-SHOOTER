@@ -10,6 +10,7 @@
 #include "../../Pause/PauseMenu.h"
 #include "../game/ScenePlay/Bullet/Player/Gunport.h"
 #include "../game/Loader/CsvLoader.h"
+#include "../../../InputFuncTable.h"
 #include "Player.h"
 
 
@@ -249,14 +250,14 @@ void Player::ControlPlayerMoveByInput(const float deltaTime) {
 	}
 
 	// 左方向
-	if (tnl::Input::IsKeyDown(eKeys::KB_A) || tnl::Input::IsPadDown(ePad::KEY_LEFT) && !_playerCamera->follow) {
+	if (InputFuncTable::IsButtonDown_LEFT() && !_playerCamera->follow) {
 
 		_moveVelocity -= tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
 		NormalizeCameraSpeed(speed);
 	}
 
 	// 右方向
-	if (tnl::Input::IsKeyDown(eKeys::KB_D) || tnl::Input::IsPadDown(ePad::KEY_RIGHT) && !_playerCamera->follow) {
+	if (InputFuncTable::IsButtonDown_RIGHT() && !_playerCamera->follow) {
 
 		_moveVelocity += tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
 		NormalizeCameraSpeed(speed);
@@ -272,7 +273,7 @@ void Player::ControlPlayerMoveByInput(const float deltaTime) {
 	}
 
 	// 下方向
-	if (tnl::Input::IsKeyDown(eKeys::KB_S) || tnl::Input::IsPadDown(ePad::KEY_DOWN)) {
+	if (InputFuncTable::IsButtonDown_DOWN()) {
 
 		_moveVelocity -= tnl::Vector3::TransformCoord({ 0, 1.0f, 0.1f }, _rotY);
 		_mesh->pos_.z -= _playerMoveSpeed;
@@ -431,7 +432,7 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& 
 	float y = 0;
 
 	//左方向
-	if (tnl::Input::IsKeyDown(eKeys::KB_A) || tnl::Input::IsPadDown(ePad::KEY_LEFT)) {
+	if (InputFuncTable::IsButtonDown_LEFT()) {
 
 		tnl::Vector3 newPos =
 			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
@@ -444,7 +445,7 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& 
 	}
 
 	// 右方向
-	if (tnl::Input::IsKeyDown(eKeys::KB_D) || tnl::Input::IsPadDown(ePad::KEY_RIGHT)) {
+	if (InputFuncTable::IsButtonDown_RIGHT()) {
 
 		tnl::Vector3 newPos =
 			_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
@@ -714,6 +715,7 @@ void Player::Update(const float deltaTime) {
 	// カメラを敵に固定するフラグを反転
 	// マウス右　ゲームパッドの場合はR1（RB)
 	if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) || tnl::Input::IsPadDownTrigger(ePad::KEY_5)) {
+		
 		if (IsEnemyInCapturableRange() || _playerCamera->follow)
 			_playerCamera->follow = !_playerCamera->follow;
 	}

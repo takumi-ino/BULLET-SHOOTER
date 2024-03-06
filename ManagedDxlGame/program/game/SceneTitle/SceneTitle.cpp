@@ -3,6 +3,7 @@
 #include "../Manager/Scene/SceneManager.h"
 #include "../SceneResult/SceneResult.h"
 #include "../Manager/Sound/SoundManager.h"
+#include "../InputFuncTable.h"
 #include "SceneTitle.h"
 
 
@@ -95,7 +96,7 @@ void SceneTitle::MakeMonoTransition_BackGround(float deltaTime)
 
 bool SceneTitle::SeqIdle(float deltaTime) {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
+	if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		PlaySoundMem(_tapSE_hdl, DX_PLAYTYPE_BACK);
 		SoundManager::GetInstance().DestroyBGM();

@@ -3,6 +3,7 @@
 #include "../ScenePlay/ScenePlay.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Score/ScoreManager.h"
+#include "../InputFuncTable.h"
 #include "SceneSelectDifficulty.h"
 
 
@@ -33,14 +34,14 @@ SceneSelectDifficulty::SceneSelectDifficulty() {
 
 void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
+	if (InputFuncTable::IsButtonDownTrigger_UP())
 	{
 		_difficultyItemIndex--;
 
 		if (_difficultyItemIndex < 0)
 			_difficultyItemIndex = _DIFFICULTY_COUNT - 1;
 	}
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
+	if (InputFuncTable::IsButtonDownTrigger_DOWN())
 	{
 		_difficultyItemIndex++;
 
@@ -87,7 +88,7 @@ void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() {
 
 void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN) || tnl::Input::IsPadDownTrigger(ePad::KEY_1)) {
+	if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
@@ -132,7 +133,8 @@ void SceneSelectDifficulty::Render() {
 
 void SceneSelectDifficulty::Update(float deltaTime) {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK)) {
+	if (InputFuncTable::IsButtonTrigger_CANCEL()) {
+
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneTitle());
 	}

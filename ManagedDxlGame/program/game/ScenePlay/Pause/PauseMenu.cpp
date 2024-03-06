@@ -4,6 +4,7 @@
 #include "../../Manager/Scene/SceneManager.h"
 #include "../../Manager/Sound/SoundManager.h"
 #include "../game/ScenePlay/Character/Player/Player.h"
+#include "../../InputFuncTable.h"
 #include "PauseMenu.h"
 
 
@@ -19,12 +20,12 @@ PauseMenu::PauseMenu(const Shared<Player>& player) {
 
 void PauseMenu::UpdatePauseMenuCursor_ByInput() {
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))
+	if (InputFuncTable::IsButtonDownTrigger_UP())
 	{
 		_menuIndex--;
 		if (_menuIndex < 0) _menuIndex = _MENU_INDEX_COUNT - 1;
 	}
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_DOWN) || tnl::Input::IsPadDownTrigger(ePad::KEY_DOWN))
+	if (InputFuncTable::IsButtonDownTrigger_DOWN())
 	{
 		_menuIndex++;
 		if (_menuIndex >= _MENU_INDEX_COUNT) _menuIndex = 0;
@@ -38,32 +39,33 @@ void PauseMenu::PickPauseMenuItemByInput() {
 		// ゲーム再開
 		if (_menuIndex == 0) {
 
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN))
+			if (InputFuncTable::IsButtonTrigger_ENTER())
 				_isShowPauseOption = false;
 		}
 		// 操作確認画面表示
 		if (_menuIndex == 1) {
 
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN))
+			if (InputFuncTable::IsButtonTrigger_ENTER())
 				_isShowConfigInfo = true;
-			else if (tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK))
+			else if (InputFuncTable::IsButtonTrigger_CANCEL())
 				_isShowConfigInfo = false;
 		}
 		// リスタート
 		if (_menuIndex == 2) {
 
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 				ResetGame();
 
 				auto mgr = SceneManager::GetInstance();
-				mgr->ChangeScene(new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
+				mgr->ChangeScene(
+					new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
 			}
 		}
 		// 難易度選択に戻る
 		if (_menuIndex == 3) {
 
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 				ResetGame();
 
@@ -74,25 +76,29 @@ void PauseMenu::PickPauseMenuItemByInput() {
 	}
 	else {
 		if (_menuIndex == 0) {
+
 			// 操作確認画面表示
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN))
+			if (InputFuncTable::IsButtonTrigger_ENTER())
 				_isShowConfigInfo = true;
-			else if (tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK))
+			else if (InputFuncTable::IsButtonTrigger_CANCEL())
 				_isShowConfigInfo = false;
 		}
 		if (_menuIndex == 1) {
+
 			// リスタート
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 				ResetGame();
 
 				auto mgr = SceneManager::GetInstance();
-				mgr->ChangeScene(new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
+				mgr->ChangeScene(
+					new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
 			}
 		}
 		if (_menuIndex == 2) {
+
 			// 難易度選択に戻る
-			if (tnl::Input::IsKeyDownTrigger(eKeys::KB_RETURN)) {
+			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 				ResetGame();
 
