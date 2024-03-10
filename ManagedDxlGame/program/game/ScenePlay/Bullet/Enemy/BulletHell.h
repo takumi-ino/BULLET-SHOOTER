@@ -61,22 +61,91 @@ private:
 	// ステージ1ボス（パチュリー）-------------------------------------
 	void WaveAssist_MetalFatigue_Patchouli(
 		Shared<EnemyBullet>& bullet,
-		tnl::Vector3& bossPosition,
 		const float& delta_time,
 		float angle_origin,
 		float radius_origin,
 		float startMoveTime
 	);
 
+	// ステージ2ボス（チルノ）-------------------------------------
+	void WaveAssist_Normal_Cirno(
+		Shared<EnemyBullet>& bullet,
+		float timing, 
+		float delayOffset,
+		const float& delta_time
+	);
+
+	void InitAssist_IcicleFall_StraightBlue_Cirno(
+		Shared<EnemyBullet>& bullet,
+		const float radius, 
+		const float angle
+	);
+
+	void UpdateAssist_IcicleFall_StraightBlue_Cirno(
+		Shared<EnemyBullet>& bullet,
+		float radius, 
+		float newAngle,
+		float startChangeDirTime,
+		const float& delta_time
+	);
+
+	void InitAssist_IcicleFall_StraightYellow_Cirno(
+		Shared<EnemyBullet>& bullet,
+		const int BULLETS_PER_ROW, 
+		const float BULLET_SPACING
+	);
+
+	void UpdateAssist_IcicleFall_StraightYellow_Cirno(
+		Shared<EnemyBullet>& bullet,
+		const float& delta_time,
+		const float BULLET_SPEED
+	);
+
 	// ステージ3ボス（諏訪子）---------------------------------------------
+	void UpdateAssist_Normal_Suwako(
+		Shared<EnemyBullet>& bullet,
+		const float timeLimit
+	);
+
 	void WaveAssist_IronRingOfMoriya_Suwako(
 		Shared<EnemyBullet>& bullet,
-		float circle_radius,
-		float angle,
-		float delta_time,
-		float bullet_speed,
-		int startMove_time
+		const float circle_radius,
+		const float angle,
+		const float delta_time,
+		const float bullet_speed,
+		const int startMove_time
 	);
+
+	void InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(
+		tnl::Vector3& upward_velocity,
+		Shared<EnemyBullet>& bullet
+	);
+
+	void UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(
+		Shared<EnemyBullet>& bullet,
+		const float& delta_time
+	);
+
+	// 共通機能-----------------------------------------------------------------------------
+	tnl::Vector3 GenerateRandomVector(  // ランダムベクター生成
+		std::mt19937& mt,
+		const int minX,
+		const int maxX,
+		const int minY,
+		const int maxY,
+		const int minZ,
+		const int maxZ)
+	{
+		std::uniform_int_distribution<int> rnd_valX(minX, maxX);
+		std::uniform_int_distribution<int> rnd_valY(minY, maxY);
+		std::uniform_int_distribution<int> rnd_valZ(minZ, maxZ);
+
+		return tnl::Vector3{
+			static_cast<float>(rnd_valX(mt)),
+			static_cast<float>(rnd_valY(mt)),
+			static_cast<float>(rnd_valZ(mt))
+		};
+	}
 
 private:
 
