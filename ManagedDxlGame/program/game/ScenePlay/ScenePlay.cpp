@@ -1,3 +1,4 @@
+#include "../DxLibEngine.h"
 #include "ScenePlay.h"
 #include "Pause/PauseMenu.h"
 #include "../Manager/Item/ItemManager.h"
@@ -8,6 +9,7 @@
 #include "Ground/HeightMap.h"
 #include "Star/ShiningStar.h"
 #include "Bullet/Enemy/EnemyBullet.h"
+#include "../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../SceneResult/SceneResult.h"
@@ -21,7 +23,7 @@
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
 
 
-Shared<dxe::Particle> ScenePlay::_weather_particle;
+Shared<dxe::Particle> ScenePlay::_weatherParticle;
 
 int ScenePlay::_STAGE_ID;
 std::string  ScenePlay::_GAME_DIFFICULTY;
@@ -52,7 +54,7 @@ namespace {
 
 ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 {
-	_isShow_beginGameText = true;
+	_isShowGameBeginText = true;
 	PauseMenu::_isShowPauseOption = false;
 
 	_GAME_DIFFICULTY = selected_difficulty;
@@ -60,10 +62,7 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 
 	_mainCamera = std::make_shared<FreeLookCamera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
-	if (_STAGE_ID == 1)
-		_weather_particle = std::make_shared<dxe::Particle>("particle/preset/snow.bin");
-	else if (_STAGE_ID == 2)
-		_weather_particle = std::make_shared<dxe::Particle>("particle/preset/customRain.bin");
+	InitWeatherParticle();
 
 	_miniMap_hdl = LoadGraph("graphics/miniMap/radar.jpg"); // ミニマップ画像ロード
 
@@ -104,6 +103,14 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 	_pauseMenu = std::make_shared<PauseMenu>(_player);
 }
 
+
+void ScenePlay::InitWeatherParticle()
+{
+	if (_STAGE_ID == 1)
+		_weatherParticle = std::make_shared<dxe::Particle>("particle/preset/snow.bin");
+	else if (_STAGE_ID == 2)
+		_weatherParticle = std::make_shared<dxe::Particle>("particle/preset/customRain.bin");
+}
 
 
 // プレイヤーボム効果-------------------------------------------------------------------------------------------------------------------------
@@ -153,6 +160,7 @@ void ScenePlay::ReactivateEnemyBullets() {
 	}
 }
 
+
 void ScenePlay::DeactivateAllEnemyBullets() {
 
 	switch (_STAGE_ID)
@@ -200,7 +208,7 @@ void ScenePlay::DeactivateAllEnemyBullets() {
 }
 
 
-void ScenePlay::InitPlayersBombCount(const std::string& selected_difficulty)
+void ScenePlay::InitPlayersBombCount(const std::string selected_difficulty)
 {
 	if (selected_difficulty == "Easy")	       _player->InitBombCount(4);
 	else if (selected_difficulty == "Normal")  _player->InitBombCount(3);
@@ -528,8 +536,8 @@ void ScenePlay::RenderEnemyRadarOnMiniMap() {
 
 		tnl::Vector3 screenPos = tnl::Vector3::ConvertToScreen(
 			{ (*enemyPos).x, (*enemyPos).y, (*enemyPos).z },
-			_miniMap_centerPos.x,
-			_miniMap_centerPos.y,
+			(float)_miniMap_centerPos.x,
+			(float)_miniMap_centerPos.y,
 			_mainCamera->view_,
 			_mainCamera->proj_
 		);
@@ -558,6 +566,14 @@ void ScenePlay::RenderPauseMenu()
 }
 
 
+void ScenePlay::RenderStageGrindGround()
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	DrawGridGround(_mainCamera, _gridSquareSize, _gridRowNum);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+
 void ScenePlay::Render() {
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _bgAlpha_whenCall_pauseMenu);
@@ -572,7 +588,7 @@ void ScenePlay::Render() {
 	if (_STAGE_ID == 1 || _STAGE_ID == 2) {
 
 		dxe::DirectXRenderBegin();
-		_weather_particle->render(_mainCamera);
+		_weatherParticle->render(_mainCamera);
 		dxe::DirectXRenderEnd();
 	}
 	if (_STAGE_ID == 3) {
@@ -601,10 +617,7 @@ void ScenePlay::Render() {
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	// グリッド線
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-	DrawGridGround(_mainCamera, _gridSquareSize, _gridRowNum);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	RenderStageGrindGround();
 
 	// ミニマップ
 	DrawRotaGraph(_miniMap_centerPos.x, _miniMap_centerPos.y, _miniMap_extendRate, 0, _miniMap_hdl, 1);
@@ -647,16 +660,16 @@ float ScenePlay::_deltaTime;
 
 void ScenePlay::UpdateShowBeginTextTimer(const float deltaTime)
 {
-	_show_beginTextTimer += deltaTime;
+	_beginTextTimer += deltaTime;
 
-	if (_isShow_beginGameText) {
+	if (_isShowGameBeginText) {
 
 		RenderBeginText();
 
-		if (_show_beginTextTimer > _showBeginTextDuration) {
+		if (_beginTextTimer > _showBeginTextDuration) {
 
-			_isShow_beginGameText = false;
-			_show_beginTextTimer = 0;
+			_isShowGameBeginText = false;
+			_beginTextTimer = 0;
 		}
 	}
 }
@@ -670,8 +683,9 @@ void ScenePlay::Update(float deltaTime) {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LALT)) {
 
-		if (!PauseMenu::_isShowPauseOption)
+		if (!PauseMenu::_isShowPauseOption) {
 			PauseMenu::_isShowPauseOption = true;
+		}
 	}
 
 	if (PauseMenu::_isShowPauseOption) {
@@ -686,4 +700,8 @@ void ScenePlay::Update(float deltaTime) {
 	}
 
 	UpdateShowBeginTextTimer(deltaTime);
+
+	if (PlayerBullet::_bulletPowerRate >= 5.0f) {
+		PlayerBullet::_bulletPowerRate = 5.0f;
+	}
 }

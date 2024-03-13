@@ -1,11 +1,11 @@
 #include "../../DxLibEngine.h"
-#include "../../SceneSelectDifficulty/SceneSelectDifficulty.h"
-#include "../../ScenePlay/ScenePlay.h"
+#include "PauseMenu.h"
 #include "../../Manager/Scene/SceneManager.h"
 #include "../../Manager/Sound/SoundManager.h"
+#include "../../ScenePlay/ScenePlay.h"
+#include "../../SceneSelectDifficulty/SceneSelectDifficulty.h"
 #include "../game/ScenePlay/Character/Player/Player.h"
 #include "../../InputFuncTable.h"
-#include "PauseMenu.h"
 
 
 bool PauseMenu::_isShowPauseOption = false;

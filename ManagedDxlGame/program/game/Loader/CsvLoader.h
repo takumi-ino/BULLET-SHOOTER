@@ -1,11 +1,10 @@
 #pragma once
 #include "../ScenePlay/ScenePlay.h"
-#include "../DxLibEngine.h"
 
 
 struct EnemyZakoInfo
 {
-	// –{‘Ì
+	// “G–{‘Ì
 	int   _id{};
 	float _scale{};
 	int   _stageID{};
@@ -47,6 +46,8 @@ struct PlayerStatus
 	int _def{};
 };
 
+
+class ScenePlay;
 
 class CsvLoader
 {

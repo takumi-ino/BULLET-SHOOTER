@@ -1,6 +1,4 @@
 #pragma once
-#include "./../../DxLibEngine.h"
-#include "../../../library/tnl_sequence.h"
 #include "../../Loader/CsvLoader.h"
 
 class Collision;

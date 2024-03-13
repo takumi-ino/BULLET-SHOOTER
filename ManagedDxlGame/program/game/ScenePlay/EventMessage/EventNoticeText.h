@@ -1,5 +1,5 @@
 #pragma once
-#include "../../DxLibEngine.h"
+
 
 class EventNoticeText
 {

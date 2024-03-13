@@ -1,10 +1,10 @@
 #include "../DxLibEngine.h"
+#include "SceneSelectDifficulty.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../ScenePlay/ScenePlay.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Score/ScoreManager.h"
 #include "../InputFuncTable.h"
-#include "SceneSelectDifficulty.h"
 
 
 namespace {
@@ -92,7 +92,7 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
-		int startStage = 1;
+		int startStage = 3;
 
 		if (_difficultyItemIndex == 0) {
 

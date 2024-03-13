@@ -1,5 +1,4 @@
 #pragma once
-#include "../../library/tnl_sequence.h"
 #include "../Manager/Scene/SceneBase.h"
 
 
@@ -8,7 +7,9 @@ class SceneSelectDifficulty : public SceneBase
 public:
 
 	SceneSelectDifficulty();
-	~SceneSelectDifficulty() { DeleteGraph(_backGround_hdl); }
+	~SceneSelectDifficulty() {
+		DeleteGraph(_backGround_hdl); 
+	}
 
 	void Render() override;
 	void Update(const float deltaTime) override;

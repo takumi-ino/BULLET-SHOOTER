@@ -1,5 +1,5 @@
-#include "../../DxLibEngine.h"
 #include "ShiningStar.h"
+#include "../../DxLibEngine.h"
 #include <random>
 
 

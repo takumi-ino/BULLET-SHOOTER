@@ -1,12 +1,11 @@
 #include <random>
-#include "../../Manager/Enemy/EnemyManager.h"
-#include "../../ScenePlay/Character/Enemy/EnemyZakoBase.h"
-#include "../../ScenePlay/Collision/Collision.h"
-#include "../Score/ScoreManager.h"
 #include "../../ScenePlay/Item/PowerUpItem.h"
+#include "../../Manager/Enemy/EnemyManager.h"
+#include "ItemManager.h"
+#include "../Score/ScoreManager.h"
+#include "../../ScenePlay/Collision/Collision.h"
 #include "../../ScenePlay/Character/Player/Player.h"
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
-#include "ItemManager.h"
 
 
 // 得点アイテム--------------------------------------------------------------------------------------------------------------------------

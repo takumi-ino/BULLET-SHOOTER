@@ -1,5 +1,5 @@
-#include "ScoreManager.h"
 #include "../../ScenePlay/Score/Score.h"
+#include "ScoreManager.h"
 
 void ScoreManager::InitScoreInstance() {
 	hitScore = std::make_shared<Score>();

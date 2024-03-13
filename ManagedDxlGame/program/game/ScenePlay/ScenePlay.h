@@ -1,6 +1,4 @@
 #pragma once
-#include "../DxLibEngine.h"
-#include "../../library/tnl_sequence.h"
 #include "../Manager/Scene/SceneBase.h"
 
 class Player;
@@ -47,6 +45,9 @@ public:
 
 private:
 
+	// パーティクル ----------------------------------------------------
+	void InitWeatherParticle();
+
 	// Setter ----------------------------------------------------------
 	void SetDeltaTime(const float deltaTime) { _deltaTime = deltaTime; };
 
@@ -74,7 +75,7 @@ private:
 	void UpdateShowBeginTextTimer(const float deltaTime);
 
 	// ボム-------------------------------------------------------------
-	void InitPlayersBombCount(const std::string& selected_difficulty);
+	void InitPlayersBombCount(const std::string selected_difficulty);
 
 	// ミニマップ-------------------------------------------------------
 	void RenderEnemyRadarOnMiniMap();
@@ -84,11 +85,12 @@ private:
 
 	// 描画・更新ー---------------------------------------------------
 	void Render() override;
+	void RenderStageGrindGround();
 	void Update(const float deltaTime) override;
 
 public:
 
-	static Shared<dxe::Particle> _weather_particle;
+	static Shared<dxe::Particle> _weatherParticle;
 
 private:
 
@@ -124,6 +126,6 @@ private:
 	int                 _miniMap_hdl{};
 
 	// ゲーム開始時に表示する「 Begin 」テキスト-------------------------
-	float               _show_beginTextTimer{};
-	bool                _isShow_beginGameText{};
+	float               _beginTextTimer{};
+	bool                _isShowGameBeginText{};
 };

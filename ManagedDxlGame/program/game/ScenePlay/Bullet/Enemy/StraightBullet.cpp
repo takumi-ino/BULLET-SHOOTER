@@ -1,5 +1,4 @@
 #include "StraightBullet.h"
-#include "EnemyBullet.h"
 
 
 StraightBullet::StraightBullet() {

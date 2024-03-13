@@ -1,9 +1,8 @@
 #pragma once
-#include "../library/tnl_sequence.h"
-#include "../Manager/Scene/SceneBase.h"
 
 
-class SceneTitle : public SceneBase {
+class SceneTitle : public SceneBase
+{
 public:
 
 	SceneTitle();
@@ -14,14 +13,15 @@ public:
 		DeleteSoundMem(_tapSE_hdl);
 	}
 
-
 	void Render() override;
 	void Update(const float deltaTime) override;
 
 private:
 
-	tnl::Sequence<SceneTitle> _sequence = tnl::Sequence<SceneTitle>(this, &SceneTitle::SeqIdle);
-	bool SeqIdle(float deltaTime);
+	void SetupAssetsData();             // 画像やエフェクトの初期化
+	void RenderBackGroundAndLogo();     // 背景とタイトルロゴ描画
+
+	void MoveToSceneSelectDifficulty();
 
 	void MakeMonoTransition_BackGround(const float deltaTime); // 背景エフェクト
 	void MakeFlushEffect_TitleLogo(const float deltaTime);     // タイトルロゴエフェクト

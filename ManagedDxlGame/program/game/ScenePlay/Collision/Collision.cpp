@@ -1,3 +1,5 @@
+#include "../../DxLibEngine.h"
+#include "Collision.h"
 #include "../Score/Score.h"
 #include "../../ScenePlay/Character/Player/Player.h"
 #include "../../ScenePlay/Character/Enemy/EnemyBase.h"
@@ -10,7 +12,6 @@
 #include "../Character/Enemy/EnemyBossBase.h"
 #include "../Item/ScoreItem.h"
 #include "../Item/PowerUpItem.h"
-#include "Collision.h"
 
 
 // キャラクターと弾----------------------------------------------------------------------------------------------------------------------------

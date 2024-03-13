@@ -17,11 +17,14 @@ public:
 		Bomb
 	};
 
-	PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
-
+	// コンストラクタ-------------------------------------------------
 	PowerUpItem() {}
-
 	explicit PowerUpItem(const PowerUpItem::TYPE item_type);
 
+	// 更新------------------------------------------------------------
 	bool Update(Shared<PowerUpItem>& item);
+
+public:
+
+	PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
 };

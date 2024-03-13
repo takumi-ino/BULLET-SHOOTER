@@ -2,11 +2,10 @@
 #include "../../ScenePlay/Item/ScoreItem.h"
 
 class Collision;
-class EnemyZakoBase;
 class EnemyManager;
 class PowerUpItem;
 class ScoreManager;
-class EventNoticeText;
+
 
 // 主に　得点アイテム・プレイヤー強化アイテムを管理
 class ItemManager

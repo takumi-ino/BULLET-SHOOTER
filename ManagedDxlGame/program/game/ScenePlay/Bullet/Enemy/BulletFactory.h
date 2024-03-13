@@ -1,8 +1,8 @@
 #pragma once
-#include "../../../DxLibEngine.h"
 
 class StraightBullet;
 class HomingBullet;
+
 
 class BulletFactory
 {

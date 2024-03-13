@@ -2,8 +2,8 @@
 #include "../../DxLibEngine.h"
 
 
-class Score {
-
+class Score 
+{
 public:
 
 	Score() : _value(0) {}

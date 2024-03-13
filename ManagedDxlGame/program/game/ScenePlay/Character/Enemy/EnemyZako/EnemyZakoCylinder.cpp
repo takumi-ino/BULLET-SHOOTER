@@ -1,9 +1,6 @@
-#include <random>
 #include "EnemyZakoCylinder.h"
-#include "../../../Bullet/Enemy/EnemyBullet.h"
 #include "../../../Bullet/Enemy/StraightBullet.h"
 #include "../../../Bullet/Enemy/HomingBullet.h"
-#include "../../../../Manager/Enemy/EnemyManager.h"
 #include "../../../Bullet/Enemy/BulletFactory.h"
 
 

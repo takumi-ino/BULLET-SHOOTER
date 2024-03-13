@@ -1,3 +1,4 @@
+#include "../../DxLibEngine.h"
 #include "EventNoticeText.h"
 
 std::deque<Shared<EventNoticeText>> EventNoticeText::_messageQueue;

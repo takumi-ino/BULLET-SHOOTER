@@ -41,7 +41,7 @@ public:
 	void AddAT(int val) { _at += val; }
 	void AddDEF(int val) { _def += val; }
 	void AddBombStockCount() { _currentBomb_stockCount++; }
-	void AddSpeed(int val) { _playerMoveSpeed += val; }
+	void AddSpeed(float val) { _playerMoveSpeed += val; }
 
 	// Others--------------------------------------------------------------------------------------------		
 	void PlayDamageHitSE();
@@ -56,6 +56,7 @@ private:
 	void NormalizeCameraSpeed(const float speed); // スピード調整
 	void ControlCameraWithoutEnemyFocus();
 	void ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& targetEnemyPos);
+	void ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y);
 
 	// プレイヤー ----------------------------------------------------------------------------------------------------------
 

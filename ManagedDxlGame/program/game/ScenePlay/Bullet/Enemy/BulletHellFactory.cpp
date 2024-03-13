@@ -1,9 +1,5 @@
-#include "../../../Manager/Enemy/EnemyManager.h"
-#include "../../ScenePlay.h"
-#include "../../../DxLibEngine.h"
-#include "../../../Loader/CsvLoader.h"
-#include "EnemyBullet.h"
 #include "BulletHell.h"
+#include "EnemyBullet.h"
 #include "BulletHellFactory.h"
 
 

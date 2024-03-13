@@ -5,7 +5,7 @@ class InputFuncTable
 {
 public:
 
-	// ApperArrow or Pad Up
+	// UpperArrow or Pad Up
 	static const bool IsButtonDownTrigger_UP() {
 
 		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_UP) || tnl::Input::IsPadDownTrigger(ePad::KEY_UP))

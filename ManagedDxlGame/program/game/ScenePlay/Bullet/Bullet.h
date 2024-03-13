@@ -1,6 +1,5 @@
 #pragma once
 #include "../../DxLibEngine.h"
-#include "../Collision/Collision.h"
 
 
 class Bullet

@@ -1,10 +1,11 @@
 #include "../DxLibEngine.h"
+#include "../library/tnl_sequence.h"
+#include "../Manager/Scene/SceneBase.h"
+#include "SceneTitle.h"
 #include "../SceneSelectDifficulty/SceneSelectDifficulty.h"
 #include "../Manager/Scene/SceneManager.h"
-#include "../SceneResult/SceneResult.h"
 #include "../Manager/Sound/SoundManager.h"
 #include "../InputFuncTable.h"
-#include "SceneTitle.h"
 
 
 namespace {
@@ -28,6 +29,15 @@ namespace {
 
 SceneTitle::SceneTitle() {
 
+	SetupAssetsData();
+
+	SoundManager::GetInstance().LoadBGM("sound/bgm/title.mp3");
+	SoundManager::GetInstance().PlayBGM();
+}
+
+
+void SceneTitle::SetupAssetsData()
+{
 	_shadowMap = std::make_shared<dxe::ShadowMap>(dxe::ShadowMap::eSize::S2048);
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 	_screenEffect->loadStatus("screenEffect/titleSceneEffect.bin");
@@ -36,11 +46,7 @@ SceneTitle::SceneTitle() {
 	_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo_star.png");
 
 	_tapSE_hdl = LoadSoundMem("sound/se/tap.mp3");
-
-	SoundManager::GetInstance().LoadBGM("sound/bgm/title.mp3");
-	SoundManager::GetInstance().PlayBGM();
 }
-
 
 
 void SceneTitle::Render() {
@@ -48,13 +54,7 @@ void SceneTitle::Render() {
 	_shadowMap->reserveBegin();
 	_screenEffect->renderBegin();
 
-	// ”wŒi‰æ‘œ
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
-	DrawRotaGraph(_BACKGROUND_POS_X, _BACKGROUND_POS_Y, 1, 0, _backGround_hdl, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	// ƒƒS
-	DrawRotaGraph(_TITLELOGO_POS_X, _TITLELOGO_POS_Y, _TITLELOGO_EXTEND_RATE, 0, _titleLogo_hdl, true);
+	RenderBackGroundAndLogo();
 
 	_screenEffect->renderEnd();
 	_shadowMap->reserveEnd();
@@ -65,6 +65,17 @@ void SceneTitle::Render() {
 	//_screenEffect->drawGuiController({ 0, 0 });
 }
 
+
+void SceneTitle::RenderBackGroundAndLogo()
+{
+	// ”wŒi‰æ‘œ
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
+	DrawRotaGraph(_BACKGROUND_POS_X, _BACKGROUND_POS_Y, 1, 0, _backGround_hdl, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	// ƒƒS
+	DrawRotaGraph(_TITLELOGO_POS_X, _TITLELOGO_POS_Y, _TITLELOGO_EXTEND_RATE, 0, _titleLogo_hdl, true);
+}
 
 
 void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime)
@@ -77,7 +88,6 @@ void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime)
 
 	_screenEffect->setBloomThreshold(bloom * _TITLELOGO_EFFECT_OSCILLATE_SPEED);
 }
-
 
 
 void SceneTitle::MakeMonoTransition_BackGround(float deltaTime)
@@ -93,9 +103,8 @@ void SceneTitle::MakeMonoTransition_BackGround(float deltaTime)
 }
 
 
-
-bool SceneTitle::SeqIdle(float deltaTime) {
-
+void SceneTitle::MoveToSceneSelectDifficulty()
+{
 	if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		PlaySoundMem(_tapSE_hdl, DX_PLAYTYPE_BACK);
@@ -104,14 +113,12 @@ bool SceneTitle::SeqIdle(float deltaTime) {
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneSelectDifficulty());
 	}
-	return true;
 }
-
 
 
 void SceneTitle::Update(float deltaTime) {
 
-	_sequence.update(deltaTime);
+	MoveToSceneSelectDifficulty();
 
 	MakeMonoTransition_BackGround(deltaTime);
 

@@ -1,6 +1,7 @@
+#include "../../DxLibEngine.h"
+#include "SkyBox.h"
 #include "../game/ScenePlay/ScenePlay.h"
 #include "../Camera/FreeLookCamera.h"
-#include "SkyBox.h"
 
 
 SkyBox::SkyBox() {

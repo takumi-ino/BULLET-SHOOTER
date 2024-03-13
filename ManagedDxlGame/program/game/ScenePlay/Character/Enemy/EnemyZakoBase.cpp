@@ -1,3 +1,4 @@
+#include "EnemyZakoBase.h"
 #include "../Player/Player.h"
 #include "../../../Manager/Score/ScoreManager.h"
 #include "../../../Manager/Enemy/EnemyManager.h"
@@ -6,7 +7,6 @@
 #include "../game/ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletFactory.h"
 #include "../game/ScenePlay/Collision/Collision.h"
-#include "EnemyZakoBase.h"
 
 Shared<dxe::Particle> EnemyZakoBase::_explode_particle;
 
@@ -23,8 +23,11 @@ namespace {
 
 // 雑魚エネミーデータ読み取り
 EnemyZakoBase::EnemyZakoBase(
-	const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision) {
-
+	const EnemyZakoInfo& data, 
+	const Shared<Player>& player, 
+	const Shared<dxe::Camera>& camera,
+	const Shared<Collision>& collision) 
+{
 	_id = data._id;
 	_name = data._name;
 	_scale = data._scale;
@@ -55,7 +58,6 @@ void EnemyZakoBase::ChasePlayer(const float delta_time) {
 
 	_mesh->pos_ += direction * delta_time * _enemyMoveSpeed;
 }
-
 
 
 void EnemyZakoBase::SearchPlayerMovementState(const float delta_time)
@@ -190,7 +192,6 @@ void EnemyZakoBase::MoveToRandomInvestigatePos(const float& delta_time)
 }
 
 
-
 bool EnemyZakoBase::DecreaseHP(int damage, Shared<dxe::Camera> camera) {
 
 	if (_hp > 0) {
@@ -245,7 +246,6 @@ bool EnemyZakoBase::ShowHpGage_EnemyZako() {
 }
 
 
-
 void EnemyZakoBase::Render(Shared<dxe::Camera> camera) {
 
 	if (_isDead) return;
@@ -263,7 +263,6 @@ void EnemyZakoBase::Render(Shared<dxe::Camera> camera) {
 		blt->Render(camera);
 	}
 }
-
 
 
 void EnemyZakoBase::ShotStraightBullet(const float& delta_time) {
@@ -306,7 +305,6 @@ void EnemyZakoBase::ReloadStraightBulletByTimer(const float& delta_time)
 		}
 	}
 }
-
 
 
 void EnemyZakoBase::UpdateStraightBullet(float delta_time)
@@ -352,12 +350,10 @@ void EnemyZakoBase::UpdateStraightBullet(float delta_time)
 }
 
 
-
 void EnemyZakoBase::ShotHomingBullet(const float& delta_time) {
 
 	_homingBullet_count++;
 
-	// 撃った弾の間隔を空けるための処理
 	if (_homingBullet_count % _bullet_fireInterval == 0 && !_homingBullet_queue.empty()) {
 
 		Shared<HomingBullet> bullet = _homingBullet_queue.front();
@@ -374,7 +370,6 @@ void EnemyZakoBase::ShotHomingBullet(const float& delta_time) {
 
 	ReloadHomingBulletByTimer(delta_time);
 }
-
 
 
 void EnemyZakoBase::ReloadHomingBulletByTimer(const float& delta_time) {
@@ -394,7 +389,6 @@ void EnemyZakoBase::ReloadHomingBulletByTimer(const float& delta_time) {
 		}
 	}
 }
-
 
 
 void EnemyZakoBase::UpdateHomingBullet(const float delta_time) {
@@ -490,7 +484,6 @@ void EnemyZakoBase::AttackPlayer(const float& delta_time) {
 }
 
 
-
 void EnemyZakoBase::DoRoutineMoves(const float& delta_time) {
 
 	// 距離 250～270内で、プレイヤーHPが０でなければプレイヤー追跡
@@ -518,7 +511,6 @@ void EnemyZakoBase::DoRoutineMoves(const float& delta_time) {
 		SearchPlayerMovementState(delta_time);
 	}
 }
-
 
 
 bool EnemyZakoBase::Update(const float delta_time) {

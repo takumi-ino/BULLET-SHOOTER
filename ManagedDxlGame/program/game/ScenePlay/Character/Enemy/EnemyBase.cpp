@@ -1,6 +1,6 @@
+#include "EnemyBase.h"
 #include <random>
 #include "../Player/Player.h"
-#include "EnemyBase.h"
 
 
 tnl::Vector3 EnemyBase::GetRandomPosition_Mt19337() const {

@@ -1,12 +1,7 @@
-#include <random>
 #include "EnemyZakoBox.h"
-#include "../../../Bullet/Enemy/EnemyBullet.h"
 #include "../../../Bullet/Enemy/StraightBullet.h"
 #include "../../../Bullet/Enemy/HomingBullet.h"
 #include "../../../Bullet/Enemy/BulletFactory.h"
-#include "../../../../Manager/Enemy/EnemyManager.h"
-#include "../../../ScenePlay.h"
-
 
 
 EnemyZakoBox::EnemyZakoBox(const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)

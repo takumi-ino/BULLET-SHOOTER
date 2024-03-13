@@ -1,8 +1,9 @@
 #include "../DxLibEngine.h"
+#include "../Manager/Scene/SceneBase.h"
+#include "SceneResult.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../InputFuncTable.h"
-#include "SceneResult.h"
 
 
 namespace {
@@ -27,46 +28,58 @@ namespace {
 
 
 SceneResult::SceneResult(const std::string difficulty, const int totalScore)
-	: _totalScore(totalScore), _difficulty(difficulty) {
+	: _TOTAL_SCORE(totalScore), _DIFFICULTY(difficulty) {
 
 	_backGround_hdl = LoadGraph("graphics/Scene/resultBackGround.png");
-
 	_resultSE_hdl = LoadSoundMem("sound/se/result.mp3");
+
 	PlaySoundMem(_resultSE_hdl, DX_PLAYTYPE_BACK);
+}
+
+
+void SceneResult::RenderResult()
+{
+	SetFontSize(70);
+	DrawString(_resultText_posX, _resultText_posY, "Result", GetColor(0, 200, 100));
+
+	SetFontSize(40);
+	DrawFormatString(_difficultyText_posX, _difficultyText_posY, GetColor(0, 200, 100), "%s", _DIFFICULTY.c_str());
+
+	SetFontSize(30);
+	DrawFormatString(_totalScoreText_posX, _totalScoreText_posY, GetColor(0, 200, 100), "TotalScore  %d", _TOTAL_SCORE);
+}
+
+
+void SceneResult::RenderBackGround()
+{
+	// ”wŒi‰æ‘œ
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _backGround_baseAlpha);
+	DrawRotaGraph(_backGround_posX, _backGround_posY, _backGround_extendRate, 0, _backGround_hdl, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 
 void SceneResult::Render() {
 
-	// ”wŒi‰æ‘œ
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _backGround_baseAlpha);
-	DrawRotaGraph(_backGround_posX, _backGround_posY, _backGround_extendRate, 0, _backGround_hdl, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	RenderBackGround();
 
-	SetFontSize(70);
-	DrawString(_resultText_posX, _resultText_posY, "Result", GetColor(0, 200, 100));
-
-	SetFontSize(40);
-	DrawFormatString(_difficultyText_posX, _difficultyText_posY, GetColor(0, 200, 100), "%s", _difficulty.c_str());
-	SetFontSize(30);
-	DrawFormatString(_totalScoreText_posX, _totalScoreText_posY, GetColor(0, 200, 100), "TotalScore  %d", _totalScore);
+	RenderResult();
 
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 
-void SceneResult::Update(float deltaTime) {
-	_sequence.update(deltaTime);
-}
-
-
-bool SceneResult::SeqIdle(float deltaTime) {
-
+void SceneResult::MoveToSceneTitle()
+{
 	if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneTitle());
 	}
+}
 
-	return true;
+
+void SceneResult::Update(float deltaTime) {
+
+	MoveToSceneTitle();
 }

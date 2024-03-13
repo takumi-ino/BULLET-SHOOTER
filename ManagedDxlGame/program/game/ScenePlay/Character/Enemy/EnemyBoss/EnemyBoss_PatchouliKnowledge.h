@@ -4,7 +4,7 @@
 class BulletHell;
 
 // ステージ1ボス
-class EnemyBoss_PatchouliKnowledge : public EnemyBossBase
+class EnemyBoss_PatchouliKnowledge final : public EnemyBossBase
 {
 public:
 

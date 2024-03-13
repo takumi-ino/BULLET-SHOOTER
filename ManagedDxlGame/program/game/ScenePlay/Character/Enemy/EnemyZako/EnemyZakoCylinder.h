@@ -1,15 +1,8 @@
 #pragma once
-#include "../EnemyBase.h"
-#include "../../../Bullet/Enemy/EnemyBullet.h"
-#include "../../../../Loader/CsvLoader.h"
 #include "../EnemyZakoBase.h"
 
-class EnemyZakoBase;
-class StraightBullet;
-class HomingBullet;
-class BulletFactory;
 
-class EnemyZakoCylinder : public EnemyZakoBase
+class EnemyZakoCylinder final : public EnemyZakoBase
 {
 public:
 

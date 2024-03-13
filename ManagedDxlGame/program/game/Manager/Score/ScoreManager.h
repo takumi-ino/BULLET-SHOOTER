@@ -1,10 +1,9 @@
 #pragma once
-#include "../../DxLibEngine.h"
 
 class Score;
 
-class ScoreManager {
-
+class ScoreManager 
+{
 public:
 
 	static ScoreManager& GetInstance() {

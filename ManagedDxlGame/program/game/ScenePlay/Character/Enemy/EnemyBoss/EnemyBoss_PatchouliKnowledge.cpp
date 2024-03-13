@@ -1,6 +1,6 @@
-#include "../../../Bullet/Enemy/BulletHell.h"
-#include "../../../ScenePlay.h"
 #include "EnemyBoss_PatchouliKnowledge.h"
+#include "../../../Bullet/Enemy/BulletHell.h"
+
 
 std::vector<Shared<EnemyBullet>> EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli;
 std::vector<Shared<EnemyBullet>> EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli;

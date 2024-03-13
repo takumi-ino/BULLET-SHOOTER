@@ -1,9 +1,8 @@
 #pragma once
-#include "../library/tnl_sequence.h"
-#include "../Manager/Scene/SceneBase.h"
 
 
-class SceneResult : public SceneBase {
+class SceneResult : public SceneBase 
+{
 public:
 
 	SceneResult() {}
@@ -18,18 +17,19 @@ public:
 	void Update(const float deltaTime) override;
 
 private:
+	 
+	void RenderBackGround();  // ”wŒi
+	void RenderResult();      // ƒeƒLƒXƒg
 
-	tnl::Sequence<SceneResult> _sequence = tnl::Sequence<SceneResult>(this, &SceneResult::SeqIdle);
-	bool SeqIdle(float deltaTime);
+	void MoveToSceneTitle();
 
 private:
 
+	int         _backGround_hdl{};	// ”wŒi‰æ‘œ
+	int         _resultSE_hdl{};   // SE
+	const int   _TOTAL_SCORE{};
+
 	bool        _isResultScene{ true };
 
-	// ”wŒi‰æ‘œ
-	int         _backGround_hdl{};
-	int         _resultSE_hdl{};
-	std::string _difficulty{};
-
-	const int   _totalScore{};
+	std::string _DIFFICULTY{};
 };

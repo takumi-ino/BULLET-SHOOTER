@@ -1,3 +1,4 @@
+#include "Player.h"
 #include <sstream>
 #include <iomanip>
 #include "../../Bullet/Player/PlayerBullet.h"
@@ -11,7 +12,6 @@
 #include "../game/ScenePlay/Bullet/Player/Gunport.h"
 #include "../game/Loader/CsvLoader.h"
 #include "../../../InputFuncTable.h"
-#include "Player.h"
 
 
 Shared<dxe::Particle> Player::_bombParticle;
@@ -431,6 +431,17 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& 
 
 	float y = 0;
 
+	ControlPlayerMoveWithEnemyFocus(q, y);
+
+	// ÉJÉÅÉâÇÃìÆÇ´ÇÃíxâÑèàóù
+	tnl::Vector3 fixPos = playerPos + tnl::Vector3::TransformCoord({ 50, y, -140 }, _mesh->rot_);
+	_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * 0.1f;
+}
+
+
+
+void Player::ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y)
+{
 	//ç∂ï˚å¸
 	if (InputFuncTable::IsButtonDown_LEFT()) {
 
@@ -456,10 +467,6 @@ void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& 
 		_mesh->pos_ = newPos;
 		_playerCamera->axis_y_angle_ -= tnl::ToRadian(2);
 	}
-
-	// ÉJÉÅÉâÇÃìÆÇ´ÇÃíxâÑèàóù
-	tnl::Vector3 fixPos = playerPos + tnl::Vector3::TransformCoord({ 50, y, -140 }, _mesh->rot_);
-	_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * 0.1f;
 }
 
 // É{ÉÄÅ|-----------------------Å|-----------------------Å|-----------------------Å|-----------------------Å|-----------------------

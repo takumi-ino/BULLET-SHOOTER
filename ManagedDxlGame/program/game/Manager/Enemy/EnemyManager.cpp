@@ -1,8 +1,11 @@
 #include <random>
+#include "./../../DxLibEngine.h"
+#include "../../../library/tnl_sequence.h"
 #include "EnemyManager.h"
 #include "../Item/ItemManager.h"
-#include "../../Manager/Scene/SceneManager.h"
 #include "../Sound/SoundManager.h"
+#include "../../Manager/Score/ScoreManager.h"
+#include "../../Manager/Scene/SceneManager.h"
 #include "../../ScenePlay/ScenePlay.h"
 #include "../../ScenePlay/Character/Player/Player.h"
 #include "../../ScenePlay/Collision/Collision.h"
@@ -17,7 +20,6 @@
 #include "../../ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_PatchouliKnowledge.h"
 #include "../../ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_Cirno.h"
 #include "../../ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
-#include "../../Manager/Score/ScoreManager.h"
 #include "../../ScenePlay/Character/Enemy/EnemyBossBase.h"
 #include "../../ScenePlay/Character/Enemy/EnemyZakoBase.h"
 #include "../../SceneResult/SceneResult.h"
@@ -543,10 +545,10 @@ bool EnemyManager::SeqMoveToResult(const float deltaTime) {
 
 		_isDefeatedAllStageEnemy = true;
 
-		SetFontSize(50);
-		DrawString(450, 200, "Accomplished", GetColor(0, 255, 0));
+		SetFontSize(60);
+		DrawString(470, 250, "Accomplished", GetColor(0, 255, 0));
 		SetFontSize(30);
-		DrawString(480, 450, "Move to Result!", GetColor(0, 255, 0));
+		DrawString(535, 450, "Move to Result!", GetColor(0, 255, 0));
 
 
 		if (InputFuncTable::IsButtonTrigger_ENTER()) {

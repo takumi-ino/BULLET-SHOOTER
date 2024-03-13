@@ -1,6 +1,6 @@
-#include "../game/ScenePlay/Character/Player/Player.h"
-#include "../game/ScenePlay/Bullet/Player/PlayerBullet.h"
+#include "../game/DxLibEngine.h"
 #include "Gunport.h"
+#include "../game/ScenePlay/Bullet/Player/PlayerBullet.h"
 
 
 Gunport::Gunport() {

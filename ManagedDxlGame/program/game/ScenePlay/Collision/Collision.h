@@ -1,5 +1,4 @@
 #pragma once
-#include "../../DxLibEngine.h"
 
 class Player;
 class PlayerBullet;
@@ -13,8 +12,8 @@ class Score;
 class ScoreItem;
 class PowerUpItem;
 
-class Collision {
-
+class Collision
+{
 public:
 
 	// キャラクター同士
@@ -61,6 +60,7 @@ public:
 		const Shared<ScoreItem> scoreItem, const Shared<Player> player
 	);
 
+
 	// 得点アイテムと得点アイテム
 	void CheckCollision_ScoreItemAndScoreItem(
 		Shared<ScoreItem>& scoreItem_1,
@@ -74,6 +74,7 @@ public:
 	bool CheckCollision_PlayerAndPowerUpItem(
 		const Shared<PowerUpItem> powerUpItem, const Shared<Player> player
 	);
+
 
 	// プレイヤー強化アイテムとプレイヤー強化アイテム
 	void CheckCollision_PowerUpItemAndPowerUpItem(

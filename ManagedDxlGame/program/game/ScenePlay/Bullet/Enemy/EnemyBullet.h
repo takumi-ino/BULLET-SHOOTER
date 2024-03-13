@@ -1,10 +1,7 @@
 #pragma once
 #include "../Bullet.h"
-#include "../../Character/Enemy/EnemyZakoBase.h"
 #include "../../Character/Player/Player.h"
 
-
-class Player;
 
 class EnemyBullet : public Bullet
 {

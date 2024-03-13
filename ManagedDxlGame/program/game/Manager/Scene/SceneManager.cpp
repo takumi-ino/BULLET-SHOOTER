@@ -1,5 +1,6 @@
+#include "../../DxLibEngine.h"
+#include "../../../library/tnl_sequence.h"
 #include "SceneManager.h"
-#include "../../ScenePlay/ScenePlay.h"
 
 
 SceneManager::SceneManager(SceneBase* startScene) : _nowScene(startScene) {

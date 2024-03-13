@@ -69,8 +69,8 @@ private:
 
 	bool ShowHpGage_EnemyZako();
 
-	const int GetIdleDistance() const { return _IDLE_DISTANCE; }
-	const int GetAttackDistance() const { return _ATTACK_DISTANCE; }
+	const float GetIdleDistance() const { return _IDLE_DISTANCE; }
+	const float GetAttackDistance() const { return _ATTACK_DISTANCE; }
 
 protected:
 

@@ -4,7 +4,7 @@
 class BulletHell;
 
 // ステージ3ボス
-class EnemyBoss_MoriyaSuwako : public EnemyBossBase
+class EnemyBoss_MoriyaSuwako final : public EnemyBossBase
 {
 public:
 

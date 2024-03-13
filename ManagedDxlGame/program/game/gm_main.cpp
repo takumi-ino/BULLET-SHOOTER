@@ -2,9 +2,7 @@
 #include "gm_main.h"
 #include "Manager/Scene/SceneManager.h"
 #include "SceneTitle/SceneTitle.h"
-#include "SceneSelectDifficulty/SceneSelectDifficulty.h"
 #include "ScenePlay/ScenePlay.h"
-#include "ScenePlay/Character/Enemy/EnemyBase.h"
 #include "ScenePlay/Character/Enemy/EnemyZakoBase.h"
 #include "ScenePlay/Character/Player/Player.h"
 
@@ -54,17 +52,11 @@ void gameStart() {
 }
 
 
-bool isFullScreen = true;
 //------------------------------------------------------------------------------------------------------------
 // 毎フレーム実行されます
 void gameMain(float delta_time) {
 
     SceneManager::GetInstance()->Update(delta_time);
-
-    //if (tnl::Input::IsKeyDown(eKeys::KB_ESCAPE)) isFullScreen = !isFullScreen;
-
-    //if (isFullScreen) ChangeWindowMode(false);
-    //else              ChangeWindowMode(true);
 
     if (tnl::Input::IsKeyDownTrigger(eKeys::KB_ESCAPE)) exit(1);
 
@@ -73,8 +65,7 @@ void gameMain(float delta_time) {
 
 
 // ※　[ 重要 ]　std::shared_ptr で確保した dxe::Particle は必ず gameEnd() の
-// 　　タイミングまでに参照カウンタが 0 になるようリセットしてください ( gameEnd 関数を参照 )
-//
+// 　　タイミングまでに参照カウンタが 0 になるようリセットしてください ( gameEnd 関数を参照 )//
 // ※　[ 重要 ]　この機能は DxLib の機能ではありません
 // 　　dxe::Particle や dxe::InstMeshPool など DirectX を直接制御するクラスの render 関数は
 //　　 dxe::DirectXRenderBegin() dxe::DirectXRenderEnd() で囲った中でコールしてください  
@@ -82,6 +73,6 @@ void gameMain(float delta_time) {
 // ゲーム終了時に１度だけ実行されます
 void gameEnd() {
     EnemyZakoBase::_explode_particle.reset();
-    ScenePlay::_weather_particle.reset();
+    ScenePlay::_weatherParticle.reset();
     Player::_bombParticle.reset();
 }

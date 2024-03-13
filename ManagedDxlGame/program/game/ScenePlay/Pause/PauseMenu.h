@@ -1,5 +1,4 @@
 #pragma once
-#include "../game/DxLibEngine.h"
 
 class ScenePlay;
 class Player;

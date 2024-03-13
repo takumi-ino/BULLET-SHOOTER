@@ -4,7 +4,7 @@
 class BulletHell;
 
 // ステージ2ボス
-class EnemyBoss_Cirno : public EnemyBossBase
+class EnemyBoss_Cirno final : public EnemyBossBase
 {
 public:
 

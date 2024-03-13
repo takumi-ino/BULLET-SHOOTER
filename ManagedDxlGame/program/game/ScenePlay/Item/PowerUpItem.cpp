@@ -1,5 +1,5 @@
-#include "../../ScenePlay/ScenePlay.h"
 #include "PowerUpItem.h"
+#include "../../ScenePlay/ScenePlay.h"
 
 
 PowerUpItem::PowerUpItem(const PowerUpItem::TYPE item_type) {

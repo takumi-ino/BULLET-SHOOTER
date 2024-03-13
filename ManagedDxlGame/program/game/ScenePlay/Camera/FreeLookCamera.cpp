@@ -1,3 +1,4 @@
+#include "../../DxLibEngine.h"
 #include "FreeLookCamera.h"
 #include "../Character/Player/Player.h"
 
@@ -7,7 +8,6 @@ void FreeLookCamera::Update(const float delta_time) {
 
 	dxe::Camera::Update(delta_time);
 }
-
 
 
 void FreeLookCamera::ControlFreeLookCamera(const Shared<FreeLookCamera> camera, const Shared<dxe::Mesh> playerMesh, const tnl::Vector3& eye) {

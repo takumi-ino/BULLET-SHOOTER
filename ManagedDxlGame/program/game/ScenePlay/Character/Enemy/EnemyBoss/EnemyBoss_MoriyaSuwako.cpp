@@ -1,6 +1,5 @@
-#include "../../../Bullet/Enemy/BulletHell.h"
-#include "../../../ScenePlay.h"
 #include "EnemyBoss_MoriyaSuwako.h"
+#include "../../../Bullet/Enemy/BulletHell.h"
 
 
 std::vector<Shared<EnemyBullet>> EnemyBoss_MoriyaSuwako::_bullet_normal_suwako;
