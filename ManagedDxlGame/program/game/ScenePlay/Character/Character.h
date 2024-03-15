@@ -5,6 +5,10 @@ class Player;
 
 class Character
 {
+protected:
+
+	virtual ~Character() {}
+
 public:
 
 	Shared<dxe::Mesh>  _mesh = nullptr;

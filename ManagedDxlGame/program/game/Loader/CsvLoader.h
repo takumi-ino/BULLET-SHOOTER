@@ -1,50 +1,6 @@
 #pragma once
 #include "../ScenePlay/ScenePlay.h"
-
-
-struct EnemyZakoInfo
-{
-	// ìGñ{ëÃ
-	int   _id{};
-	float _scale{};
-	int   _stageID{};
-	int   _hp{};
-	int   _maxTotalEnemy_spawnCount{}; // ÉQÅ[ÉÄëSëÃÇ≈ë∂ç›Ç≈Ç´ÇÈé¿ëÃÇÃç≈ëÂêî
-	float _enemyMoveSpeed{};
-	std::string _name{};
-
-	// íe
-	int    _maxBulletSpawnCount{};
-	int    _bullet_fireInterval{};
-	float  _bullet_moveSpeed{};
-	float  _bullet_reloadTimeInterval{};
-};
-
-struct EnemyBossInfo
-{
-	int    _id{};
-	int    _stageID{};
-	float  _scale{};
-	int    _hp{};
-	int    _maxBulletSpawnCount{};
-	float  _enemyMoveSpeed{};
-	std::string _name{};
-};
-
-struct BulletHellType_Info
-{
-	int   _id{};
-	int   _maxBulletSpawnCount{};
-	float _bulletSpawnRate{};
-	std::string _typeName{};
-};
-
-struct PlayerStatus
-{
-	int _hp{};
-	int _at{};
-	int _def{};
-};
+#include "CsvStructData.h"
 
 
 class ScenePlay;
@@ -55,10 +11,10 @@ public:
 
 	CsvLoader() {}
 
-	std::unordered_map<int, EnemyZakoInfo> LoadEnemyZakoInfos(const std::string enemy_csv);
-	std::unordered_map<int, EnemyBossInfo> LoadEnemyBossInfos(const std::string enemy_csv);
-	std::unordered_map<int, BulletHellType_Info> LoadBulletHellTypeInfos(const std::string bulletHell_csv);
-	PlayerStatus& LoadPlayerStatus(const std::string status_csv);
+	std::unordered_map<int, EnemyZakoInfo> LoadEnemyZakoInfos(const std::string enemyCsv);
+	std::unordered_map<int, EnemyBossInfo> LoadEnemyBossInfos(const std::string enemyCsv);
+	std::unordered_map<int, BulletHellType_Info> LoadBulletHellTypeInfos(const std::string bulletHellCsv);
+	PlayerStatus& LoadPlayerStatus(const std::string statusCsv);
 
 private:
 

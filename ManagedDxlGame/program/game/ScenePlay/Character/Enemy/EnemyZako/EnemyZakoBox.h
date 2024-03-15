@@ -7,6 +7,8 @@ class EnemyZakoBox final : public EnemyZakoBase
 public:
 
 	EnemyZakoBox() {}
+	~EnemyZakoBox() override {}
+
 
 	EnemyZakoBox(
 		const EnemyZakoInfo& info,

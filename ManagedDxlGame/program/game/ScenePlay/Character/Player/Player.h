@@ -13,27 +13,27 @@ class Player : public Character
 public:
 
 	Player() {}
-	explicit Player(const Shared<FreeLookCamera> camera_ref);
+	explicit Player(const Shared<FreeLookCamera> cameraRef);
 
-	~Player() { DeleteSoundMem(_getDamageSE_hdl); }
+	~Player() override { DeleteSoundMem(_getDamageSE_hdl); }
 
 
 	// Init--------------------------------------------------------------------------------------------
 	void InitBombCount(const int count) { _currentBomb_stockCount = count; }
 
 	// Getter--------------------------------------------------------------------------------------------
-	int GetHP() const { return _hp; }
-	int GetMaxHP() const { return _MAX_HP; }
-	int GetAT() const { return _at; }
-	int GetDEF() const { return _def; }
+	const int GetHP() const noexcept { return _hp; }
+	const int GetMaxHP() const noexcept { return _MAX_HP; }
+	const int GetAT() const noexcept { return _at; }
+	const int GetDEF() const noexcept { return _def; }
 	const tnl::Vector3 GetPos() const { return _mesh->pos_; }
-	bool GetIsTriggeredBombEffect() const { return _isTriggered_playersBombEffect; }
+	const bool GetIsTriggeredBombEffect() const noexcept { return _isTriggered_playersBombEffect; }
 
 	// Setter--------------------------------------------------------------------------------------------
 	void SetHP(int val) { _hp = val; }
 	void SetIsInvincible(const bool flag) { _isInvincible = flag; }
-	void SetEnemyManagerRef(const Shared<EnemyManager>& enemyMgr) { _enemyManager_ref = enemyMgr; };
-	void SetPlayerRef(const Shared<Player>& player_ref) { _player_ref = player_ref; }
+	void SetEnemyManagerRef(const Shared<EnemyManager>& enemyManager) { _enemyManager_ref = enemyManager; };
+	void SetPlayerRef(const Shared<Player>& playerRef) { _player_ref = playerRef; }
 
 	// UpdateStatus--------------------------------------------------------------------------------------------
 	void HealHP(int heal) { _hp += heal; }
@@ -44,9 +44,9 @@ public:
 	void AddSpeed(float val) { _playerMoveSpeed += val; }
 
 	// Others--------------------------------------------------------------------------------------------		
-	void PlayDamageHitSE();
+	void PlayDamageHitSE() noexcept;
 
-	void Update(const float delta_time);
+	void Update(const float deltaTime);
 	void Render(const Shared<FreeLookCamera> playerCamera);
 
 private:
@@ -64,7 +64,7 @@ private:
 	void InitPlayerStatus();
 
 	// 無敵時間-----------------------------------------------
-	void WatchInvincibleTimer(const float deltaTime);
+	void WatchInvincibleTimer(const float deltaTime) noexcept;
 	void TriggerInvincible(const Shared<FreeLookCamera>& camera);
 
 	// HP -----------------------------------------------------
@@ -76,11 +76,11 @@ private:
 	void ControlRotationByPadOrMouse();                      // 視点操作
 
 	// 弾 --------------------------------------------------------------------------------------------------------------------
-	void ShotPlayerBullet();                        // 弾を撃つ処理
-	void UpdateStraightBullet(float deltaTime);     // 弾の更新処理
-	const tnl::Vector3& GetBulletMoveDirection();   // 弾の移動方向取得
+	void ShotPlayerBullet();                          // 弾を撃つ処理
+	void UpdateStraightBullet(const float deltaTime); // 弾の更新処理
+	const tnl::Vector3& GetBulletMoveDirection();     // 弾の移動方向取得
 
-	bool IsShooting() {
+	bool IsShooting() noexcept {
 		return
 			tnl::Input::IsMouseDown(eMouse::LEFT) ||
 			tnl::Input::IsPadDown(ePad::KEY_1);
@@ -97,7 +97,7 @@ private:
 	void UseBomb();                                            // 使用
 	void ValidateBombEffect();                                 // エフェクト有効化
 	void InvalidateBombEffect(const float deltaTime);          // エフェクト無効化
-	void RenderBombRemainCount();                              // ボム残数描画
+	void RenderBombRemainCount() noexcept;                     // ボム残数描画
 
 	// 敵位置------------------------------------------------------------------------------------------------------------------
 	void ChangeTarget_ByMouseWheel();                          // マウスホイールでターゲット変更処理

@@ -58,8 +58,10 @@ public:
 	EnemyBullet(){}
 	EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color , const float size);
 
+	~EnemyBullet() override {}
+
 	// ï`âÊÅiíeñãópÅj-------------------------------------------------------------------------------------
-	void Render(Shared<dxe::Camera> camera) override;
+	void Render(const Shared<dxe::Camera> camera) override;
 
 protected:
 

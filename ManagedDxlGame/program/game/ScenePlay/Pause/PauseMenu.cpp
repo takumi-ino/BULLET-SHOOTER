@@ -18,7 +18,7 @@ PauseMenu::PauseMenu(const Shared<Player>& player) {
 }
 
 
-void PauseMenu::UpdatePauseMenuCursor_ByInput() {
+void PauseMenu::UpdatePauseMenuCursor_ByInput() noexcept {
 
 	if (InputFuncTable::IsButtonDownTrigger_UP())
 	{
@@ -118,7 +118,7 @@ void PauseMenu::ResetGame()
 }
 
 
-void PauseMenu::RenderConfigStateInfo() {
+void PauseMenu::RenderConfigStateInfo() noexcept {
 
 	int color = -1;
 	int upSide = 200;
@@ -147,7 +147,7 @@ void PauseMenu::RenderConfigStateInfo() {
 }
 
 
-void PauseMenu::RenderPauseMenuItems() {
+void PauseMenu::RenderPauseMenuItems() noexcept {
 
 	int baseColor = 150;
 

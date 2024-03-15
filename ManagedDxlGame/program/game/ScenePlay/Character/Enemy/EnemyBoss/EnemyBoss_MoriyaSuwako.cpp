@@ -65,7 +65,7 @@ void EnemyBoss_MoriyaSuwako::AttackPlayer(const float& delta_time) {
 
 	if (1 == EnemyBossBase::_bossHp.size()) {
 		EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = true;
-		_bulletHell->ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(delta_time);
+		_bulletHell->ShotBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako(delta_time);
 
 		CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_keroChanStandsFirmAgainstTheStorm_suwako);
 	}

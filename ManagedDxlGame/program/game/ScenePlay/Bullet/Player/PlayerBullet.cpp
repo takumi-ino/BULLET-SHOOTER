@@ -26,17 +26,17 @@ PlayerBullet::PlayerBullet(
 }
 
 
-void PlayerBullet::Render(Shared<dxe::Camera> _mainCamera) {
+void PlayerBullet::Render(const Shared<dxe::Camera> mainCamera) {
 	
-	_mesh->render(_mainCamera);
+	_mesh->render(mainCamera);
 }
 
 
-void PlayerBullet::Update(float delta_time) {
+void PlayerBullet::Update(const float deltaTime) {
 
 	static tnl::Vector3 start = _mesh->pos_;
 
-	_mesh->pos_ += _moveDirection * delta_time * _speed;
+	_mesh->pos_ += _moveDirection * deltaTime * _speed;
 
 	float dx = _mesh->pos_.x - start.x;
 	float dy = _mesh->pos_.y - start.y;

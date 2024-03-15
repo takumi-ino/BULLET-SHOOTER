@@ -36,7 +36,7 @@ SceneTitle::SceneTitle() {
 }
 
 
-void SceneTitle::SetupAssetsData()
+void SceneTitle::SetupAssetsData() noexcept
 {
 	_shadowMap = std::make_shared<dxe::ShadowMap>(dxe::ShadowMap::eSize::S2048);
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
@@ -49,36 +49,7 @@ void SceneTitle::SetupAssetsData()
 }
 
 
-void SceneTitle::Render() {
-
-	_shadowMap->reserveBegin();
-	_screenEffect->renderBegin();
-
-	RenderBackGroundAndLogo();
-
-	_screenEffect->renderEnd();
-	_shadowMap->reserveEnd();
-
-
-	// ƒfƒoƒbƒOî•ñ•`‰æ
-	//DrawDefaultLightGuiController();
-	//_screenEffect->drawGuiController({ 0, 0 });
-}
-
-
-void SceneTitle::RenderBackGroundAndLogo()
-{
-	// ”wŒi‰æ‘œ
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
-	DrawRotaGraph(_BACKGROUND_POS_X, _BACKGROUND_POS_Y, 1, 0, _backGround_hdl, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	// ƒƒS
-	DrawRotaGraph(_TITLELOGO_POS_X, _TITLELOGO_POS_Y, _TITLELOGO_EXTEND_RATE, 0, _titleLogo_hdl, true);
-}
-
-
-void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime)
+void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime) noexcept
 {
 	_transTime_logoLights += deltaTime;
 
@@ -90,7 +61,7 @@ void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime)
 }
 
 
-void SceneTitle::MakeMonoTransition_BackGround(float deltaTime)
+void SceneTitle::MakeMonoTransition_BackGround(float deltaTime) noexcept
 {
 	_transTime_cb += deltaTime;
 	_transTime_cr -= deltaTime;
@@ -113,6 +84,35 @@ void SceneTitle::MoveToSceneSelectDifficulty()
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneSelectDifficulty());
 	}
+}
+
+
+void SceneTitle::RenderBackGroundAndLogo() noexcept
+{
+	// ”wŒi‰æ‘œ
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _BACKGROUND_ALPHA);
+	DrawRotaGraph(_BACKGROUND_POS_X, _BACKGROUND_POS_Y, 1, 0, _backGround_hdl, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	// ƒƒS
+	DrawRotaGraph(_TITLELOGO_POS_X, _TITLELOGO_POS_Y, _TITLELOGO_EXTEND_RATE, 0, _titleLogo_hdl, true);
+}
+
+
+void SceneTitle::Render() {
+
+	_shadowMap->reserveBegin();
+	_screenEffect->renderBegin();
+
+	RenderBackGroundAndLogo();
+
+	_screenEffect->renderEnd();
+	_shadowMap->reserveEnd();
+
+
+	// ƒfƒoƒbƒOî•ñ•`‰æ
+	//DrawDefaultLightGuiController();
+	//_screenEffect->drawGuiController({ 0, 0 });
 }
 
 

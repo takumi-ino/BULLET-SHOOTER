@@ -22,7 +22,7 @@ void SoundManager::LoadStageBGM(const int stage_id) {
 	}
 }
 
-void SoundManager::PlayStageBGM(const bool isBossBattle) {
+void SoundManager::PlayStageBGM(const bool isBossBattle) noexcept {
 
 	if (isBossBattle)
 		PlaySoundMem(_BGM_boss_hdl, DX_PLAYTYPE_LOOP);
@@ -31,7 +31,7 @@ void SoundManager::PlayStageBGM(const bool isBossBattle) {
 }
 
 
-void SoundManager::DestroyStageBGM(const bool isBossBattle) {
+void SoundManager::DestroyStageBGM(const bool isBossBattle) noexcept {
 
 	if (isBossBattle) {
 		DeleteSoundMem(_BGM_hdl);
@@ -43,11 +43,11 @@ void SoundManager::DestroyStageBGM(const bool isBossBattle) {
 }
 
 
-void SoundManager::PlayBGM() {
+void SoundManager::PlayBGM() noexcept {
 	PlaySoundMem(_BGM_hdl, DX_PLAYTYPE_LOOP);
 }
 
 
-void SoundManager::DestroyBGM() {
+void SoundManager::DestroyBGM() noexcept {
 	DeleteSoundMem(_BGM_hdl);
 }

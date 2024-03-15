@@ -17,9 +17,11 @@ public:
 		Bomb
 	};
 
-	// コンストラクタ-------------------------------------------------
+	// コンストラクタ・デストラクタ------------------------------------
 	PowerUpItem() {}
-	explicit PowerUpItem(const PowerUpItem::TYPE item_type);
+	explicit PowerUpItem(const PowerUpItem::TYPE itemType);
+
+	~PowerUpItem() override {}
 
 	// 更新------------------------------------------------------------
 	bool Update(Shared<PowerUpItem>& item);

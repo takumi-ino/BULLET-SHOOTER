@@ -10,7 +10,7 @@
 
 // ステージ1ボス（パチュリー）--------------------------------------------------------------------------------------------------
 
-void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
+void BulletHell::ShotBulletHell_Normal_Patchouli(const float deltaTime) {
 
 	tnl::Vector3 bossPosition = _bossMesh_ref->pos_;
 
@@ -43,11 +43,11 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 
 		// 左回転
 		if (bullet->_id % 2 == 0)
-			bullet->_angle += delta_time;
+			bullet->_angle += deltaTime;
 
 		// 右回転
 		if (bullet->_id % 2 != 0)
-			bullet->_angle -= delta_time;
+			bullet->_angle -= deltaTime;
 
 		// X
 		bullet->_mesh->pos_.x = bossPosition.x + roundBullet_radius * cos(bullet->_angle);
@@ -64,8 +64,8 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 
 		roundBullet_moveDirection.normalize();
 
-		bullet->_mesh->pos_.x += roundBullet_moveDirection.x * delta_time * roundBullet_moveSpeed;
-		bullet->_mesh->pos_.z += roundBullet_moveDirection.z * delta_time * roundBullet_moveSpeed;
+		bullet->_mesh->pos_.x += roundBullet_moveDirection.x * deltaTime * roundBullet_moveSpeed;
+		bullet->_mesh->pos_.z += roundBullet_moveDirection.z * deltaTime * roundBullet_moveSpeed;
 	}
 
 
@@ -74,10 +74,10 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 
 		// 左回転
 		if (bullet->_id % 2 == 0)
-			bullet->_angle += delta_time;
+			bullet->_angle += deltaTime;
 		// 右回転
 		else
-			bullet->_angle -= delta_time;
+			bullet->_angle -= deltaTime;
 
 		// X
 		bullet->_mesh->pos_.x = bossPosition.x + (roundBullet_radius + 150.f) * cos(bullet->_angle);
@@ -86,8 +86,8 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 		// Z
 		bullet->_mesh->pos_.z = bossPosition.z + (roundBullet_radius + 150.f) * sin(bullet->_angle);
 
-		bullet->_mesh->pos_.x += roundBullet_moveDirection.x * delta_time * roundBullet_moveSpeed;
-		bullet->_mesh->pos_.z += roundBullet_moveDirection.z * delta_time * roundBullet_moveSpeed;
+		bullet->_mesh->pos_.x += roundBullet_moveDirection.x * deltaTime * roundBullet_moveSpeed;
+		bullet->_mesh->pos_.z += roundBullet_moveDirection.z * deltaTime * roundBullet_moveSpeed;
 	}
 
 	// パターン３　全方位弾 １回につき16発 * 3連続周囲に発射。それを４セット
@@ -119,7 +119,7 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 			bullet->_moveDirection = moveDir;
 		}
 
-		bullet->_timer += delta_time;
+		bullet->_timer += deltaTime;
 
 		if (bullet->_isActive && bullet->_timer >= timing) {
 
@@ -136,13 +136,13 @@ void BulletHell::ShotBulletHell_Normal_Patchouli(const float& delta_time) {
 		}
 
 		//　更新
-		bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 200;
+		bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 200;
 	}
 }
 
 
 
-void BulletHell::ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time) {
+void BulletHell::ShotBulletHell_MetalFatigue_Patchouli(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.size(); i++) {
 
@@ -163,7 +163,7 @@ void BulletHell::ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time) 
 			// 初弾 ８個
 			if (bullet->_id < 8) {
 
-				bullet->_timer += delta_time;
+				bullet->_timer += deltaTime;
 				bullet->_isActive = true;
 
 				if (bullet->_timer > 0.5) {
@@ -182,27 +182,27 @@ void BulletHell::ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time) 
 
 				bullet->_moveDirection = bullet_orbit_origin;
 
-				bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 300.0f;
+				bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 300.0f;
 			}
 
 			//　1波 64個
 			if (bullet->_id >= 8 && bullet->_id < 8 + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI) {
 
-				WaveAssist_MetalFatigue_Patchouli(bullet, delta_time, angle_origin, radius_origin, 0.f);
+				WaveAssist_MetalFatigue_Patchouli(bullet, deltaTime, angle_origin, radius_origin, 0.f);
 			}
 
 			//　2波 64個
 			if (bullet->_id >= 8 + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI &&
 				bullet->_id < 8 + (SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI * 2)) {
 
-				WaveAssist_MetalFatigue_Patchouli(bullet, delta_time, angle_origin, radius_origin, 0.1f);
+				WaveAssist_MetalFatigue_Patchouli(bullet, deltaTime, angle_origin, radius_origin, 0.1f);
 			}
 
 			//　3波 64個
 			if (bullet->_id >= 8 + (SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI) * 2 &&
 				bullet->_id < 8 + (SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI * 3)) {
 
-				WaveAssist_MetalFatigue_Patchouli(bullet, delta_time, angle_origin, radius_origin, 0.2f);
+				WaveAssist_MetalFatigue_Patchouli(bullet, deltaTime, angle_origin, radius_origin, 0.2f);
 			}
 		}
 	}
@@ -211,24 +211,24 @@ void BulletHell::ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time) 
 
 void BulletHell::WaveAssist_MetalFatigue_Patchouli(
 	Shared<EnemyBullet>& bullet,
-	const float& delta_time,
-	float angle_origin,
-	float radius_origin,
-	float startMoveTime)
+	const float deltaTime,
+	const float angleOrigin,
+	const float radiusOrigin,
+	const float startMoveTime)
 {
 	tnl::Vector3 bossPosition = _bossMesh_ref->pos_;
 
 	tnl::Vector3 bullet_move_orbit_wave = bullet->_moveDirection;
 
-	bullet->_timer += delta_time;
+	bullet->_timer += deltaTime;
 
 	// 1　初弾と同じように飛ぶ
 	if (bullet->_timer > startMoveTime && bullet->_timer < startMoveTime + 0.5) {
 
 		bullet->_isActive = true;
 
-		bullet_move_orbit_wave.x = bossPosition.x + cos(angle_origin) * radius_origin;
-		bullet_move_orbit_wave.y = bossPosition.y + sin(angle_origin) * radius_origin;
+		bullet_move_orbit_wave.x = bossPosition.x + cos(angleOrigin) * radiusOrigin;
+		bullet_move_orbit_wave.y = bossPosition.y + sin(angleOrigin) * radiusOrigin;
 
 		bullet->_moveDirection = bullet_move_orbit_wave;
 	}
@@ -237,9 +237,9 @@ void BulletHell::WaveAssist_MetalFatigue_Patchouli(
 
 		float angle = (2.0f * tnl::PI / 8) * (bullet->_id / 8);
 
-		bullet_move_orbit_wave.x = cos(angle) * radius_origin;
-		bullet_move_orbit_wave.y = sin(angle) * radius_origin;
-		bullet_move_orbit_wave.z = sin(angle) * radius_origin;
+		bullet_move_orbit_wave.x = cos(angle) * radiusOrigin;
+		bullet_move_orbit_wave.y = sin(angle) * radiusOrigin;
+		bullet_move_orbit_wave.z = sin(angle) * radiusOrigin;
 
 		bullet->_moveDirection = bullet_move_orbit_wave;
 	}
@@ -252,12 +252,12 @@ void BulletHell::WaveAssist_MetalFatigue_Patchouli(
 		bullet->_timer = 0;
 	}
 
-	bullet->_mesh->pos_ += bullet->_moveDirection * delta_time;
+	bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime;
 }
 
 
 
-void BulletHell::ShotBulletHell_SilentSerena_Patchouli(const float& delta_time) {
+void BulletHell::ShotBulletHell_SilentSerena_Patchouli(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.size(); i++) {
 
@@ -297,14 +297,14 @@ void BulletHell::ShotBulletHell_SilentSerena_Patchouli(const float& delta_time) 
 				bullet->_moveDirection.normalize();
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			//　更新
 			if (bullet->_timer > 0 && bullet->_timer < LIFETIME_LIMIT) {
 
 				bullet->_isActive = true;
 
-				bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 200.f;
+				bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 200.f;
 			}
 
 			//　リセット
@@ -349,10 +349,10 @@ void BulletHell::ShotBulletHell_SilentSerena_Patchouli(const float& delta_time) 
 				bullet->_isActive = true;
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			//　更新
-			bullet->_mesh->pos_ += moveDir * delta_time * 50.f;
+			bullet->_mesh->pos_ += moveDir * deltaTime * 50.f;
 
 			//　リセット
 			if (bullet->_timer > LIFETIME_LIMIT) {
@@ -369,7 +369,7 @@ void BulletHell::ShotBulletHell_SilentSerena_Patchouli(const float& delta_time) 
 
 // ステージ2ボス（チルノ）--------------------------------------------------------------------------------------------------
 
-void BulletHell::ShotBulletHell_Normal_Cirno(const float& delta_time) {
+void BulletHell::ShotBulletHell_Normal_Cirno(const float deltaTime) {
 
 	tnl::Vector3 bossPosition = _bossMesh_ref->pos_;
 
@@ -387,23 +387,23 @@ void BulletHell::ShotBulletHell_Normal_Cirno(const float& delta_time) {
 			const float offset = 0.1f;
 			float timing = offset * (bullet->_id / 8);
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			switch (wave)
 			{
 			case 0:
 			{
-				WaveAssist_Normal_Cirno(bullet, timing, 0.0f, delta_time);
+				WaveAssist_Normal_Cirno(bullet, timing, 0.0f, deltaTime);
 			}
 			break;
 			case 1:
 			{
-				WaveAssist_Normal_Cirno(bullet, timing, 2.0f, delta_time);
+				WaveAssist_Normal_Cirno(bullet, timing, 2.0f, deltaTime);
 			}
 			break;
 			case 2:
 			{
-				WaveAssist_Normal_Cirno(bullet, timing, 4.0f, delta_time);
+				WaveAssist_Normal_Cirno(bullet, timing, 4.0f, deltaTime);
 			}
 			break;
 			}
@@ -440,7 +440,7 @@ void BulletHell::ShotBulletHell_Normal_Cirno(const float& delta_time) {
 				bullet->_isActive = true;
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			if (bullet->_isActive && bullet->_timer >= timing) {
 
@@ -464,13 +464,13 @@ void BulletHell::ShotBulletHell_Normal_Cirno(const float& delta_time) {
 				}
 			}
 
-			bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * BULLET_SPEED;
+			bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * BULLET_SPEED;
 		}
 	}
 }
 
 
-void BulletHell::WaveAssist_Normal_Cirno(Shared<EnemyBullet>& bullet, float timing, float delayOffset, const float& delta_time)
+void BulletHell::WaveAssist_Normal_Cirno(Shared<EnemyBullet>& bullet, const float timing, const float delayOffset, const float delta_time)
 {
 	static const float width = 70.0f;
 	static const float defaultLimit = 4.0f;
@@ -508,7 +508,7 @@ float assistTimer_icicleFall_straightBlue_cirno = 0.f;
 float assistTimer_icicleFall_straightYellow_cirno = 0.f;
 
 
-void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
+void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_Cirno::_bullet_icicleFall_cirno.size(); i++) {
 		auto bullet = EnemyBoss_Cirno::_bullet_icicleFall_cirno[i];
@@ -532,7 +532,7 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 				(bullet->_id >= 110 && bullet->_id < 119) ?
 				tnl::ToRadian(angleToPlayer - 45) : tnl::ToRadian(angleToPlayer + 45);
 
-			assistTimer_icicleFall_straightBlue_cirno += delta_time;
+			assistTimer_icicleFall_straightBlue_cirno += deltaTime;
 
 			if (assistTimer_icicleFall_straightBlue_cirno > 0) {
 				// 0 ～ 19 の弾
@@ -547,9 +547,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 1.0f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 1.0f, deltaTime);
 				}
 			}
 
@@ -565,9 +565,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 1.5f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 1.5f, deltaTime);
 				}
 			}
 
@@ -583,9 +583,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 2.0f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 2.0f, deltaTime);
 				}
 			}
 
@@ -601,9 +601,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 2.5f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 2.5f, deltaTime);
 				}
 			}
 
@@ -619,9 +619,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 3.0f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 3.0f, deltaTime);
 				}
 			}
 
@@ -637,9 +637,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 3.5f, delta_time);
+					UpdateAssist_IcicleFall_StraightBlue_Cirno(bullet, radius, newAngle, 3.5f, deltaTime);
 				}
 			}
 		}
@@ -652,7 +652,7 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 			const float FIRE_INTERVAL = 5.0f;
 			const int BULLETS_PER_ROW = 5;   // 1行あたりの弾数
 
-			assistTimer_icicleFall_straightYellow_cirno += delta_time;
+			assistTimer_icicleFall_straightYellow_cirno += deltaTime;
 
 			if (assistTimer_icicleFall_straightYellow_cirno > 0) {
 
@@ -663,9 +663,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightYellow_Cirno(bullet, BULLETS_PER_ROW, BULLET_SPACING);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, delta_time, BULLET_SPEED);
+					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, deltaTime, BULLET_SPEED);
 				}
 			}
 
@@ -680,9 +680,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightYellow_Cirno(bullet, BULLETS_PER_ROW, BULLET_SPACING);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, delta_time, BULLET_SPEED);
+					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, deltaTime, BULLET_SPEED);
 				}
 			}
 
@@ -697,9 +697,9 @@ void BulletHell::ShotBulletHell_IcicleFall_Cirno(const float& delta_time) {
 						InitAssist_IcicleFall_StraightYellow_Cirno(bullet, BULLETS_PER_ROW, BULLET_SPACING);
 					}
 
-					bullet->_timer += delta_time;
+					bullet->_timer += deltaTime;
 
-					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, delta_time, BULLET_SPEED);
+					UpdateAssist_IcicleFall_StraightYellow_Cirno(bullet, deltaTime, BULLET_SPEED);
 				}
 			}
 		}
@@ -734,10 +734,10 @@ void BulletHell::InitAssist_IcicleFall_StraightBlue_Cirno(
 
 void BulletHell::UpdateAssist_IcicleFall_StraightBlue_Cirno(
 	Shared<EnemyBullet>& bullet,
-	float radius,
-	float newAngle,
-	float startChangeDirTime,
-	const float& delta_time)
+	const float radius,
+	const float newAngle,
+	const float startChangeDirTime,
+	const float deltaTime)
 {
 	const float BULLET_SPEED = 200.0f;
 
@@ -759,18 +759,18 @@ void BulletHell::UpdateAssist_IcicleFall_StraightBlue_Cirno(
 		bullet->_mesh->pos_ = _bossMesh_ref->pos_;
 	}
 
-	bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * BULLET_SPEED;
+	bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * BULLET_SPEED;
 }
 
 
 void BulletHell::UpdateAssist_IcicleFall_StraightYellow_Cirno(
 	Shared<EnemyBullet>& bullet,
-	const float& delta_time,
-	const float BULLET_SPEED)
+	const float deltaTime,
+	const float bulletSpeed)
 {
 	if (bullet->_isActive) {
 
-		bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * BULLET_SPEED;
+		bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * bulletSpeed;
 	}
 
 	if (bullet->_timer > 4.f) {
@@ -783,16 +783,16 @@ void BulletHell::UpdateAssist_IcicleFall_StraightYellow_Cirno(
 
 void BulletHell::InitAssist_IcicleFall_StraightYellow_Cirno(
 	Shared<EnemyBullet>& bullet,
-	const int BULLETS_PER_ROW,
-	const float BULLET_SPACING)
+	const int bullets_perRow,
+	const float bulletSpace)
 {
 	tnl::Vector3 direction = _player_ref->GetPos() - _bossMesh_ref->pos_;
 	direction.normalize();
 	bullet->_moveDirection = direction;
 
 	// 中央以外の弾が左右にずれるように調整
-	int column = bullet->_id % BULLETS_PER_ROW;
-	float offset = (column - BULLETS_PER_ROW / 2) * BULLET_SPACING;
+	int column = bullet->_id % bullets_perRow;
+	float offset = (column - bullets_perRow / 2) * bulletSpace;
 	tnl::Vector3 sideOffset = tnl::Vector3::TransformCoord({ offset,0,0 }, _bossMesh_ref->rot_);
 
 	bullet->_mesh->pos_ = _bossMesh_ref->pos_ + sideOffset;
@@ -801,7 +801,7 @@ void BulletHell::InitAssist_IcicleFall_StraightYellow_Cirno(
 
 
 // ----------------------------------------------------------------------------------------------
-void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
+void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.size(); i++) {
 
@@ -840,11 +840,11 @@ void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
 				bullet->_isActive = true;
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			if (bullet->_timer < 2) {
 
-				bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 0.1f;
+				bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 0.1f;
 			}
 			else if (bullet->_timer > 2 && bullet->_timer < 5) {
 
@@ -864,7 +864,7 @@ void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
 				shotNum = (shotNum + 1) % 80;
 			}
 
-			bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 200;
+			bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 200;
 
 			if (bullet->_timer > 9) {
 				bullet->_isActive = false;
@@ -892,7 +892,7 @@ void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
 				bullet->_mesh->pos_ = spawn_pos;
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			const float offset = 0.1f;
 			float timing = offset * (bullet->_id / 8);
@@ -901,7 +901,7 @@ void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
 
 				bullet->_isActive = true;
 
-				bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 500;
+				bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 500;
 			}
 			else {
 
@@ -920,7 +920,7 @@ void BulletHell::ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time) {
 
 // ステージ3ボス（諏訪子）--------------------------------------------------------------------------------------------------
 
-void BulletHell::ShotBulletHell_Normal_Suwako(const float& delta_time) {
+void BulletHell::ShotBulletHell_Normal_Suwako(const float deltaTime) {
 	// 全方位 １回につき６４発生成、８方向へ無限に飛ばし続ける
 
 	for (int i = 0; i < EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.size(); i++) {
@@ -953,7 +953,7 @@ void BulletHell::ShotBulletHell_Normal_Suwako(const float& delta_time) {
 			}
 
 			float timeLimit = 0;
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			int row = bullet->_id / 56;
 
@@ -996,7 +996,7 @@ void BulletHell::ShotBulletHell_Normal_Suwako(const float& delta_time) {
 				}
 			}
 
-			bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 500;
+			bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 500;
 		}
 
 		// 左
@@ -1023,7 +1023,7 @@ void BulletHell::ShotBulletHell_Normal_Suwako(const float& delta_time) {
 				bullet->_moveDirection = moveDirection;
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
 			int row = bullet->_id / 56;
 			float timeLimit = 0;
@@ -1068,7 +1068,7 @@ void BulletHell::ShotBulletHell_Normal_Suwako(const float& delta_time) {
 				}
 			}
 
-			bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * 500;
+			bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * 500;
 		}
 	}
 }
@@ -1087,7 +1087,7 @@ void BulletHell::UpdateAssist_Normal_Suwako(Shared<EnemyBullet>& bullet, const f
 }
 
 
-void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time) {
+void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.size(); i++) {
 
@@ -1113,7 +1113,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1124,7 +1124,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1137,7 +1137,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1148,7 +1148,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1162,7 +1162,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1173,7 +1173,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1186,7 +1186,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1197,7 +1197,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1211,7 +1211,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1222,7 +1222,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1236,7 +1236,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1247,7 +1247,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1261,7 +1261,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1272,7 +1272,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1286,7 +1286,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1297,7 +1297,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1311,7 +1311,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1322,7 +1322,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1336,7 +1336,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle1Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1347,7 +1347,7 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 						bullet,
 						circle2Radius,
 						angle,
-						delta_time,
+						deltaTime,
 						bulletSpeed,
 						row);
 				}
@@ -1359,11 +1359,11 @@ void BulletHell::ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time)
 
 void BulletHell::WaveAssist_IronRingOfMoriya_Suwako(
 	Shared<EnemyBullet>& bullet,
-	const float circle_radius,
+	const float circleRadius,
 	const float angle,
-	const float delta_time,
-	const float bullet_speed,
-	const int startMove_time)
+	const float deltaTime,
+	const float bulletSpeed,
+	const int startMoveTime)
 {
 	tnl::Vector3 bossPosition = _bossMesh_ref->pos_;
 	tnl::Vector3 spawn_pos = bossPosition;
@@ -1371,17 +1371,17 @@ void BulletHell::WaveAssist_IronRingOfMoriya_Suwako(
 
 	if (bullet->_timer == 0) {
 
-		spawn_pos.x += circle_radius * cos(angle);
-		spawn_pos.z += circle_radius * sin(angle);
+		spawn_pos.x += circleRadius * cos(angle);
+		spawn_pos.z += circleRadius * sin(angle);
 		bullet->_mesh->pos_ = spawn_pos;
 	}
 
 	targetDir = _player_ref->GetPos() - spawn_pos;
 	targetDir.normalize();
 
-	bullet->_timer += delta_time;
+	bullet->_timer += deltaTime;
 
-	if (bullet->_timer > startMove_time) {
+	if (bullet->_timer > startMoveTime) {
 
 		bullet->_isActive = true;
 
@@ -1392,13 +1392,13 @@ void BulletHell::WaveAssist_IronRingOfMoriya_Suwako(
 			bullet->_timer
 		);
 
-		bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * bullet_speed;
+		bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * bulletSpeed;
 	}
 	else {
 		bullet->_isActive = false;
 	}
 
-	if (bullet->_timer > startMove_time + 10) {
+	if (bullet->_timer > startMoveTime + 10) {
 
 		bullet->_isActive = false;
 		bullet->_timer = 0;
@@ -1406,7 +1406,7 @@ void BulletHell::WaveAssist_IronRingOfMoriya_Suwako(
 }
 
 
-void BulletHell::ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(const float& delta_time) {
+void BulletHell::ShotBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako(const float deltaTime) {
 
 	for (int i = 0; i < EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.size(); i++) {
 
@@ -1419,12 +1419,12 @@ void BulletHell::ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(const 
 
 			if (bullet->_timer == 0) {
 
-				InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(upward_velocity, bullet);
+				InitAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(upward_velocity, bullet);
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
-			UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(bullet, delta_time);
+			UpdateAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(bullet, deltaTime);
 		}
 
 		if (bullet->specificType == EnemyBullet::SPECIFICTYPE::Cylinder_Straight_EmeraldGreen) {
@@ -1433,18 +1433,18 @@ void BulletHell::ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(const 
 
 			if (bullet->_timer == 0) {
 
-				InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(upward_velocity, bullet);
+				InitAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(upward_velocity, bullet);
 			}
 
-			bullet->_timer += delta_time;
+			bullet->_timer += deltaTime;
 
-			UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(bullet, delta_time);
+			UpdateAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(bullet, deltaTime);
 		}
 	}
 }
 
 
-void BulletHell::InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(tnl::Vector3& upward_velocity, Shared<EnemyBullet>& bullet)
+void BulletHell::InitAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(tnl::Vector3& upwardVelocity, Shared<EnemyBullet>& bullet)
 {
 
 	tnl::Vector3 spawn_pos = _bossMesh_ref->pos_;
@@ -1459,7 +1459,7 @@ void BulletHell::InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(tnl::Vecto
 	tnl::Vector3 moveDir;
 
 	moveDir += spawn_pos + offset;
-	moveDir.y += upward_velocity.y; // 前方向へ力を加える
+	moveDir.y += upwardVelocity.y; // 前方向へ力を加える
 
 	moveDir.normalize();
 
@@ -1468,7 +1468,7 @@ void BulletHell::InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(tnl::Vecto
 }
 
 
-void BulletHell::UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(Shared<EnemyBullet>& bullet, const float& delta_time)
+void BulletHell::UpdateAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(Shared<EnemyBullet>& bullet, const float deltaTime)
 {
 	const float bulletSpeed = 200.0f;
 	const float gravityAcceleration = -9.8f;
@@ -1481,12 +1481,12 @@ void BulletHell::UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(Shared<E
 
 		bullet->_isActive = true;
 
-		tnl::Vector3 gravity = { 0, gravityAcceleration * delta_time, 0 };
+		tnl::Vector3 gravity = { 0, gravityAcceleration * deltaTime, 0 };
 
-		bullet->_moveDirection += gravity * delta_time;
+		bullet->_moveDirection += gravity * deltaTime;
 		bullet->_moveDirection.normalize();
 
-		bullet->_mesh->pos_ += bullet->_moveDirection * delta_time * bulletSpeed;
+		bullet->_mesh->pos_ += bullet->_moveDirection * deltaTime * bulletSpeed;
 	}
 
 	if (bullet->_timer > timing + lifeTime) {

@@ -7,10 +7,12 @@ class Bullet
 public:
 
 	Bullet(){}
-	Bullet(const tnl::Vector3& spawn_pos, const tnl::Vector3& direction)  {}
+	Bullet(const tnl::Vector3& spawnPos, const tnl::Vector3& direction) {}
+	virtual ~Bullet() {}
 
-	virtual void Update(const float delta_time){}
-	virtual void Render(Shared<dxe::Camera> mainCamera){}
+
+	virtual void Update(const float deltaTime){}
+	virtual void Render(const Shared<dxe::Camera> mainCamera){}
 
 public:
 

@@ -11,14 +11,14 @@ public:
 	}
 
 	// ScenePlay専用（ザコ戦とボス戦で流すBGMを使い分ける目的があるため）----------------------------
-	void LoadStageBGM(const int stage_id);
-	void PlayStageBGM(const bool isBossBattle);
-	void DestroyStageBGM(const bool isBossBattle);
+	void LoadStageBGM(const int stageId);
+	void PlayStageBGM(const bool isBossBattle) noexcept;
+	void DestroyStageBGM(const bool isBossBattle) noexcept;
 
 	// その他クラス専用（BGMが固定なため通常機能のみの実装）-----------------------------------------
 	void LoadBGM(const std::string path);
-	void PlayBGM();
-	void DestroyBGM();
+	void PlayBGM() noexcept;
+	void DestroyBGM() noexcept;
 
 private:
 

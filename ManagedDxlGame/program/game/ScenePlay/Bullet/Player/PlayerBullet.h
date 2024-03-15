@@ -23,9 +23,16 @@ public:
 		const float size
 	);
 
+	~PlayerBullet() override {}
+
+	//　弾の威力設定-----------------------------------------------------------
+	static void ClampBulletPowerRate() noexcept { if (_bulletPowerRate >= 5.0f) _bulletPowerRate = 5.0f; }
+
+	static void ResetBulletPowerRate() noexcept { _bulletPowerRate = 0.f; }
+
 	//　描画・更新---------------------------------------------------------------
-	void Render(Shared<dxe::Camera> _mainCamera) override;
-	void Update(float delta_time) override;
+	void Render(const Shared<dxe::Camera> mainCamera) override;
+	void Update(const float deltaTime) override;
 
 public:
 

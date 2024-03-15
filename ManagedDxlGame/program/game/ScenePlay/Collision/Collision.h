@@ -18,8 +18,8 @@ public:
 
 	// キャラクター同士
 	bool CheckCollision_PlayerAndEnemyZako(
-		const Shared<Player> player,
-		const  Shared<EnemyZakoBase> enemy,
+		Shared<Player>& player,
+		Shared<EnemyZakoBase>& enemy,
 		const tnl::Vector3 prevPos_player,
 		const tnl::Vector3 prevPos_enemy
 	);
@@ -32,17 +32,17 @@ public:
 	void CheckCollision_EnemyAndEnemy(
 		Shared<EnemyZakoBase>& enemy_type1,
 		Shared<EnemyZakoBase>& enemy_type2,
-		const tnl::Vector3 prev_pos_e1,
-		const tnl::Vector3 prev_pos_e2
+		const tnl::Vector3 prevPos_enemy1,
+		const tnl::Vector3 prevPos_enemy2
 	);
 
 
 	// キャラクターと弾
 	bool CheckCollision_PlayerBulletAndEnemyZako(
-		const Shared<PlayerBullet> meshA, const Shared<EnemyZakoBase> meshB
+		const Shared<PlayerBullet>& meshA, const Shared<EnemyZakoBase>& meshB
 	);
 	bool CheckCollision_PlayerBulletAndEnemyBoss(
-		const Shared<PlayerBullet> meshA, const Shared<EnemyBossBase> meshB
+		const Shared<PlayerBullet>& meshA, const Shared<EnemyBossBase>& meshB
 	);
 	bool CheckCollision_EnemyStraightBulletAndPlayer(
 		const Shared<StraightBullet>& bullet, const Shared<Player>& player
@@ -57,7 +57,7 @@ public:
 
 	// プレイヤーと得点アイテム
 	bool CheckCollision_PlayerAndScoreItem(
-		const Shared<ScoreItem> scoreItem, const Shared<Player> player
+		const Shared<ScoreItem>& scoreItem, const Shared<Player>& player
 	);
 
 
@@ -65,14 +65,14 @@ public:
 	void CheckCollision_ScoreItemAndScoreItem(
 		Shared<ScoreItem>& scoreItem_1,
 		Shared<ScoreItem>& scoreItem_2,
-		const tnl::Vector3 prev_pos_si1,
-		const tnl::Vector3 prev_pos_si2
+		const tnl::Vector3 prevPos_scoreItem1,
+		const tnl::Vector3 prevPos_scoreItem2
 	);
 
 
 	// プレイヤーとプレイヤー強化アイテム
 	bool CheckCollision_PlayerAndPowerUpItem(
-		const Shared<PowerUpItem> powerUpItem, const Shared<Player> player
+		const Shared<PowerUpItem>& powerUpItem, const Shared<Player>& player
 	);
 
 
@@ -80,8 +80,8 @@ public:
 	void CheckCollision_PowerUpItemAndPowerUpItem(
 		Shared<PowerUpItem>& powerUpItem_1,
 		Shared<PowerUpItem>& powerUpItem_2,
-		const tnl::Vector3 prevPos_pui1,
-		const tnl::Vector3 prevPos_pui2
+		const tnl::Vector3 prevPos_powerUpItem1,
+		const tnl::Vector3 prevPos_powerUpItem2
 	);
 
 
@@ -89,7 +89,7 @@ public:
 	void CheckCollision_ScoreItemAndPowerUpItem(
 		Shared<ScoreItem>& scoreItem,
 		Shared<PowerUpItem>& powerUpItem,
-		const tnl::Vector3 prevPos_si,
-		const tnl::Vector3 prevPos_pui
+		const tnl::Vector3 prevPos_scoreItem,
+		const tnl::Vector3 prevPos_powerUpItem
 	);
 };

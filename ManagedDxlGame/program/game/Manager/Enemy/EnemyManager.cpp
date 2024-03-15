@@ -56,7 +56,7 @@ EnemyManager::EnemyManager(
 }
 
 
-void EnemyManager::SetMaxEnemySpawnCount()
+void EnemyManager::SetMaxEnemySpawnCount() noexcept
 {
 	if (ScenePlay::GetGameDifficulty() == "Easy")         _maxEnemySpawnCount_PerInterval = 2;
 	else if (ScenePlay::GetGameDifficulty() == "Normal")  _maxEnemySpawnCount_PerInterval = 2;
@@ -198,10 +198,6 @@ void EnemyManager::SetSpawnEnemyBoss() {
 	}
 }
 
-
-int EnemyManager::GetRemainingEnemyCount() const {
-	return _zakoEnemyTotalLeftCount;
-}
 
 // -------------------------------------------------------------------------------------------------------------------------------------------
 void EnemyManager::CheckDoSpawnEnemy() {
@@ -399,8 +395,8 @@ void EnemyManager::NotifyEnemyPosition_ToItemManager() {
 }
 
 
-void EnemyManager::SendEnemyPosition(const tnl::Vector3& new_position, const bool isEnemyDead) {
-	_enemyZako_position = new_position;
+void EnemyManager::SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyDead) {
+	_enemyZako_position = newPosition;
 	_isEnemyZako_dead = isEnemyDead;
 	NotifyEnemyPosition_ToItemManager();
 }
@@ -449,7 +445,7 @@ bool EnemyManager::IsKilledStageBoss() {
 }
 
 
-void EnemyManager::ShowBossAppearanceText() {
+void EnemyManager::ShowBossAppearanceText() noexcept {
 
 	SetFontSize(80);
 	DrawFormatString(390, 200, GetColor(255, 0, 0), "Boss Appears");
@@ -457,7 +453,7 @@ void EnemyManager::ShowBossAppearanceText() {
 }
 
 
-void EnemyManager::UpdateBossAppearanceTextTimer(const float& deltaTime)
+void EnemyManager::UpdateBossAppearanceTextTimer(const float deltaTime) noexcept
 {
 	if (_isShowBossAppearanceText) {
 
@@ -492,7 +488,7 @@ void EnemyManager::RenderEventHitText() const
 }
 
 
-void EnemyManager::UpdateEventHitText(const float& deltaTime)
+void EnemyManager::UpdateEventHitText(const float deltaTime)
 {
 	// イベント通知
 	for (auto msg : EventNoticeText::_messageQueue) {
@@ -553,6 +549,8 @@ bool EnemyManager::SeqMoveToResult(const float deltaTime) {
 
 		if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
+			PlayerBullet::ResetBulletPowerRate();
+
 			SoundManager::GetInstance().DestroyStageBGM(false);
 
 			ScenePlay::DestroyThirdStageBulletHellLists();
@@ -597,7 +595,7 @@ void EnemyManager::Render(const Shared<dxe::Camera>& camera) const {
 }
 
 // 更新------------------------------------------------------------------------------------------------------------------------------------------
-void EnemyManager::UpdateEnemyBossList(const float& deltaTime)
+void EnemyManager::UpdateEnemyBossList(const float deltaTime)
 {
 	if (_enemyZakoList.empty() && !_enemyBossList.empty()) {
 
@@ -619,7 +617,7 @@ void EnemyManager::UpdateEnemyBossList(const float& deltaTime)
 }
 
 
-void EnemyManager::UpdateEnemyZakoList(const float& deltaTime)
+void EnemyManager::UpdateEnemyZakoList(const float deltaTime)
 {
 	if (!_enemyZakoList.empty()) {
 
@@ -644,7 +642,7 @@ void EnemyManager::UpdateEnemyZakoList(const float& deltaTime)
 float EnemyManager::_showBossAppearanceText_timer;
 
 
-void EnemyManager::Update(const float& deltaTime) {
+void EnemyManager::Update(const float deltaTime) {
 
 	_sequence.update(deltaTime);
 

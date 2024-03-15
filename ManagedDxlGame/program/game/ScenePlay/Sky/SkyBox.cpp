@@ -35,7 +35,7 @@ void SkyBox::Update() {
 }
 
 
-void SkyBox::Render(const Shared<FreeLookCamera> camera) {
+void SkyBox::Render(const Shared<FreeLookCamera>& camera) {
 
 	_skybox->render(camera);
 }

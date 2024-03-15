@@ -18,13 +18,13 @@ public:
 
 private:
 
-	void SetupAssetsData();             // 画像やエフェクトの初期化
-	void RenderBackGroundAndLogo();     // 背景とタイトルロゴ描画
+	void SetupAssetsData() noexcept;         // 画像やエフェクトの初期化
+	void RenderBackGroundAndLogo() noexcept; // 背景とタイトルロゴ描画
 
 	void MoveToSceneSelectDifficulty();
 
-	void MakeMonoTransition_BackGround(const float deltaTime); // 背景エフェクト
-	void MakeFlushEffect_TitleLogo(const float deltaTime);     // タイトルロゴエフェクト
+	void MakeMonoTransition_BackGround(const float deltaTime) noexcept; // 背景エフェクト
+	void MakeFlushEffect_TitleLogo(const float deltaTime) noexcept;     // タイトルロゴエフェクト
 
 private:
 

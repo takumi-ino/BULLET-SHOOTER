@@ -7,6 +7,7 @@ class EnemyZakoCylinder final : public EnemyZakoBase
 public:
 
 	EnemyZakoCylinder(){}
+	~EnemyZakoCylinder() override{}
 
 	EnemyZakoCylinder(
 		const EnemyZakoInfo& info,

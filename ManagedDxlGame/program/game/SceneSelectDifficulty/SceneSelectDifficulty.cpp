@@ -32,7 +32,7 @@ SceneSelectDifficulty::SceneSelectDifficulty() {
 }
 
 
-void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() {
+void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() noexcept {
 
 	if (InputFuncTable::IsButtonDownTrigger_UP())
 	{
@@ -51,7 +51,7 @@ void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() {
 }
 
 
-void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() {
+void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() noexcept {
 
 	int colors[] = { 1,1,1,1 };
 	colors[_difficultyItemIndex] = -1;
@@ -92,7 +92,7 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
-		int startStage = 3;
+		int startStage = 1;
 
 		if (_difficultyItemIndex == 0) {
 
@@ -117,7 +117,7 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 }
 
 
-void SceneSelectDifficulty::RenderBackGround() {
+void SceneSelectDifficulty::RenderBackGround() noexcept {
 	DrawRotaGraph(600, 360, 1, 0, _backGround_hdl, false);
 }
 

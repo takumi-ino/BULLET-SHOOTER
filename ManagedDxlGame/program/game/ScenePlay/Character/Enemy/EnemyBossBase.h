@@ -12,6 +12,8 @@ class EnemyBossBase : public EnemyBase
 public:
 
 	EnemyBossBase() {}
+	~EnemyBossBase() override {}
+
 
 	EnemyBossBase(
 		const EnemyBossInfo& data,
@@ -40,7 +42,7 @@ protected:
 	void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
 
 	// ACT------------------------------------------------------------
-	void ActKeepDistanceToPlayer(const float& delta_time);
+	void ActKeepDistanceToPlayer(const float& deltaTime);
 
 public:
 

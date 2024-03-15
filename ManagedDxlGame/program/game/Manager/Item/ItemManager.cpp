@@ -280,7 +280,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer() {
 }
 
 
-void ItemManager::DestroyAllItems() {
+void ItemManager::DestroyAllItems() noexcept {
 	_scoreItem_small.clear();
 	_scoreItem_medium.clear();
 	_scoreItem_large.clear();
@@ -313,7 +313,7 @@ void ItemManager::RenderEventHitText() const {
 }
 
 
-void ItemManager::UpdateEventHitText(const float& deltaTime) {
+void ItemManager::UpdateEventHitText(const float deltaTime) {
 
 	for (auto msg : EventNoticeText::_messageQueue) {
 		msg->Update(deltaTime);
@@ -562,7 +562,7 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 	AvoidOverlap_ScoreItemAndPowerUpItem();
 }
 
-void ItemManager::Update(const float& deltaTime) {
+void ItemManager::Update(const float deltaTime) {
 
 	UpdateScoreItem();
 	UpdatePowerUpItem();

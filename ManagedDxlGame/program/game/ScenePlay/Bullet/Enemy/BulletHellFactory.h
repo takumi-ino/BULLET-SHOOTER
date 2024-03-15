@@ -1,38 +1,22 @@
 #pragma once
 #include "../../../Loader/CsvLoader.h"
+#include "BulletHellsBulletNumInfo.h"
 
 class BulletHell;
 class EnemyManager;
 
-// パチュリー（ノーマル）
-constexpr int ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI = 8;
-constexpr int EVERYDIRECTION_BULLETCOUNT_T_NORMAL_PATCHOULI = 192;
-// パチュリー（メタル・ファティーグ）
-constexpr int EVERYDIRECTION_BULLETCOUNT_T_METALFATIGUE_PATCHOULI = 8;
-constexpr int SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI = 64;
-// パチュリー（サイレント・セレナ）
-constexpr int CIRCLECONTIGUOUS_BULLETCOUNT_T_SILENTSERENA_PATCHOULI = 320;
-constexpr int SLOWLYCOMING_BULLETCOUNT_T_SILENTSERENA_PATCHOULI = 180;
-// チルノ（ノーマル）
-constexpr int STRAIGHTAPPROACH_BULLETCOUNT_T_NORMAL_CIRNO = 81;
-constexpr int EVERYDIRECTION_BULLETCOUNT_T_NORMAL_CIRNO = 112;
-// チルノ（アイシクル・フォール）
-constexpr int SHOTOUTERMOVEINNER_BULLETCOUNT_T_ICICLEFALL_CIRNO = 120;
-constexpr int LINEUPSTRAIGHTSHOT_BULLETCOUNT_T_ICICLEFALL_CIRNO = 15;
-// チルノ（パーフェクト・フリーズ）
-constexpr int CIRCLECONTIGUOUS_BULLETCOUNT_T_PERFECTFREEZE_CIRNO = 300;
-constexpr int EXPANDSTRAIGHTSHOT_BULLETCOUNT_T_PERFECTFREEZE_CIRNO = 120;
-// 諏訪子（ノーマル）
-constexpr int CIRCLECONTIGUOUS_BULLETCOUNT_T_NORMAL_SUWAKO = 280;
-// 諏訪子（洩矢の鉄の輪）
-constexpr int SLOWLYCOMING_BULLETCOUNT_T_IRONRINGOFMORIYA_SUWAKO = 900;
-// 諏訪子（ケロちゃん風雨に負けず）
-constexpr int STRAIGHTAPPROACH_BULLETCOUNT_T_KCSTANDSFIRMAGAINSTSTORM_SUWAKO = 200;
-constexpr int FALLINGAPPROACH_BULLETCOUNT_T_KCSTANDSFIRMAGAINSTSTORM_SUWAKO = 300;
+
+/*
+ 　　 　 各弾幕パターンを初期化 (EnemyBoss限定)
+
+
+　　※    弾幕の名称・実装は
+		「東方プロジェクト」という弾幕シューティングゲームを中心としたコンテンツから直接引用しています。
+		固有名詞が非常に多く分かりづらくなっているかと存じますが、何卒ご理解いただけますと幸いです。　　
+*/
 
 
 
-// 特定の弾幕パターンを生成
 class BulletHellFactory
 {
 public:
@@ -49,6 +33,8 @@ private:
 
 private:
 
+	//   各キャラクターの各弾幕情報を構造体で取得。難易度ごとに弾幕を調整するため
+	
 	BulletHellType_Info _sBltHell_patchouli_info{};
 	BulletHellType_Info _sBltHell_cirno_info{};
 	BulletHellType_Info _sBltHell_suwako_info{};
@@ -56,6 +42,19 @@ private:
 	std::unordered_map<int, BulletHellType_Info> _bulletHellData_map;
 
 private:
+
+	/*
+	
+	    以下関数は
+	    
+	      1. 機能（主に発射・初期化）
+	      2. スペル（弾幕名）
+	      3. 使用者（キャラクター名）
+	    
+	    という規則に則って命名しています。
+
+　　*/
+
 
 	// パチュリー・ノーレッジ------------------------------------------------------------------------------------------------------------
 	//// <summary>
@@ -81,14 +80,14 @@ private:
 	//// <summary>
 	/// ※　CreateBulletHell_MetalFatigue_Patchouli関数で使用する弾幕生成ロジックの関数化
 	/// </summary>
-	/// <param name="split_one_into_eight_WAVE1"></param>
-	/// <param name="split_one_into_eight_bullet"></param>
+	/// <param name="splitOneIntoEight_wave"></param>
+	/// <param name="splitOneIntoEight_bullet"></param>
 	//// <param name="enemyBullet"></param>
 	void InitAssist_MetalFatigue_Patchouli(
-		int split_one_into_eight_WAVE1, 
-		int id, Shared<EnemyBullet>& split_one_into_eight_bullet, 
+		const int splitOneIntoEight_wave,
+		int id, Shared<EnemyBullet>& splitOneIntoEight_bullet,
 		std::vector<Shared<EnemyBullet>>& enemyBullet,
-		EnemyBullet::SPECIFICTYPE wave
+		const EnemyBullet::SPECIFICTYPE wave
 	);
 
 	//// <summary>
@@ -127,7 +126,7 @@ private:
 	// 3.自機依存された８方向ショットを連続でうつ
 	// 4.止めていた弾を全方向で動かし始める
 	//// </summary>
-	std::vector<Shared<EnemyBullet>> CreateBulletHell_PerfectFreeze();
+	std::vector<Shared<EnemyBullet>> CreateBulletHell_PerfectFreeze_Cirno();
 
 	// 諏訪子-------------------------------------------------------------------------------------------------------------------------
 	//// <summary>
@@ -154,5 +153,5 @@ private:
 	//　2.弾を下向きに加速し全体に広げる
 	//  3.同時にプレイヤー方向へ広がるように直行弾も放つ
 	//// </summary>
-	std::vector<Shared<EnemyBullet>> CreateBulletHell_KeroChanStandsFirm_AgainstTheStorm();
+	std::vector<Shared<EnemyBullet>> CreateBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako();
 };

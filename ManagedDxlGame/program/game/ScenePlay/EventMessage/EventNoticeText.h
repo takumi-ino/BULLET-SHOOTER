@@ -10,7 +10,7 @@ public:
 
 	bool IsExpired() const { return _duration <= 0.0f; };
 
-	void Render(int index);
+	void Render(const int index);
 	void Update(const float deltaTime);
 
 public:

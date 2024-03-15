@@ -15,7 +15,7 @@
 
 
 // キャラクターと弾----------------------------------------------------------------------------------------------------------------------------
-bool Collision::CheckCollision_PlayerBulletAndEnemyZako(const Shared<PlayerBullet> bullet, const Shared<EnemyZakoBase> enemy) {
+bool Collision::CheckCollision_PlayerBulletAndEnemyZako(const Shared<PlayerBullet>& bullet, const Shared<EnemyZakoBase>& enemy) {
 
 	if (!enemy->_mesh) return false;
 
@@ -26,7 +26,7 @@ bool Collision::CheckCollision_PlayerBulletAndEnemyZako(const Shared<PlayerBulle
 }
 
 
-bool Collision::CheckCollision_PlayerBulletAndEnemyBoss(const Shared<PlayerBullet> bullet, const Shared<EnemyBossBase> enemy) {
+bool Collision::CheckCollision_PlayerBulletAndEnemyBoss(const Shared<PlayerBullet>& bullet, const Shared<EnemyBossBase>& enemy) {
 
 	if (!enemy->_mesh) return false;
 
@@ -67,7 +67,7 @@ bool Collision::CheckCollision_BulletHellBulletsAndPlayer(const Shared<EnemyBull
 // キャラクター同士----------------------------------------------------------------------------------------------------------------------------
 
 bool Collision::CheckCollision_PlayerAndEnemyZako(
-	Shared<Player> player, Shared<EnemyZakoBase> enemy, tnl::Vector3 prevPos_player, tnl::Vector3 prevPos_enemy) {
+	Shared<Player>& player, Shared<EnemyZakoBase>& enemy, const tnl::Vector3 prevPos_player, const tnl::Vector3 prevPos_enemy) {
 
 	if (!enemy->_mesh) return false;
 
@@ -87,7 +87,7 @@ bool Collision::CheckCollision_PlayerAndEnemyZako(
 
 
 bool Collision::CheckCollision_PlayerAndEnemyBoss(
-	Shared<Player>& player, Shared<EnemyBossBase>& enemy, tnl::Vector3 prevPos_player, tnl::Vector3 prevPos_enemy) {
+	Shared<Player>& player, Shared<EnemyBossBase>& enemy, const tnl::Vector3 prevPos_player, const tnl::Vector3 prevPos_enemy) {
 
 	if (!enemy->_mesh) return false;
 
@@ -107,12 +107,12 @@ bool Collision::CheckCollision_PlayerAndEnemyBoss(
 
 
 void Collision::CheckCollision_EnemyAndEnemy(
-	Shared<EnemyZakoBase>& enemy_type1, Shared<EnemyZakoBase>& enemy_type2, const tnl::Vector3 prev_pos_e1, const tnl::Vector3 prev_pos_e2) {
+	Shared<EnemyZakoBase>& enemy_type1, Shared<EnemyZakoBase>& enemy_type2, const tnl::Vector3 prevPos_enemy1, const tnl::Vector3 prevPos_enemy2) {
 
 	if (!enemy_type1->_mesh || !enemy_type2->_mesh) return;
 
-	tnl::Vector3 prevChord_e1 = prev_pos_e1;
-	tnl::Vector3 prevChord_e2 = prev_pos_e2;
+	tnl::Vector3 prevChord_e1 = prevPos_enemy1;
+	tnl::Vector3 prevChord_e2 = prevPos_enemy2;
 
 	if (tnl::IsIntersectAABB(enemy_type1->_mesh->pos_, enemy_type1->_collideSize, enemy_type2->_mesh->pos_, enemy_type2->_collideSize)) {
 
@@ -126,7 +126,7 @@ void Collision::CheckCollision_EnemyAndEnemy(
 }
 
 // プレイヤーと得点アイテム----------------------------------------------------------------------------------------------------------------------------
-bool Collision::CheckCollision_PlayerAndScoreItem(const Shared<ScoreItem> scoreItem, const Shared<Player> player) {
+bool Collision::CheckCollision_PlayerAndScoreItem(const Shared<ScoreItem>& scoreItem, const Shared<Player>& player) {
 
 	if (tnl::IsIntersectAABB(scoreItem->_mesh->pos_, scoreItem->_collisionSize, player->_mesh->pos_, player->_mesh->scl_)) {
 		return true;
@@ -136,14 +136,14 @@ bool Collision::CheckCollision_PlayerAndScoreItem(const Shared<ScoreItem> scoreI
 
 // 得点アイテムと得点アイテム----------------------------------------------------------------------------------------------------------------------------
 void Collision::CheckCollision_ScoreItemAndScoreItem(
-	Shared<ScoreItem>& scoreItem_1, Shared<ScoreItem>& scoreItem_2, const tnl::Vector3 prevPos_si1, const tnl::Vector3 prevPos_si2) {
+	Shared<ScoreItem>& scoreItem_1, Shared<ScoreItem>& scoreItem_2, const tnl::Vector3 prevPos_scoreItem1, const tnl::Vector3 prevPos_scoreItem2) {
 
 	if (!scoreItem_1->_mesh || !scoreItem_2->_mesh) return;
 
 	if (tnl::IsIntersectAABB(scoreItem_1->_mesh->pos_, scoreItem_1->_collisionSize, scoreItem_2->_mesh->pos_, scoreItem_2->_collisionSize)) {
 
 		tnl::CorrectPositionAABB(
-			prevPos_si1, prevPos_si2,
+			prevPos_scoreItem1, prevPos_scoreItem2,
 			scoreItem_1->_mesh->scl_, scoreItem_2->_mesh->scl_,
 			scoreItem_1->_mesh->pos_, scoreItem_2->_mesh->pos_,
 			tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH,
@@ -152,7 +152,7 @@ void Collision::CheckCollision_ScoreItemAndScoreItem(
 }
 
 // プレイヤーとプレイヤー強化アイテム----------------------------------------------------------------------------------------------------------------------------
-bool Collision::CheckCollision_PlayerAndPowerUpItem(const Shared<PowerUpItem> powerUpItem, const Shared<Player> player) {
+bool Collision::CheckCollision_PlayerAndPowerUpItem(const Shared<PowerUpItem>& powerUpItem, const Shared<Player>& player) {
 
 	if (tnl::IsIntersectAABB(powerUpItem->_mesh->pos_, powerUpItem->_collisionSize, player->_mesh->pos_, player->_mesh->scl_)) {
 		return true;
@@ -161,14 +161,14 @@ bool Collision::CheckCollision_PlayerAndPowerUpItem(const Shared<PowerUpItem> po
 }
 // プレイヤー強化アイテムとプレイヤー強化アイテム-------------------------------------------------------------------------------
 void Collision::CheckCollision_PowerUpItemAndPowerUpItem(
-	Shared<PowerUpItem>& powerUpItem_1, Shared<PowerUpItem>& powerUpItem_2, const tnl::Vector3 prevPos_pui1, const tnl::Vector3 prevPos_pui2) {
+	Shared<PowerUpItem>& powerUpItem_1, Shared<PowerUpItem>& powerUpItem_2, const tnl::Vector3 prevPos_powerUpItem1, const tnl::Vector3 prevPos_powerUpItem2) {
 
 	if (!powerUpItem_1->_mesh || !powerUpItem_2->_mesh) return;
 
 	if (tnl::IsIntersectAABB(powerUpItem_1->_mesh->pos_, powerUpItem_1->_collisionSize, powerUpItem_2->_mesh->pos_, powerUpItem_2->_collisionSize)) {
 
 		tnl::CorrectPositionAABB(
-			prevPos_pui1, prevPos_pui2,
+			prevPos_powerUpItem1, prevPos_powerUpItem2,
 			powerUpItem_1->_mesh->scl_, powerUpItem_2->_mesh->scl_,
 			powerUpItem_1->_mesh->pos_, powerUpItem_2->_mesh->pos_,
 			tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH,
@@ -179,14 +179,14 @@ void Collision::CheckCollision_PowerUpItemAndPowerUpItem(
 
 // 得点アイテムとプレイヤー強化アイテム-------------------------------------------------------------------------------
 void Collision::CheckCollision_ScoreItemAndPowerUpItem(
-	Shared<ScoreItem>& scoreItem, Shared<PowerUpItem>& powerUpItem, const tnl::Vector3 prevPos_si, const tnl::Vector3 prevPos_pui) {
+	Shared<ScoreItem>& scoreItem, Shared<PowerUpItem>& powerUpItem, const tnl::Vector3 prevPos_scoreItem, const tnl::Vector3 prevPos_powerUpItem) {
 
 	if (!scoreItem->_mesh || !powerUpItem->_mesh) return;
 
 	if (tnl::IsIntersectAABB(scoreItem->_mesh->pos_, scoreItem->_collisionSize, powerUpItem->_mesh->pos_, powerUpItem->_collisionSize)) {
 
 		tnl::CorrectPositionAABB(
-			prevPos_si, prevPos_pui,
+			prevPos_scoreItem, prevPos_powerUpItem,
 			scoreItem->_mesh->scl_, powerUpItem->_mesh->scl_,
 			scoreItem->_mesh->pos_, powerUpItem->_mesh->pos_,
 			tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH, tnl::eCorrTypeAABB::BOTH,

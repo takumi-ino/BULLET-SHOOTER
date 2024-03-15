@@ -16,13 +16,13 @@ public:
 private:
 
 	//　ポーズメニュー選択入力（上下）
-	void UpdatePauseMenuCursor_ByInput();
+	void UpdatePauseMenuCursor_ByInput() noexcept;
 
 	//　メニュー項目描画
-	void RenderPauseMenuItems();
+	void RenderPauseMenuItems() noexcept;
 
 	//　操作説明描画（画像ではなく文字列のみ）
-	void RenderConfigStateInfo();
+	void RenderConfigStateInfo() noexcept;
 
 	//　決定（項目ごとに異なる処理が実行される）
 	void PickPauseMenuItemByInput();

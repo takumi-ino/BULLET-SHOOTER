@@ -37,7 +37,7 @@ SceneResult::SceneResult(const std::string difficulty, const int totalScore)
 }
 
 
-void SceneResult::RenderResult()
+void SceneResult::RenderResult() noexcept
 {
 	SetFontSize(70);
 	DrawString(_resultText_posX, _resultText_posY, "Result", GetColor(0, 200, 100));
@@ -50,7 +50,7 @@ void SceneResult::RenderResult()
 }
 
 
-void SceneResult::RenderBackGround()
+void SceneResult::RenderBackGround() noexcept
 {
 	// ”wŒi‰æ‘œ
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _backGround_baseAlpha);

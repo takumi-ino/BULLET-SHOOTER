@@ -3,12 +3,24 @@
 
 class BulletHell;
 
-// ステージ1ボス
+
+/*
+　　ステージ1ボス：パチュリー・ノーレッジ
+
+	このボスは「東方プロジェクト」という弾幕シューティングゲームを中心とした
+	コンテンツに登場するキャラクターをモチーフにしています。
+　　基本的な機能は他のボスと同じですが、弾幕のみ異なる実装をしています。
+*/
+
+
+
 class EnemyBoss_PatchouliKnowledge final : public EnemyBossBase
 {
 public:
 
 	EnemyBoss_PatchouliKnowledge() {}
+	~EnemyBoss_PatchouliKnowledge() override {}
+
 
 	explicit EnemyBoss_PatchouliKnowledge(Shared<EnemyBoss_PatchouliKnowledge> boss) {}
 
@@ -26,18 +38,18 @@ public:
 
 	// 描画・更新-----------------------------------------------------------------------------
 	void Render(Shared<dxe::Camera> camera) override;
-	bool Update(const float delta_time) override;
+	bool Update(const float deltaTime) override;
 
 private:
 
 	// プレイヤーへ攻撃
-	void AttackPlayer(const float& delta_time) override;
+	void AttackPlayer(const float& deltaTime) override;
 
 	// 弾幕名表示
 	void RenderBossSpellCardName() override;
 
 	// プレイヤーを見る、攻撃する、追いかける、距離を取るなどをまとめた動き
-	void DoRoutineMoves(const float& delta_time) override;
+	void DoRoutineMoves(const float& deltaTime) override;
 
 public:
 

@@ -24,13 +24,13 @@ public:
 
 	// 得点アイテム--------------------------------------------------------------------------------------
 
-	void CreateScoreItemPool(const std::string difficulty, const int stage_id);    // アイテムプール
+	void CreateScoreItemPool(const std::string difficulty, const int stageId);     // アイテムプール
 	void EventHit_ScoreItemAndPlayer();	                                           // プレイヤーとの当たり判定処理
 	void UpdateScoreItem(); 	                                          	       // 更新処理
 
 	// プレイヤー強化アイテム----------------------------------------------------------------------------
 
-	void CreatePowerUpItemPool(const std::string difficulty, const int stage_id);  // アイテムプール
+	void CreatePowerUpItemPool(const std::string difficulty, const int stageId);   // アイテムプール
 	void EventHit_PowerUpItemAndPlayer();	                                       // プレイヤーとの当たり判定処理
 	void UpdatePowerUpItem();		                                               // 更新処理
 
@@ -38,10 +38,10 @@ public:
 
 	void SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const bool isEnemyDead); // 敵の消滅地点にアイテムをスポーン
 
-	void DestroyAllItems();		                                                       // 全てのアイテムを削除
+	void DestroyAllItems() noexcept;		                                           // 全てのアイテムを削除
 
 	void Render(const Shared<dxe::Camera>& camera);
-	void Update(const float& deltaTime);
+	void Update(const float deltaTime);
 
 private:
 
@@ -94,8 +94,8 @@ private:
 
 	// イベント通知（プレイヤーがアイテムを取得したときに表示するメッセージを通達）---------------------------------------------------
 	void RenderEventHitText() const;
-	void UpdateEventHitText(const float& deltaTime);
-	void EventNotify_OnCaughtItem(const std::string item_name, const std::string effect);
+	void UpdateEventHitText(const float deltaTime);
+	void EventNotify_OnCaughtItem(const std::string itemName, const std::string effect);
 
 private:
 

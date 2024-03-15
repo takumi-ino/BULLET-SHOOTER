@@ -38,7 +38,7 @@ EnemyBullet::EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color, con
 }
 
 
-void EnemyBullet::Render(Shared<dxe::Camera> camera) {
+void EnemyBullet::Render(const Shared<dxe::Camera> camera) {
 
 	_mesh->render(camera);
 }

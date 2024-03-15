@@ -208,7 +208,7 @@ void ScenePlay::DeactivateAllEnemyBullets() {
 }
 
 
-void ScenePlay::InitPlayersBombCount(const std::string selected_difficulty)
+void ScenePlay::InitPlayersBombCount(const std::string selected_difficulty) noexcept
 {
 	if (selected_difficulty == "Easy")	       _player->InitBombCount(4);
 	else if (selected_difficulty == "Normal")  _player->InitBombCount(3);
@@ -519,7 +519,7 @@ void ScenePlay::CheckDoUpdate_ThirdStageBulletHellLists() {
 
 
 // •`‰æ-----------------------------------------------------------------------------------------------------------------------------
-void ScenePlay::RenderBeginText() {
+void ScenePlay::RenderBeginText() noexcept {
 
 	SetFontSize(88);
 	DrawStringEx(_beginText_posX, _beginText_posY, GetColor(0, 0, 255), "Begin");
@@ -566,7 +566,7 @@ void ScenePlay::RenderPauseMenu()
 }
 
 
-void ScenePlay::RenderStageGrindGround()
+void ScenePlay::RenderStageGrindGround() noexcept
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
 	DrawGridGround(_mainCamera, _gridSquareSize, _gridRowNum);
@@ -658,7 +658,7 @@ void ScenePlay::MoveToNextStage(const int stage, const std::string difficulty) {
 
 float ScenePlay::_deltaTime;
 
-void ScenePlay::UpdateShowBeginTextTimer(const float deltaTime)
+void ScenePlay::UpdateShowBeginTextTimer(const float deltaTime) noexcept
 {
 	_beginTextTimer += deltaTime;
 
@@ -700,8 +700,5 @@ void ScenePlay::Update(float deltaTime) {
 	}
 
 	UpdateShowBeginTextTimer(deltaTime);
-
-	if (PlayerBullet::_bulletPowerRate >= 5.0f) {
-		PlayerBullet::_bulletPowerRate = 5.0f;
-	}
+	PlayerBullet::ClampBulletPowerRate();
 }

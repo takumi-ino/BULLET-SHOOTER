@@ -18,8 +18,8 @@ public:
 
 private:
 	 
-	void RenderBackGround();  // 背景
-	void RenderResult();      // テキスト
+	void RenderBackGround() noexcept;  // 背景
+	void RenderResult() noexcept;      // テキスト
 
 	void MoveToSceneTitle();
 

@@ -13,6 +13,6 @@ HomingBullet::HomingBullet() {
 }
 
 
-void HomingBullet::Render(Shared<dxe::Camera> _mainCamera) {
-	_mesh->render(_mainCamera);
+void HomingBullet::Render(const Shared<dxe::Camera> mainCamera) {
+	_mesh->render(mainCamera);
 }

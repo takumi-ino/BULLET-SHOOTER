@@ -8,6 +8,10 @@ public:
 	ItemBase() {}
 	ItemBase(const std::vector<Shared<ItemBase>>& scoreItem, const  std::vector<Shared<ItemBase>>& power) {}
 
+protected:
+
+	virtual ~ItemBase() {}
+
 public:
 
 	Shared<dxe::Mesh> _mesh = nullptr;

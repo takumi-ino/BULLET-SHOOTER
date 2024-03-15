@@ -8,7 +8,7 @@ public:
 	FreeLookCamera() {}
 	FreeLookCamera(const int screen_w, const int screen_h) : dxe::Camera(screen_w, screen_h) {}
 
-	void Update(const float delta_time) override;
+	void Update(const float deltaTime) override;
 
 private:
 

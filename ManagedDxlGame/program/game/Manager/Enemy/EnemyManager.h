@@ -37,31 +37,31 @@ public:
 	const tnl::Vector3& GetEnemyBossPosition();
 
 	// 残りの敵数取得------------------------------------------------------------
-	int GetRemainingEnemyCount() const;
+	const int GetRemainingEnemyCount() const noexcept { return _zakoEnemyTotalLeftCount; }
 
 	//------------------------------------------------------------
 	void Render(const Shared<dxe::Camera>& camera) const;
-	void Update(const float& deltaTime);
+	void Update(const float deltaTime);
 
 private:
 
 	// ザコのみ------------------------------------------------------------------------------------------------------
 	void InitEnemyZakoInfo();                          // 初期化
-	void UpdateEnemyZakoList(const float& deltaTime);  // 更新
-	void SetMaxEnemySpawnCount();                      // 1度に生成可能な敵数を設定（難易度ごとに調整）
+	void UpdateEnemyZakoList(const float deltaTime);  // 更新
+	void SetMaxEnemySpawnCount() noexcept;             // 1度に生成可能な敵数を設定（難易度ごとに調整）
 
 	// ボスのみ------------------------------------------------------------------------------------------------------
 	void InitEnemyBossInfo();                          // 初期化
-	void UpdateEnemyBossList(const float& deltaTime);  // 更新
+	void UpdateEnemyBossList(const float deltaTime);  // 更新
 
 	// 生成はするが、ザコが全滅するまでボスは非アクティブ
 	void SetSpawnEnemyBoss();
 
 	// ボスが出現したときに一定時間表示するテキスト
-	void ShowBossAppearanceText();
+	void ShowBossAppearanceText() noexcept;
 
 	// ShowBossAppearanceText 関数の有効時間を計測
-	void UpdateBossAppearanceTextTimer(const float& deltaTime);
+	void UpdateBossAppearanceTextTimer(const float deltaTime) noexcept;
 
 	// 更新処理開始
 	void SummonBoss();
@@ -78,12 +78,12 @@ private:
 	// アイテム取得イベント通知---------------------------------------------------------------------------------------
 	void AttachItemManagerInstance(const Shared<ItemManager>& observer);
 	void NotifyEnemyPosition_ToItemManager();                             // アイテムスポーンに必要な敵の位置情報を通達
-	void SendEnemyPosition(const tnl::Vector3& new_position, const bool isEnemyActive);
+	void SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyActive);
 
 	// 敵殺傷イベント通知---------------------------------------------------------------------------------------------
-	void EventNotify_OnEnemyKilled(const std::string enemy_name);         // 敵の撃破情報を通達
+	void EventNotify_OnEnemyKilled(const std::string enemyName);         // 敵の撃破情報を通達
 	void RenderEventHitText() const;
-	void UpdateEventHitText(const float& deltaTime);
+	void UpdateEventHitText(const float deltaTime);
 
 	// ステージ移動---------------------------------------------------------------------------------------------------
 	tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
@@ -143,13 +143,13 @@ private:
 	std::vector<tnl::Vector3>  _enemyPosList{};
 
 	//　ボス---------------------------------------------------------------------------------------------------
-	static float   _showBossAppearanceText_timer;
+	static float   _showBossAppearanceText_timer;       // ボス出現警告テキストのタイマー
+	bool           _isShowBossAppearanceText{};         // ボス出現警告テキストのフラグ
 
-	bool           _isShowBossAppearanceText{};
-	bool           _isSummonBoss{ false };
-	bool           _isInitializedBossInfo{ false };
+	bool           _isSummonBoss{ false };              // ボス生成フラグ
+	bool           _isInitializedBossInfo{ false };	    // ボス初期化フラグ
 
-	bool           _isDefeatedAllStageEnemy{};
+	bool           _isDefeatedAllStageEnemy{};          // 敵を全滅させたかのフラグ
 
 	tnl::Vector3   _enemyBossPos{};
 

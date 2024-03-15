@@ -17,6 +17,7 @@ public:
 
 
 	StraightBullet();
+	~StraightBullet() override {}
 
-	void Render(Shared<dxe::Camera> _mainCamera) override;
+	void Render(const Shared<dxe::Camera> mainCamera) override;
 };

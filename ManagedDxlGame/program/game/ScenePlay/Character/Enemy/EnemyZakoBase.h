@@ -24,12 +24,14 @@ public:
 
 	// コンストラクタ・デストラクタ------------------------------------------
 	EnemyZakoBase() {}
+	~EnemyZakoBase() override {}
+
 
 	EnemyZakoBase(
 		const EnemyZakoInfo& data,
 		const Shared<Player>& player,
 		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& _collision
+		const Shared<Collision>& collision
 	);
 
 	// Init ------------------------------------------------------------------
@@ -40,37 +42,37 @@ public:
 
 	// 描画・更新 ------------------------------------------------------------
 	void Render(Shared<dxe::Camera> camera) override;
-	bool Update(const float delta_time) override;
+	bool Update(const float deltaTime) override;
 
 protected:
 
 	// 直行弾 ------------------------------------------------------------
-	void ShotStraightBullet(const float& delta_time);
-	void ReloadStraightBulletByTimer(const float& delta_time);
-	void UpdateStraightBullet(const float delta_time);
+	void ShotStraightBullet(const float deltaTime);
+	void ReloadStraightBulletByTimer(const float deltaTime);
+	void UpdateStraightBullet(const float deltaTime);
 
 	// 追尾弾 ------------------------------------------------------------
-	void ShotHomingBullet(const float& delta_time);
-	void ReloadHomingBulletByTimer(const float& delta_time);
-	void UpdateHomingBullet(const float delta_time);
+	void ShotHomingBullet(const float deltaTime);
+	void ReloadHomingBulletByTimer(const float deltaTime);
+	void UpdateHomingBullet(const float deltaTime);
 
 	// プレイヤーへ攻撃 ---------------------------------------------------
-	void AttackPlayer(const float& delta_time);
+	void AttackPlayer(const float deltaTime);
 
 	// 挙動	----------------------------------------------------------------------------------
-	void DoRoutineMoves(const float& delta_time);             // 追跡、攻撃、待機を使い分ける
+	void DoRoutineMoves(const float deltaTime);              // 追跡、攻撃、待機を使い分ける
 
-	void SearchPlayerMovementState(const float delta_time);   // 待機状態中、STOP・ MOVE・ TURNのステートによって行動
-	void MoveToRandomInvestigatePos(const float& delta_time); // 待機状態中、ランダム移動
+	void SearchPlayerMovementState(const float deltaTime);   // 待機状態中、STOP・ MOVE・ TURNのステートによって行動
+	void MoveToRandomInvestigatePos(const float deltaTime);  // 待機状態中、ランダム移動
 
-	void ChasePlayer(const float delta_time);                 // プレイヤー追跡
+	void ChasePlayer(const float deltaTime);                 // プレイヤー追跡
 
 private:
 
 	bool ShowHpGage_EnemyZako();
 
-	const float GetIdleDistance() const { return _IDLE_DISTANCE; }
-	const float GetAttackDistance() const { return _ATTACK_DISTANCE; }
+	const float GetIdleDistance() const noexcept { return _IDLE_DISTANCE; }
+	const float GetAttackDistance() const noexcept { return _ATTACK_DISTANCE; }
 
 protected:
 

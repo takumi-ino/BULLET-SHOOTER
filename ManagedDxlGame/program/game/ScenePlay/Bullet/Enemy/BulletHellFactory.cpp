@@ -148,24 +148,28 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_MetalFatigu
 
 
 void BulletHellFactory::InitAssist_MetalFatigue_Patchouli(
-	int split_one_into_eight_wave, int id, Shared<EnemyBullet>& split_one_into_eight_bullet, std::vector<Shared<EnemyBullet>>& enemyBullet, EnemyBullet::SPECIFICTYPE wave)
+	const int splitOneIntoEight_wave,
+	int id,
+	Shared<EnemyBullet>& splitOneIntoEight_bullet,
+	std::vector<Shared<EnemyBullet>>& enemyBullet,
+	const EnemyBullet::SPECIFICTYPE wave)
 {
-	for (int i = 0; i < split_one_into_eight_wave; i++) {
+	for (int i = 0; i < splitOneIntoEight_wave; i++) {
 
-		split_one_into_eight_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 12.0f);
+		splitOneIntoEight_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 12.0f);
 
-		split_one_into_eight_bullet->_radius = 65.0f;
-		split_one_into_eight_bullet->_angle = (2.0f * tnl::PI / 8) * i;
+		splitOneIntoEight_bullet->_radius = 65.0f;
+		splitOneIntoEight_bullet->_angle = (2.0f * tnl::PI / 8) * i;
 		
-		split_one_into_eight_bullet->_mesh->pos_.x = split_one_into_eight_bullet->_radius * cos(split_one_into_eight_bullet->_angle);
-		split_one_into_eight_bullet->_mesh->pos_.y = split_one_into_eight_bullet->_mesh->pos_.y;;
-		split_one_into_eight_bullet->_mesh->pos_.z = split_one_into_eight_bullet->_radius * sin(split_one_into_eight_bullet->_angle);
+		splitOneIntoEight_bullet->_mesh->pos_.x = splitOneIntoEight_bullet->_radius * cos(splitOneIntoEight_bullet->_angle);
+		splitOneIntoEight_bullet->_mesh->pos_.y = splitOneIntoEight_bullet->_mesh->pos_.y;;
+		splitOneIntoEight_bullet->_mesh->pos_.z = splitOneIntoEight_bullet->_radius * sin(splitOneIntoEight_bullet->_angle);
 		
-		split_one_into_eight_bullet->_id = id++;
-		split_one_into_eight_bullet->_isActive = true;
-		split_one_into_eight_bullet->specificType = wave;
+		splitOneIntoEight_bullet->_id = id++;
+		splitOneIntoEight_bullet->_isActive = true;
+		splitOneIntoEight_bullet->specificType = wave;
 
-		enemyBullet.push_back(split_one_into_eight_bullet);
+		enemyBullet.push_back(splitOneIntoEight_bullet);
 	}
 }
 
@@ -273,7 +277,7 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IcicleFall_
 }
 
 
-std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_PerfectFreeze() {
+std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_PerfectFreeze_Cirno() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
 	int circle_contiguous_bullet_id = 0;
@@ -367,7 +371,7 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_IronRingOfM
 }
 
 
-std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_KeroChanStandsFirm_AgainstTheStorm() {
+std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako() {
 
 	std::vector<Shared<EnemyBullet>> enemyBullet;
 	int fall_approach_bullet_id = 0;
@@ -423,7 +427,7 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell(const Bulle
 		return CreateBulletHell_IcicleFall_Cirno();
 		break;
 	case BulletHell::TYPE::Perfect_Freeze_Cirno:
-		return CreateBulletHell_PerfectFreeze();
+		return CreateBulletHell_PerfectFreeze_Cirno();
 		break;
 	// êzñKéq
 	case BulletHell::TYPE::Normal_Suwako:
@@ -433,7 +437,7 @@ std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell(const Bulle
 		return CreateBulletHell_IronRingOfMoriya_Suwako();
 		break;
 	case BulletHell::TYPE::KeroChan_StandsFirm_AgainstTheStorm_Suwako:
-		return CreateBulletHell_KeroChanStandsFirm_AgainstTheStorm();
+		return CreateBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako();
 		break;
 	}
 	return std::vector<Shared<EnemyBullet>>();

@@ -13,7 +13,7 @@ EventNoticeText::EventNoticeText(const std::string text, const int color, const 
 }
 
 
-void EventNoticeText::Render(int index) {
+void EventNoticeText::Render(const int index) {
 
 	SetFontSize(_fontSize);
 	int y = _startTextPos_Y - index * _margin;

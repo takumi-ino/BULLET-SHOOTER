@@ -6,25 +6,28 @@ class EnemyBase : public Character
 {
 public:
 
+	// コンストラクタ・デストラクタ------------------------------------
 	EnemyBase(){}
+	~EnemyBase() override {}
 
+	// ------------------------------------------------------------------
 	float GetDistanceToPlayer();
 
 	// 形状、テクスチャ、ポジション、スケール
 	virtual void SetMeshInfo() {}
 
-	virtual bool Update(const float delta_time) { return true; }
+	virtual bool Update(const float deltaTime) { return true; }
 
 	virtual void Render(Shared<dxe::Camera> camera) {}
 
 protected:
 
 	// 待機、追跡、攻撃などのパターンを管理し実行
-	virtual void DoRoutineMoves(const float& delta_time) {}
+	virtual void DoRoutineMoves(const float& deltaTime) {}
 
-	virtual void ChasePlayer(const float delta_time) {}
+	virtual void ChasePlayer(const float deltaTime) {}
 
-	virtual void AttackPlayer(const float& delta_time) {}
+	virtual void AttackPlayer(const float& deltaTime) {}
 
 	void LookAtPlayer();
 

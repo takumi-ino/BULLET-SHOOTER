@@ -6,23 +6,32 @@ class BulletHellFactory;
 class ScenePlay;
 class Player;
 
-// 弾の生成、弾幕のパターン、弾の更新と削除などを行う (EnemyBoss限定)
-// ボスは通常攻撃、スペルカード1、スペルカード2の計３種類の弾幕を放つ
+/*
+ 　　 　弾の生成、更新、削除などを行うクラス (EnemyBoss限定)
+　　　ボスは通常攻撃、特殊攻撃１、特殊攻撃２、の計３種類の弾幕を放つ
+
+
+　　※    弾幕の名称・実装は
+        「東方プロジェクト」という弾幕シューティングゲームを中心としたコンテンツから直接引用しています。
+	    固有名詞が非常に多く分かりづらくなっているかと存じますが、何卒ご理解いただけますと幸いです。　　
+*/
+
+
 
 class BulletHell : public EnemyBullet
 {
 public:
 
 	enum class TYPE {
-		// パチュリー
+		// パチュリー（ステージ１ボス）
 		Normal_Patchouli,
 		MetalFatigue_Patchouli,
 		SilentSerena_Patchouli,
-		// チルノ
+		// チルノ（ステージ２ボス）
 		Normal_Cirno,
 		IcicleFall_Cirno,
 		Perfect_Freeze_Cirno,
-		// 諏訪子
+		// 諏訪子（ステージ３ボス）
 		Normal_Suwako,
 		IronRingOfMoriya_Suwako,
 		KeroChan_StandsFirm_AgainstTheStorm_Suwako,
@@ -30,49 +39,60 @@ public:
 
 public:
 
+	// コンストラクタ--------------------------------------------------------------------------------
+
 	BulletHell() {}
 	BulletHell(const Shared<dxe::Mesh>& bossMesh, const Shared<Player>& player)
 		: _bossMesh_ref(bossMesh) {	_player_ref = player; }
 
+	~BulletHell() override {}
 
-	// 1. 機能
-	// 2. スペル（弾幕名）
-	// 3. 使用者（キャラ名）
+	// ----------------------------------------------------------------------------------------------
 
-	// ステージ1ボス（パチュリー）-------------------------------------
-	void ShotBulletHell_Normal_Patchouli(const float& delta_time);
-	void ShotBulletHell_MetalFatigue_Patchouli(const float& delta_time);
-	void ShotBulletHell_SilentSerena_Patchouli(const float& delta_time);
+	/*
+	     以下関数は
+	
+		 1. 機能（主に発射・初期化）
+	     2. スペル（弾幕名）
+	     3. 使用者（キャラクター名）
 
-	// ステージ2ボス（チルノ）---------------------------------------------
-	void ShotBulletHell_Normal_Cirno(const float& delta_time);
-	void ShotBulletHell_IcicleFall_Cirno(const float& delta_time);
-	void ShotBulletHell_PerfectFreeze_Cirno(const float& delta_time);
+		 という規則に則って命名しています。
+	*/
 
-	// ステージ3ボス（諏訪子）---------------------------------------------
-	void ShotBulletHell_Normal_Suwako(const float& delta_time);
-	void ShotBulletHell_IronRingOfMoriya_Suwako(const float& delta_time);
-	void ShotBulletHell_KeroChanStandsFirm_AgainstTheStorm_Suwako(const float& delta_time);
+	// ステージ1ボス（パチュリー）--------------------------------------------------
+	void ShotBulletHell_Normal_Patchouli(const float deltaTime);
+	void ShotBulletHell_MetalFatigue_Patchouli(const float deltaTime);
+	void ShotBulletHell_SilentSerena_Patchouli(const float deltaTime);
+
+	// ステージ2ボス（チルノ）----------------------------------------------------------
+	void ShotBulletHell_Normal_Cirno(const float deltaTime);
+	void ShotBulletHell_IcicleFall_Cirno(const float deltaTime);
+	void ShotBulletHell_PerfectFreeze_Cirno(const float deltaTime);
+
+	// ステージ3ボス（諏訪子）----------------------------------------------------------
+	void ShotBulletHell_Normal_Suwako(const float deltaTime);
+	void ShotBulletHell_IronRingOfMoriya_Suwako(const float deltaTime);
+	void ShotBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako(const float deltaTime);
 
 private:
 
-	// 似た処理が多い場合に補助関数を使用（ WaveAssist ）など
+	// 似た処理が多い場合、効率化のため補助関数を使用（ InitAssist, WaveAssist, UpdateAssist）など
 
-	// ステージ1ボス（パチュリー）-------------------------------------
+	// ステージ1ボス（パチュリー）---------------------------------------------------------------
 	void WaveAssist_MetalFatigue_Patchouli(
 		Shared<EnemyBullet>& bullet,
-		const float& delta_time,
-		float angle_origin,
-		float radius_origin,
-		float startMoveTime
+		const float deltaTime,
+		const float angleOrigin,
+		const float radiusOrigin,
+		const float startMoveTime
 	);
 
-	// ステージ2ボス（チルノ）-------------------------------------
+	// ステージ2ボス（チルノ）---------------------------------------------------------------
 	void WaveAssist_Normal_Cirno(
 		Shared<EnemyBullet>& bullet,
-		float timing, 
-		float delayOffset,
-		const float& delta_time
+		const float timing,
+		const float delayOffset,
+		const float deltaTime
 	);
 
 	void InitAssist_IcicleFall_StraightBlue_Cirno(
@@ -83,25 +103,25 @@ private:
 
 	void UpdateAssist_IcicleFall_StraightBlue_Cirno(
 		Shared<EnemyBullet>& bullet,
-		float radius, 
-		float newAngle,
-		float startChangeDirTime,
-		const float& delta_time
+		const float radius,
+		const float newAngle,
+		const float startChangeDirTime,
+		const float deltaTime
 	);
 
 	void InitAssist_IcicleFall_StraightYellow_Cirno(
 		Shared<EnemyBullet>& bullet,
-		const int BULLETS_PER_ROW, 
-		const float BULLET_SPACING
+		const int bullets_perRow,
+		const float bulletSpace
 	);
 
 	void UpdateAssist_IcicleFall_StraightYellow_Cirno(
 		Shared<EnemyBullet>& bullet,
-		const float& delta_time,
-		const float BULLET_SPEED
+		const float deltaTime,
+		const float bulletSpeed
 	);
 
-	// ステージ3ボス（諏訪子）---------------------------------------------
+	// ステージ3ボス（諏訪子）-----------------------------------------------------------------------
 	void UpdateAssist_Normal_Suwako(
 		Shared<EnemyBullet>& bullet,
 		const float timeLimit
@@ -109,21 +129,21 @@ private:
 
 	void WaveAssist_IronRingOfMoriya_Suwako(
 		Shared<EnemyBullet>& bullet,
-		const float circle_radius,
+		const float circleRadius,
 		const float angle,
-		const float delta_time,
-		const float bullet_speed,
-		const int startMove_time
+		const float deltaTime,
+		const float bulletSpeed,
+		const int startMoveTime
 	);
 
-	void InitAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(
-		tnl::Vector3& upward_velocity,
+	void InitAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(
+		tnl::Vector3& upwardVelocity,
 		Shared<EnemyBullet>& bullet
 	);
 
-	void UpdateAssist_KeroChanStandsFirm_AgainstTheStorm_Suwako(
+	void UpdateAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(
 		Shared<EnemyBullet>& bullet,
-		const float& delta_time
+		const float deltaTime
 	);
 
 	// 共通機能-----------------------------------------------------------------------------

@@ -14,9 +14,14 @@ public:
 		Large
 	};
 
-	ScoreItem() {}
-	explicit ScoreItem(const ScoreItem::TYPE item_type);
 
+	// コンストラクタ・デストラクタ------------------------------------
+	ScoreItem() {}
+	explicit ScoreItem(const ScoreItem::TYPE itemType);
+
+	~ScoreItem() override {}
+
+	// 更新------------------------------------------------------------
 	bool Update(Shared<ScoreItem>& item);
 
 public:

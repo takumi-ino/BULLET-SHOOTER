@@ -110,7 +110,7 @@ bool Player::DecreaseHP(int damage) {
 }
 
 
-void Player::PlayDamageHitSE() {
+void Player::PlayDamageHitSE() noexcept {
 
 	PlaySoundMem(_getDamageSE_hdl, DX_PLAYTYPE_BACK, TRUE);
 }
@@ -554,7 +554,7 @@ void Player::RenderBulletPowerRate() {
 }
 
 
-void Player::RenderBombRemainCount() {
+void Player::RenderBombRemainCount() noexcept {
 
 	std::string s = std::to_string(_currentBomb_stockCount);
 	DrawFormatString(30, 80, -1, "Bomb:%s", s.c_str());
@@ -637,7 +637,7 @@ void Player::UpdateStraightBullet(float deltaTime)
 }
 
 
-void Player::WatchInvincibleTimer(const float deltaTime) {
+void Player::WatchInvincibleTimer(const float deltaTime) noexcept {
 
 	if (_isInvincible) {
 		_invincibleTimer += deltaTime;
