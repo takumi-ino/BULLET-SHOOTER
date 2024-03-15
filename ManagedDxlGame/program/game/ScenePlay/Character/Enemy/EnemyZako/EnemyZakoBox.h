@@ -1,23 +1,25 @@
 #pragma once
 #include "../EnemyZakoBase.h"
 
+namespace inl {
 
-class EnemyZakoBox final : public EnemyZakoBase
-{
-public:
+	class EnemyZakoBox final : public EnemyZakoBase
+	{
+	public:
 
-	EnemyZakoBox() {}
-	~EnemyZakoBox() override {}
+		EnemyZakoBox() {}
+		~EnemyZakoBox() override {}
 
 
-	EnemyZakoBox(
-		const EnemyZakoInfo& info,
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision
-	);
+		EnemyZakoBox(
+			const EnemyZakoInfo& info,
+			const Shared<Player>& player,
+			const Shared<dxe::Camera>& camera,
+			const Shared<Collision>& collision
+		);
 
-	// èâä˙âª---------------------------------------------------------------------------------
-	void InitBulletFactoryInstance() override;
-	void SetMeshInfo() override;
-};
+		// èâä˙âª---------------------------------------------------------------------------------
+		void InitBulletFactoryInstance() override;
+		void SetMeshInfo() override;
+	};
+}

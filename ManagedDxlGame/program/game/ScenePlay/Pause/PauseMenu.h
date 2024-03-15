@@ -1,48 +1,53 @@
 #pragma once
 
 class ScenePlay;
-class Player;
 
-class PauseMenu
-{
-public:
+namespace inl {
 
-	PauseMenu() {}
-	PauseMenu(const Shared<Player>& player);
+	class Player;
 
-	void Update();
-	void Render();
 
-private:
+	class PauseMenu
+	{
+	public:
 
-	//　ポーズメニュー選択入力（上下）
-	void UpdatePauseMenuCursor_ByInput() noexcept;
+		PauseMenu() {}
+		PauseMenu(const Shared<Player>& player);
 
-	//　メニュー項目描画
-	void RenderPauseMenuItems() noexcept;
+		void Update();
+		void Render();
 
-	//　操作説明描画（画像ではなく文字列のみ）
-	void RenderConfigStateInfo() noexcept;
+	private:
 
-	//　決定（項目ごとに異なる処理が実行される）
-	void PickPauseMenuItemByInput();
+		//　ポーズメニュー選択入力（上下）
+		void UpdatePauseMenuCursor_ByInput() noexcept;
 
-	//  BGMハンドルの削除とプレイヤーHPのリセット
-	void ResetGame();
+		//　メニュー項目描画
+		void RenderPauseMenuItems() noexcept;
 
-private:
+		//　操作説明描画（画像ではなく文字列のみ）
+		void RenderConfigStateInfo() noexcept;
 
-	Shared<ScenePlay> _scenePlay = nullptr;
-	Shared<Player>    _player_ref = nullptr;
+		//　決定（項目ごとに異なる処理が実行される）
+		void PickPauseMenuItemByInput();
 
-public:
+		//  BGMハンドルの削除とプレイヤーHPのリセット
+		void ResetGame();
 
-	static bool _isShowPauseOption;
+	private:
 
-private:
+		Shared<ScenePlay> _scenePlay = nullptr;
+		Shared<Player>    _player_ref = nullptr;
 
-	int         _MENU_INDEX_COUNT{ 4 };
-	int         _menuIndex{};
+	public:
 
-	bool        _isShowConfigInfo{ false };
-};
+		static bool _isShowPauseOption;
+
+	private:
+
+		int         _MENU_INDEX_COUNT{ 4 };
+		int         _menuIndex{};
+
+		bool        _isShowConfigInfo{ false };
+	};
+}

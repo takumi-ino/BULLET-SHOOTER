@@ -2,196 +2,197 @@
 #include "HomingBullet.h"
 #include "BulletFactory.h"
 
+namespace inl {
 
-std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet(const StraightBullet::USER user, const int maxBulletSpawnCount) {
+	std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet(const StraightBullet::USER user, const int maxBulletSpawnCount) {
 
-	switch (user) {
+		switch (user) {
 
-	case StraightBullet::USER::ZakoBox:
-		return CreateStraightBullet_ZakoBox(maxBulletSpawnCount);
-		break;
-	case  StraightBullet::USER::ZakoDome:
-		return CreateStraightBullet_ZakoDome(maxBulletSpawnCount);
-		break;
-	case  StraightBullet::USER::ZakoCylinder:
-		return CreateStraightBullet_ZakoCylinder(maxBulletSpawnCount);
-		break;
-	}
+		case StraightBullet::USER::ZakoBox:
+			return CreateStraightBullet_ZakoBox(maxBulletSpawnCount);
+			break;
+		case  StraightBullet::USER::ZakoDome:
+			return CreateStraightBullet_ZakoDome(maxBulletSpawnCount);
+			break;
+		case  StraightBullet::USER::ZakoCylinder:
+			return CreateStraightBullet_ZakoCylinder(maxBulletSpawnCount);
+			break;
+		}
 
-	return std::list<Shared<StraightBullet>>();
-}
-
-
-
-std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoBox(const int maxBulletSpawnCount) {
-
-	std::list<Shared<StraightBullet>> straightBullet;
-
-	tnl::Vector3 rot_vec = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _enemyMesh_ref->rot_);
-
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
-
-		Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
-
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
-
-		spawn_pos += rot_vec;
-
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
-
-		straightBullet.push_back(bullet);
-	}
-
-	return straightBullet;
-}
-
-
-std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoDome(const int maxBulletSpawnCount) {
-
-	std::list<Shared<StraightBullet>> straightBullet;
-
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
-
-		Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
-
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
-
-		spawn_pos.x += _enemyMesh_ref->rot_.x;
-		spawn_pos.y += _enemyMesh_ref->rot_.y;
-		spawn_pos.z += _enemyMesh_ref->rot_.z;
-
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
-
-		straightBullet.push_back(bullet);
+		return std::list<Shared<StraightBullet>>();
 	}
 
 
-	return straightBullet;
 
-}
+	std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoBox(const int maxBulletSpawnCount) {
 
+		std::list<Shared<StraightBullet>> straightBullet;
 
-std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoCylinder(const int maxBulletSpawnCount) {
+		tnl::Vector3 rot_vec = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _enemyMesh_ref->rot_);
 
-	std::list<Shared<StraightBullet>> straightBullet;
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
 
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
+			Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
 
-		Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
 
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+			spawn_pos += rot_vec;
 
-		spawn_pos.x += _enemyMesh_ref->rot_.x;
-		spawn_pos.y += _enemyMesh_ref->rot_.y;
-		spawn_pos.z += _enemyMesh_ref->rot_.z;
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
 
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
+			straightBullet.push_back(bullet);
+		}
 
-		straightBullet.push_back(bullet);
+		return straightBullet;
 	}
 
-	return straightBullet;
-}
+
+	std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoDome(const int maxBulletSpawnCount) {
+
+		std::list<Shared<StraightBullet>> straightBullet;
+
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+			Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
+
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+
+			spawn_pos.x += _enemyMesh_ref->rot_.x;
+			spawn_pos.y += _enemyMesh_ref->rot_.y;
+			spawn_pos.z += _enemyMesh_ref->rot_.z;
+
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
+
+			straightBullet.push_back(bullet);
+		}
 
 
+		return straightBullet;
 
-std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet(
-	const HomingBullet::USER user, const int maxBulletSpawnCount) {
-
-	switch (user) {
-
-	case HomingBullet::USER::ZakoBox:
-		return CreateHomingBullet_ZakoBox( maxBulletSpawnCount);
-		break;
-	case  HomingBullet::USER::ZakoDome:
-		return CreateHomingBullet_ZakoDome( maxBulletSpawnCount);
-		break;
-	case  HomingBullet::USER::ZakoCylinder:
-		return CreateHomingBullet_ZakoCylinder( maxBulletSpawnCount);
-		break;
 	}
 
-	return std::list<Shared<HomingBullet>>();
-}
 
+	std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoCylinder(const int maxBulletSpawnCount) {
 
+		std::list<Shared<StraightBullet>> straightBullet;
 
-std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoBox(const int maxBulletSpawnCount) {
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
 
-	std::list<Shared<HomingBullet>> homingBullet;
+			Shared<StraightBullet> bullet = std::make_shared<StraightBullet>();
 
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
 
-		Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+			spawn_pos.x += _enemyMesh_ref->rot_.x;
+			spawn_pos.y += _enemyMesh_ref->rot_.y;
+			spawn_pos.z += _enemyMesh_ref->rot_.z;
 
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
 
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+			straightBullet.push_back(bullet);
+		}
 
-		spawn_pos.x += _enemyMesh_ref->rot_.x;
-		spawn_pos.y += _enemyMesh_ref->rot_.y;
-		spawn_pos.z += _enemyMesh_ref->rot_.z;
-		
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
-
-		homingBullet.push_back(bullet);
+		return straightBullet;
 	}
 
-	return homingBullet;
-}
 
 
-std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoDome(const int maxBulletSpawnCount) {
+	std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet(
+		const HomingBullet::USER user, const int maxBulletSpawnCount) {
 
-	std::list<Shared<HomingBullet>> homingBullet;
+		switch (user) {
 
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
+		case HomingBullet::USER::ZakoBox:
+			return CreateHomingBullet_ZakoBox(maxBulletSpawnCount);
+			break;
+		case  HomingBullet::USER::ZakoDome:
+			return CreateHomingBullet_ZakoDome(maxBulletSpawnCount);
+			break;
+		case  HomingBullet::USER::ZakoCylinder:
+			return CreateHomingBullet_ZakoCylinder(maxBulletSpawnCount);
+			break;
+		}
 
-		Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
-
-
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
-
-		spawn_pos.x += _enemyMesh_ref->rot_.x;
-		spawn_pos.y += _enemyMesh_ref->rot_.y;
-		spawn_pos.z += _enemyMesh_ref->rot_.z;
-
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
-
-		homingBullet.push_back(bullet);
+		return std::list<Shared<HomingBullet>>();
 	}
 
-	return homingBullet;
 
 
-}
+	std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoBox(const int maxBulletSpawnCount) {
+
+		std::list<Shared<HomingBullet>> homingBullet;
+
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+			Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
 
 
-std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoCylinder(const int maxBulletSpawnCount) {
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
 
-	std::list<Shared<HomingBullet>> homingBullet;
+			spawn_pos.x += _enemyMesh_ref->rot_.x;
+			spawn_pos.y += _enemyMesh_ref->rot_.y;
+			spawn_pos.z += _enemyMesh_ref->rot_.z;
 
-	for (int i = 0; i < maxBulletSpawnCount; i++) {
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
 
-		Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+			homingBullet.push_back(bullet);
+		}
 
-
-		tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
-
-		spawn_pos.x += _enemyMesh_ref->rot_.x;
-		spawn_pos.y += _enemyMesh_ref->rot_.y;
-		spawn_pos.z += _enemyMesh_ref->rot_.z;
-
-		bullet->_mesh->pos_ = spawn_pos;
-		bullet->_isActive = true;
-
-		homingBullet.push_back(bullet);
+		return homingBullet;
 	}
 
-	return homingBullet;
 
+	std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoDome(const int maxBulletSpawnCount) {
+
+		std::list<Shared<HomingBullet>> homingBullet;
+
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+			Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+
+
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+
+			spawn_pos.x += _enemyMesh_ref->rot_.x;
+			spawn_pos.y += _enemyMesh_ref->rot_.y;
+			spawn_pos.z += _enemyMesh_ref->rot_.z;
+
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
+
+			homingBullet.push_back(bullet);
+		}
+
+		return homingBullet;
+
+
+	}
+
+
+	std::list<Shared<HomingBullet>> BulletFactory::CreateHomingBullet_ZakoCylinder(const int maxBulletSpawnCount) {
+
+		std::list<Shared<HomingBullet>> homingBullet;
+
+		for (int i = 0; i < maxBulletSpawnCount; i++) {
+
+			Shared<HomingBullet> bullet = std::make_shared<HomingBullet>();
+
+
+			tnl::Vector3 spawn_pos = _enemyMesh_ref->pos_;
+
+			spawn_pos.x += _enemyMesh_ref->rot_.x;
+			spawn_pos.y += _enemyMesh_ref->rot_.y;
+			spawn_pos.z += _enemyMesh_ref->rot_.z;
+
+			bullet->_mesh->pos_ = spawn_pos;
+			bullet->_isActive = true;
+
+			homingBullet.push_back(bullet);
+		}
+
+		return homingBullet;
+	}
 }

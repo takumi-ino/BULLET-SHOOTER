@@ -1,29 +1,32 @@
 #pragma once
 #include "../../DxLibEngine.h"
 
-class Player;
+namespace inl {
 
-class Character
-{
-protected:
+	class Player;
 
-	virtual ~Character() {}
+	class Character
+	{
+	protected:
 
-public:
+		virtual ~Character() {}
 
-	Shared<dxe::Mesh>  _mesh = nullptr;
+	public:
 
-protected:
+		Shared<dxe::Mesh>  _mesh = nullptr;
 
-	Shared<Player>     _player_ref = nullptr;
+	protected:
 
-public:
+		Shared<Player>     _player_ref = nullptr;
 
-	tnl::Vector3       _collideSize{};
+	public:
 
-protected:
+		tnl::Vector3       _collideSize{};
 
-	int                _at{};        // CSV
-	int                _def{};       // CSV
-	int                _MAX_HP{};
-};
+	protected:
+
+		int                _at{};        // CSV
+		int                _def{};       // CSV
+		int                _MAX_HP{};
+	};
+}

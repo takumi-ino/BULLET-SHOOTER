@@ -1,34 +1,38 @@
 #pragma once
 #include "../../DxLibEngine.h"
 
-class ItemBase
-{
-public:
 
-	ItemBase() {}
-	ItemBase(const std::vector<Shared<ItemBase>>& scoreItem, const  std::vector<Shared<ItemBase>>& power) {}
+namespace inl {
 
-protected:
+	class ItemBase
+	{
+	public:
 
-	virtual ~ItemBase() {}
+		ItemBase() {}
+		ItemBase(const std::vector<Shared<ItemBase>>& scoreItem, const  std::vector<Shared<ItemBase>>& power) {}
 
-public:
+	protected:
 
-	Shared<dxe::Mesh> _mesh = nullptr;
+		virtual ~ItemBase() {}
 
-public:
+	public:
 
-	float        _lifeTimer{};
+		Shared<dxe::Mesh> _mesh = nullptr;
 
-	bool         _isActive{ false };
-	bool         _hasSpawned{ false };
+	public:
 
-	tnl::Vector3 _velocity{ 0,150,0 };
-	tnl::Vector3 _gravity{ 0, -9.8f, 0 };
-	tnl::Vector3 _collisionSize{};
-	tnl::Vector3 _position{};
+		float        _lifeTimer{};
 
-protected:
+		bool         _isActive{ false };
+		bool         _hasSpawned{ false };
 
-	float _lifeTime{};  // Žõ–½
-};
+		tnl::Vector3 _velocity{ 0,150,0 };
+		tnl::Vector3 _gravity{ 0, -9.8f, 0 };
+		tnl::Vector3 _collisionSize{};
+		tnl::Vector3 _position{};
+
+	protected:
+
+		float _lifeTime{};  // Žõ–½
+	};
+}

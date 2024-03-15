@@ -1,11 +1,15 @@
 #pragma once
 #include "../../ScenePlay/Item/ScoreItem.h"
 
-class Collision;
-class EnemyManager;
-class PowerUpItem;
 class ScoreManager;
 
+namespace inl {
+	class Collision;
+	class EnemyManager;
+
+	class PowerUpItem;
+	class Player;
+}
 
 // 主に　得点アイテム・プレイヤー強化アイテムを管理
 class ItemManager
@@ -13,7 +17,7 @@ class ItemManager
 public:
 
 	ItemManager() {}
-	ItemManager(const Shared<Player>& player, const Shared<Collision>& collision)
+	ItemManager(const Shared<inl::Player>& player, const Shared<inl::Collision>& collision)
 		: _player_ref(player), _collision_ref(collision) {}
 
 	static ItemManager& GetInstance() {
@@ -54,43 +58,43 @@ private:
 
 	// 描画------------------------------------------------------------------------------
 	void RenderScoreItems(
-		std::vector<Shared<ScoreItem>>& scoreItems, const Shared<dxe::Camera>& camera);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems, const Shared<dxe::Camera>& camera);
 
 	// 更新------------------------------------------------------------------------------
-	void UpdateScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems);
+	void UpdateScoreItem_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems);
 
 	// 当たり判定------------------------------------------------------------------------
 	void EventHit_ScoreItemAndPlayer_DRY(
-		std::vector<Shared<ScoreItem>>& scoreItems, const ScoreItem::TYPE type);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems, const inl::ScoreItem::TYPE type);
 
 	void AvoidOverlap_ScoreItemAndScoreItem();
 
 	void AvoidOverlap_ScoreItemAndScoreItem_DRY(
-		std::vector<Shared<ScoreItem>>& scoreItems_1, std::vector<Shared<ScoreItem>>& scoreItems_2);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems_1, std::vector<Shared<inl::ScoreItem>>& scoreItems_2);
 
 	// プレイヤー強化アイテム----------------------------------------------------------------------------------------------------------
 
 	// 描画------------------------------------------------------------------------------
 	void RenderPowerUpItems(
-		std::vector<Shared<PowerUpItem>>& powerUpItems, const Shared<dxe::Camera>& camera);
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems, const Shared<dxe::Camera>& camera);
 
 	// 更新------------------------------------------------------------------------------
-	void UpdatePowerUpItem_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems);
+	void UpdatePowerUpItem_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
 	// 当たり判定------------------------------------------------------------------------
-	void EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems);
+	void EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
 	void AvoidOverlap_PowerUpItemAndPowerUpItem();
 
 	void AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
-		std::vector<Shared<PowerUpItem>>& powerUpItems_1, std::vector<Shared<PowerUpItem>>& powerUpItems_2);
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1, std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2);
 
 	// 得点アイテム＆プレイヤー強化アイテム-------------------------------------------------------------------------------------------
 
 	void AvoidOverlap_ScoreItemAndPowerUpItem();
 
 	void AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
-		std::vector<Shared<ScoreItem>>& scoreItems, std::vector<Shared<PowerUpItem>>& powerUpItems);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems, std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
 	// イベント通知（プレイヤーがアイテムを取得したときに表示するメッセージを通達）---------------------------------------------------
 	void RenderEventHitText() const;
@@ -99,21 +103,21 @@ private:
 
 private:
 
-	Shared<Player>      _player_ref = nullptr;
+	Shared<inl::Player>      _player_ref = nullptr;
 
-	Shared<Collision>   _collision_ref = nullptr;
+	Shared<inl::Collision>   _collision_ref = nullptr;
 
 private:
 
 	// 得点アイテム
-	static std::vector<Shared<ScoreItem>> _scoreItem_small;
-	static std::vector<Shared<ScoreItem>> _scoreItem_medium;
-	static std::vector<Shared<ScoreItem>> _scoreItem_large;
+	static std::vector<Shared<inl::ScoreItem>> _scoreItem_small;
+	static std::vector<Shared<inl::ScoreItem>> _scoreItem_medium;
+	static std::vector<Shared<inl::ScoreItem>> _scoreItem_large;
 
 	// プレイヤー強化アイテム
-	static std::vector<Shared<PowerUpItem>> _powerUpItem_heal;
-	static std::vector<Shared<PowerUpItem>> _powerUpItem_attack;
-	static std::vector<Shared<PowerUpItem>> _powerUpItem_defense;
-	static std::vector<Shared<PowerUpItem>> _powerUpItem_speed;
-	static std::vector<Shared<PowerUpItem>> _powerUpItem_bomb;
+	static std::vector<Shared<inl::PowerUpItem>> _powerUpItem_heal;
+	static std::vector<Shared<inl::PowerUpItem>> _powerUpItem_attack;
+	static std::vector<Shared<inl::PowerUpItem>> _powerUpItem_defense;
+	static std::vector<Shared<inl::PowerUpItem>> _powerUpItem_speed;
+	static std::vector<Shared<inl::PowerUpItem>> _powerUpItem_bomb;
 };

@@ -2,9 +2,9 @@
 #include "../../ScenePlay/ScenePlay.h"
 
 
-ScoreItem::ScoreItem(const ScoreItem::TYPE item_type) {
+inl::ScoreItem::ScoreItem(const inl::ScoreItem::TYPE itemType) {
 
-	switch (item_type)
+	switch (itemType)
 	{
 	case ScoreItem::TYPE::Small:
 	{
@@ -41,7 +41,7 @@ ScoreItem::ScoreItem(const ScoreItem::TYPE item_type) {
 }
 
 
-bool ScoreItem::Update(Shared<ScoreItem>& item) {
+bool inl::ScoreItem::Update(Shared<inl::ScoreItem>& item) {
 
 	if (item->_isActive) {
 		item->_lifeTimer += ScenePlay::GetDeltaTime();

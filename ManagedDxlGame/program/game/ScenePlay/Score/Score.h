@@ -1,18 +1,20 @@
 #pragma once
 #include "../../DxLibEngine.h"
 
+namespace inl {
 
-class Score 
-{
-public:
+	class Score
+	{
+	public:
 
-	Score() : _value(0) {}
+		Score() : _value(0) {}
 
-	void Add(int point);
+		void Add(int point);
 
-	int Get() const;
+		int Get() const;
 
-private:
+	private:
 
-	int _value ;
+		int _value;
+	};
 };

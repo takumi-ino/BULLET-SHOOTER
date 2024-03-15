@@ -4,38 +4,41 @@
 #include "../Camera/FreeLookCamera.h"
 
 
-SkyBox::SkyBox() {
+namespace inl {
 
-	// ディレクショナルライト
-	ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f));
+	SkyBox::SkyBox() {
 
-	SetDefaultLightParameter("directional_light_parameter.bin");
+		// ディレクショナルライト
+		ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f));
 
-	_skybox = dxe::Mesh::CreateCubeMV(50000, 20, 20);
+		SetDefaultLightParameter("directional_light_parameter.bin");
 
-	switch (ScenePlay::GetStageID())
-	{
-	case 1:
-		_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_c.png"));
-		break;
-	case 2:
-		_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_b.png"));
-		break;
-	case 3:
-		_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_a.png"));
-		break;
+		_skybox = dxe::Mesh::CreateCubeMV(50000, 20, 20);
+
+		switch (ScenePlay::GetStageID())
+		{
+		case 1:
+			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_c.png"));
+			break;
+		case 2:
+			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_b.png"));
+			break;
+		case 3:
+			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_a.png"));
+			break;
+		}
 	}
-}
 
 
-void SkyBox::Update() {
+	void SkyBox::Render(const Shared<inl::FreeLookCamera>& camera) {
 
-	// 自動更新
-	_skybox->rot_ *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(0.01f));
-}
+		_skybox->render(camera);
+	}
 
 
-void SkyBox::Render(const Shared<FreeLookCamera>& camera) {
+	void SkyBox::Update() {
 
-	_skybox->render(camera);
+		// 自動更新
+		_skybox->rot_ *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(0.01f));
+	}
 }

@@ -2,67 +2,71 @@
 #include "EnemyBase.h"
 
 class Player;
-class BulletHell;
-class EnemyBullet;
+
+namespace inl {
+	class BulletHell;
+	class EnemyBullet;
 class Collision;
 struct EnemyBossInfo;
 
-class EnemyBossBase : public EnemyBase
-{
-public:
 
-	EnemyBossBase() {}
-	~EnemyBossBase() override {}
+	class EnemyBossBase : public EnemyBase
+	{
+	public:
+
+		EnemyBossBase() {}
+		~EnemyBossBase() override {}
 
 
-	EnemyBossBase(
-		const EnemyBossInfo& data,
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision
-	);
+		EnemyBossBase(
+			const EnemyBossInfo& data,
+			const Shared<Player>& player,
+			const Shared<dxe::Camera>& camera,
+			const Shared<Collision>& collision
+		);
 
-	// INIT----------------------------------------------------------
-	virtual void InitBulletHellInstance() {}
+		// INIT----------------------------------------------------------
+		virtual void InitBulletHellInstance() {}
 
-	// DAMAGE--------------------------------------------------------
-	void DecreaseBossHP(int damage);
+		// DAMAGE--------------------------------------------------------
+		void DecreaseBossHP(int damage);
 
-protected:
+	protected:
 
-	// HP------------------------------------------------------------
-	bool ShowHpGage_EnemyBoss();
-	void RenderBossRemainLife();
+		// HP------------------------------------------------------------
+		bool ShowHpGage_EnemyBoss();
+		void RenderBossRemainLife();
 
-	// NAME-----------------------------------------------------------
-	void RenderBossName();
-	virtual void RenderBossSpellCardName() {}
+		// NAME-----------------------------------------------------------
+		void RenderBossName();
+		virtual void RenderBossSpellCardName() {}
 
-	// HIT------------------------------------------------------------
-	void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
+		// HIT------------------------------------------------------------
+		void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
 
-	// ACT------------------------------------------------------------
-	void ActKeepDistanceToPlayer(const float& deltaTime);
+		// ACT------------------------------------------------------------
+		void ActKeepDistanceToPlayer(const float& deltaTime);
 
-public:
+	public:
 
-	std::deque<int>                  _bossHp{};
-	Shared<BulletHell>               _bulletHell = nullptr;
+		std::deque<int>                  _bossHp{};
+		Shared<BulletHell>               _bulletHell = nullptr;
 
-protected:
+	protected:
 
-	Shared<Collision>                _collision_ref = nullptr;
+		Shared<Collision>                _collision_ref = nullptr;
 
-protected:
+	protected:
 
-	int       _MAX_HP{};
-	float     _WARPING_DURATION{};
+		int       _MAX_HP{};
+		float     _WARPING_DURATION{};
 
-private:
+	private:
 
-	// ボス残りHP。4つの赤い ダイヤの形をしたもの-------------------------
-	std::stack<std::deque<int>> _remainingLife_indicator;
+		// ボス残りHP。4つの赤い ダイヤの形をしたもの-------------------------
+		std::stack<std::deque<int>> _remainingLife_indicator;
 
-	// ワープするタイミングをタイマーで制御-------------------------------
-	float _warpToRandPosTimer{};
-};
+		// ワープするタイミングをタイマーで制御-------------------------------
+		float _warpToRandPosTimer{};
+	};
+}

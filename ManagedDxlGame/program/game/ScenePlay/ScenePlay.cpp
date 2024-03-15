@@ -55,33 +55,33 @@ namespace {
 ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 {
 	_isShowGameBeginText = true;
-	PauseMenu::_isShowPauseOption = false;
+	inl::PauseMenu::_isShowPauseOption = false;
 
 	_GAME_DIFFICULTY = selected_difficulty;
 	_STAGE_ID = stage;
 
-	_mainCamera = std::make_shared<FreeLookCamera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
+	_mainCamera = std::make_shared<inl::FreeLookCamera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
 	InitWeatherParticle();
 
 	_miniMap_hdl = LoadGraph("graphics/miniMap/radar.jpg"); // ミニマップ画像ロード
 
 	// プレイヤー
-	_player = std::make_shared<Player>(_mainCamera);
+	_player = std::make_shared<inl::Player>(_mainCamera);
 	_player->SetPlayerRef(_player);
 
 	InitPlayersBombCount(selected_difficulty);
 
 	// スカイボックス(天空)
-	_skyBox = std::make_shared<SkyBox>();
+	_skyBox = std::make_shared<inl::SkyBox>();
 
 	// 当たり判定
-	_collision = std::make_shared<Collision>();
+	_collision = std::make_shared<inl::Collision>();
 
 	// 敵に関するあらゆる処理を全て管理
-	_enemyManager = std::make_shared<EnemyManager>(_player, _mainCamera, _collision);
+	_enemyManager = std::make_shared<inl::EnemyManager>(_player, _mainCamera, _collision);
 
-	_bltHellFactory = std::make_shared<BulletHellFactory>();
+	_bltHellFactory = std::make_shared<inl::BulletHellFactory>();
 	// 生成する弾幕を最初に選び、初期化
 	CheckDoInit_FirstStageBulletHellLists();
 	CheckDoInit_SecondStageBulletHellLists();
@@ -100,7 +100,7 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
-	_pauseMenu = std::make_shared<PauseMenu>(_player);
+	_pauseMenu = std::make_shared<inl::PauseMenu>(_player);
 }
 
 
@@ -120,39 +120,39 @@ void ScenePlay::ReactivateEnemyBullets() {
 	{
 	case 1:
 	{
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			b->_isActive = true;
 		}
 		break;
 	}
 	case 2:
 	{
-		for (auto b : EnemyBoss_Cirno::_bullet_normal_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
 			b->_isActive = true;
 		}
 		break;
 	}
 	case 3:
 	{
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
 			b->_isActive = true;
 		}
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			b->_isActive = true;
 		}
 		break;
@@ -167,39 +167,39 @@ void ScenePlay::DeactivateAllEnemyBullets() {
 	{
 	case 1:
 	{
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			b->_isActive = false;
 		}
 		break;
 	}
 	case 2:
 	{
-		for (auto b : EnemyBoss_Cirno::_bullet_normal_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+		for (auto b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
 			b->_isActive = false;
 		}
 		break;
 	}
 	case 3:
 	{
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
 			b->_isActive = false;
 		}
-		for (auto b : EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			b->_isActive = false;
 		}
 		break;
@@ -222,55 +222,55 @@ void ScenePlay::CheckDoInit_FirstStageBulletHellLists()
 {
 	if (_STAGE_ID != 1) return;
 
-	EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Patchouli);
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::Normal_Patchouli);
 
-	EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::MetalFatigue_Patchouli);
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::MetalFatigue_Patchouli);
 
-	EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::SilentSerena_Patchouli);
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::SilentSerena_Patchouli);
 }
 
 
 void ScenePlay::TurnOff_FirstStageBulletHellLists() {
 
-	EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli = false;
-	EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli = false;
-	EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli = false;
+	inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli = false;
+	inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli = false;
+	inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli = false;
 }
 
 
 void ScenePlay::DestroyFirstStageBulletHellLists() {
 
-	EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.clear();
-	EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.clear();
-	EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.clear();
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.clear();
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.clear();
+	inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.clear();
 }
 
 
 void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 {
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
-		for (auto blt : EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
+		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_normal_patchouli.size());
 		//DrawFormatString(1000, 50, -1, "%s個 normal", s.c_str());
 	}
 
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli) {
 
-		for (auto blt : EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());
 		//DrawFormatString(1000, 50, -1, "%s個 metalFatigue", s.c_str());
 	}
 
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli) {
 
-		for (auto blt : EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());
@@ -282,10 +282,10 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 
 void ScenePlay::CheckDoUpdate_FirstStageBulletHellLists()
 {
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
 
-		auto it = EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.begin();
-		while (it != EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.end())
+		auto it = inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.begin();
+		while (it != inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -293,10 +293,10 @@ void ScenePlay::CheckDoUpdate_FirstStageBulletHellLists()
 			it++;
 		}
 	}
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli) {
 
-		auto it = EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.begin();
-		while (it != EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.end())
+		auto it = inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.begin();
+		while (it != inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -304,10 +304,10 @@ void ScenePlay::CheckDoUpdate_FirstStageBulletHellLists()
 			it++;
 		}
 	}
-	if (EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli) {
+	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli) {
 
-		auto it = EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.begin();
-		while (it != EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.end())
+		auto it = inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.begin();
+		while (it != inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -322,55 +322,55 @@ void ScenePlay::CheckDoInit_SecondStageBulletHellLists()
 {
 	if (_STAGE_ID != 2) return;
 
-	EnemyBoss_Cirno::_bullet_normal_cirno =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Cirno);
+	inl::EnemyBoss_Cirno::_bullet_normal_cirno =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::Normal_Cirno);
 
-	EnemyBoss_Cirno::_bullet_icicleFall_cirno =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::IcicleFall_Cirno);
+	inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::IcicleFall_Cirno);
 
-	EnemyBoss_Cirno::_bullet_perfectFreeze_cirno =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Perfect_Freeze_Cirno);
+	inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::Perfect_Freeze_Cirno);
 }
 
 
 void ScenePlay::TurnOff_SecondStageBulletHellLists() {
-	EnemyBoss_Cirno::_isUsingBullet_normal_cirno = false;
-	EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno = false;
-	EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno = false;
+	inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno = false;
+	inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno = false;
+	inl::EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno = false;
 }
 
 
 void ScenePlay::DestroySecondStageBulletHellLists() {
 
-	EnemyBoss_Cirno::_bullet_normal_cirno.clear();
-	EnemyBoss_Cirno::_bullet_icicleFall_cirno.clear();
-	EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.clear();
+	inl::EnemyBoss_Cirno::_bullet_normal_cirno.clear();
+	inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno.clear();
+	inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.clear();
 }
 
 
 
 void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 {
-	if (EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
-		for (auto blt : EnemyBoss_Cirno::_bullet_normal_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
+		for (auto blt : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_normal_cirno.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
-	if (EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno) {
 
-		for (auto blt : EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+		for (auto blt : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_icicleFall_cirno.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
-	if (EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno) {
 
-		for (auto blt : EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+		for (auto blt : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_perfectFreeze_cirno.size());
@@ -382,10 +382,10 @@ void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 
 void ScenePlay::CheckDoUpdate_SecondStageBulletHellLists()
 {
-	if (EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
 
-		auto it = EnemyBoss_Cirno::_bullet_normal_cirno.begin();
-		while (it != EnemyBoss_Cirno::_bullet_normal_cirno.end())
+		auto it = inl::EnemyBoss_Cirno::_bullet_normal_cirno.begin();
+		while (it != inl::EnemyBoss_Cirno::_bullet_normal_cirno.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -394,10 +394,10 @@ void ScenePlay::CheckDoUpdate_SecondStageBulletHellLists()
 		}
 	}
 
-	if (EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno) {
 
-		auto it = EnemyBoss_Cirno::_bullet_icicleFall_cirno.begin();
-		while (it != EnemyBoss_Cirno::_bullet_icicleFall_cirno.end())
+		auto it = inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno.begin();
+		while (it != inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -406,10 +406,10 @@ void ScenePlay::CheckDoUpdate_SecondStageBulletHellLists()
 		}
 	}
 
-	if (EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno) {
+	if (inl::EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno) {
 
-		auto it = EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.begin();
-		while (it != EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.end())
+		auto it = inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.begin();
+		while (it != inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -424,53 +424,53 @@ void ScenePlay::CheckDoInit_ThirdStageBulletHellLists() {
 
 	if (_STAGE_ID != 3) return;
 
-	EnemyBoss_MoriyaSuwako::_bullet_normal_suwako =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::Normal_Suwako);
+	inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::Normal_Suwako);
 
-	EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::IronRingOfMoriya_Suwako);
+	inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::IronRingOfMoriya_Suwako);
 
-	EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako =
-		_bltHellFactory->CreateBulletHell(BulletHell::TYPE::KeroChan_StandsFirm_AgainstTheStorm_Suwako);
+	inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako =
+		_bltHellFactory->CreateBulletHell(inl::BulletHell::TYPE::KeroChan_StandsFirm_AgainstTheStorm_Suwako);
 }
 
 
 void ScenePlay::TurnOff_ThirdStageBulletHellLists() {
-	EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = false;
-	EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = false;
-	EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = false;
+	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = false;
+	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = false;
+	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = false;
 }
 
 
 void ScenePlay::DestroyThirdStageBulletHellLists() {
-	EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.clear();
-	EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.clear();
-	EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.clear();
+	inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.clear();
+	inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.clear();
+	inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.clear();
 }
 
 
 void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
-		for (auto blt : EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
+		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_normal_suwako.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako) {
 
-		for (auto blt : EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_ironRingOfMoriya_suwako.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
 	}
 
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 
-		for (auto blt : EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_keroChanStandsFirmAgainstTheStorm_suwako.size());
@@ -482,10 +482,10 @@ void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 
 void ScenePlay::CheckDoUpdate_ThirdStageBulletHellLists() {
 
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
 
-		auto it = EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.begin();
-		while (it != EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.end())
+		auto it = inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.begin();
+		while (it != inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -493,10 +493,10 @@ void ScenePlay::CheckDoUpdate_ThirdStageBulletHellLists() {
 			it++;
 		}
 	}
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako) {
 
-		auto it = EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.begin();
-		while (it != EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.end())
+		auto it = inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.begin();
+		while (it != inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -504,10 +504,10 @@ void ScenePlay::CheckDoUpdate_ThirdStageBulletHellLists() {
 			it++;
 		}
 	}
-	if (EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 
-		auto it = EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.begin();
-		while (it != EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.end())
+		auto it = inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.begin();
+		while (it != inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.end())
 		{
 			if (!(*it)->_isActive) {
 				(*it)->_isActive = true;
@@ -556,7 +556,7 @@ void ScenePlay::RenderEnemyRadarOnMiniMap() {
 
 void ScenePlay::RenderPauseMenu()
 {
-	if (PauseMenu::_isShowPauseOption) {
+	if (inl::PauseMenu::_isShowPauseOption) {
 		_pauseMenu->Render();
 		_bgAlpha_whenCall_pauseMenu = 100;
 	}
@@ -593,16 +593,16 @@ void ScenePlay::Render() {
 	}
 	if (_STAGE_ID == 3) {
 		// お星さま描画
-		ShiningStar s;	s.Render();
+		inl::ShiningStar s;	s.Render();
 	}
 
 
 	if (_player->GetIsTriggeredBombEffect()) {
 
 		dxe::DirectXRenderBegin();
-		Player::_bombParticle->setPosition(_player->_mesh->pos_);
-		Player::_bombParticle->start();
-		Player::_bombParticle->render(_mainCamera);
+		inl::Player::_bombParticle->setPosition(_player->_mesh->pos_);
+		inl::Player::_bombParticle->start();
+		inl::Player::_bombParticle->render(_mainCamera);
 		dxe::DirectXRenderEnd();
 	}
 
@@ -683,12 +683,12 @@ void ScenePlay::Update(float deltaTime) {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LALT)) {
 
-		if (!PauseMenu::_isShowPauseOption) {
-			PauseMenu::_isShowPauseOption = true;
+		if (!inl::PauseMenu::_isShowPauseOption) {
+			inl::PauseMenu::_isShowPauseOption = true;
 		}
 	}
 
-	if (PauseMenu::_isShowPauseOption) {
+	if (inl::PauseMenu::_isShowPauseOption) {
 		_pauseMenu->Update();
 	}
 	else {
@@ -700,5 +700,5 @@ void ScenePlay::Update(float deltaTime) {
 	}
 
 	UpdateShowBeginTextTimer(deltaTime);
-	PlayerBullet::ClampBulletPowerRate();
+	inl::PlayerBullet::ClampBulletPowerRate();
 }

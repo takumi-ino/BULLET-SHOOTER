@@ -1,6 +1,9 @@
 #pragma once
 
-class Score;
+namespace inl {
+
+	class Score;
+}
 
 class ScoreManager 
 {
@@ -35,9 +38,9 @@ public:
 
 private:
 
-	Shared<Score> hitScore = nullptr;
-	Shared<Score> scoreItemScore = nullptr;
-	Shared<Score> comboScore = nullptr;
-	Shared<Score> killBonus = nullptr;
-	Shared<Score> spellCardBonus = nullptr;
+	Shared<inl::Score> hitScore = nullptr;
+	Shared<inl::Score> scoreItemScore = nullptr;
+	Shared<inl::Score> comboScore = nullptr;
+	Shared<inl::Score> killBonus = nullptr;
+	Shared<inl::Score> spellCardBonus = nullptr;
 };

@@ -2,11 +2,11 @@
 #include "ScoreManager.h"
 
 void ScoreManager::InitScoreInstance() {
-	hitScore = std::make_shared<Score>();
-	scoreItemScore = std::make_shared<Score>();
-	comboScore = std::make_shared<Score>();
-	killBonus = std::make_shared<Score>();
-	spellCardBonus = std::make_shared<Score>();
+	hitScore = std::make_shared<inl::Score>();
+	scoreItemScore = std::make_shared<inl::Score>();
+	comboScore = std::make_shared<inl::Score>();
+	killBonus = std::make_shared<inl::Score>();
+	spellCardBonus = std::make_shared<inl::Score>();
 }
 
 void ScoreManager::AddHitBulletScore(int points) {

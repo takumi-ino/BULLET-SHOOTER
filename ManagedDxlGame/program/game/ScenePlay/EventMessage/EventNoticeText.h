@@ -1,31 +1,34 @@
 #pragma once
 
 
-class EventNoticeText
-{
-public:
+namespace inl {
 
-	EventNoticeText() {}
-	EventNoticeText(const std::string text, const int color, const int fontSize, const int margin);
+	class EventNoticeText
+	{
+	public:
 
-	bool IsExpired() const { return _duration <= 0.0f; };
+		EventNoticeText() {}
+		EventNoticeText(const std::string text, const int color, const int fontSize, const int margin);
 
-	void Render(const int index);
-	void Update(const float deltaTime);
+		bool IsExpired() const { return _duration <= 0.0f; };
 
-public:
+		void Render(const int index);
+		void Update(const float deltaTime);
 
-	static std::deque<Shared<EventNoticeText>> _messageQueue;
+	public:
 
-private:
+		static std::deque<Shared<EventNoticeText>> _messageQueue;
 
-	int          _color{};
-	int          _fontSize{};
-	int          _margin{};
-	int          _startTextPos_X{};
-	int          _startTextPos_Y{};
+	private:
 
-	float        _duration{};
+		int          _color{};
+		int          _fontSize{};
+		int          _margin{};
+		int          _startTextPos_X{};
+		int          _startTextPos_Y{};
 
-	std::string  _messageText{};
-};
+		float        _duration{};
+
+		std::string  _messageText{};
+	};
+}

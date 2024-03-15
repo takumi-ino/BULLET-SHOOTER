@@ -72,7 +72,7 @@ void gameMain(float delta_time) {
 //------------------------------------------------------------------------------------------------------------
 // ゲーム終了時に１度だけ実行されます
 void gameEnd() {
-    EnemyZakoBase::_explode_particle.reset();
+    inl::EnemyZakoBase::_explode_particle.reset();
+    inl::Player::_bombParticle.reset();
     ScenePlay::_weatherParticle.reset();
-    Player::_bombParticle.reset();
 }

@@ -9,9 +9,9 @@
 
 
 // 得点アイテム--------------------------------------------------------------------------------------------------------------------------
-std::vector<Shared<ScoreItem>> ItemManager::_scoreItem_small;
-std::vector<Shared<ScoreItem>> ItemManager::_scoreItem_medium;
-std::vector<Shared<ScoreItem>> ItemManager::_scoreItem_large;
+std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_small;
+std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_medium;
+std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_large;
 
 void ItemManager::CreateScoreItemPool(const std::string difficulty, const int stage_id) {
 
@@ -55,17 +55,17 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 		ItemSize& size = itemCountSetting[difficulty][stage_id - 1];
 
 		for (int i = 0; i < size.s; i++) {
-			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Small);
+			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Small);
 			_scoreItem_small.push_back(item);
 		}
 
 		for (int i = 0; i < size.m; i++) {
-			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Medium);
+			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Medium);
 			_scoreItem_medium.push_back(item);
 		}
 
 		for (int i = 0; i < size.l; i++) {
-			Shared<ScoreItem> item = std::make_shared<ScoreItem>(ScoreItem::TYPE::Large);
+			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Large);
 			_scoreItem_large.push_back(item);
 		}
 	}
@@ -73,7 +73,7 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 
 
 
-void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<ScoreItem>>& scoreItems, const ScoreItem::TYPE type) {
+void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems, const inl::ScoreItem::TYPE type) {
 
 	for (auto it : scoreItems) {
 
@@ -83,19 +83,19 @@ void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<ScoreItem>>
 
 				switch (type)
 				{
-				case ScoreItem::TYPE::Small:
+				case inl::ScoreItem::TYPE::Small:
 				{
 					EventNotify_OnCaughtItem("得点アイテム小", "500ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(500);
 					break;
 				}
-				case ScoreItem::TYPE::Medium:
+				case inl::ScoreItem::TYPE::Medium:
 				{
 					EventNotify_OnCaughtItem("得点アイテム中", "1000ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(100);
 					break;
 				}
-				case ScoreItem::TYPE::Large:
+				case inl::ScoreItem::TYPE::Large:
 				{
 					EventNotify_OnCaughtItem("得点アイテム大", "1500ポイント加算。");
 					ScoreManager::GetInstance().AddScoreItemScore(1500);
@@ -112,13 +112,13 @@ void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<ScoreItem>>
 
 void ItemManager::EventHit_ScoreItemAndPlayer()
 {
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_small, ScoreItem::TYPE::Small);
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_medium, ScoreItem::TYPE::Medium);
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_large, ScoreItem::TYPE::Large);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_small, inl::ScoreItem::TYPE::Small);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_medium, inl::ScoreItem::TYPE::Medium);
+	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_large, inl::ScoreItem::TYPE::Large);
 }
 
 
-void ItemManager::UpdateScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems) {
+void ItemManager::UpdateScoreItem_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems) {
 
 	if (!scoreItems.empty()) {
 
@@ -140,11 +140,11 @@ void ItemManager::UpdateScoreItem()
 }
 
 // プレイヤー強化アイテム------------------------------------------------------------------------------------------------------------------------------------
-std::vector<Shared<PowerUpItem>> ItemManager::_powerUpItem_heal;
-std::vector<Shared<PowerUpItem>> ItemManager::_powerUpItem_attack;
-std::vector<Shared<PowerUpItem>> ItemManager::_powerUpItem_defense;
-std::vector<Shared<PowerUpItem>> ItemManager::_powerUpItem_speed;
-std::vector<Shared<PowerUpItem>> ItemManager::_powerUpItem_bomb;
+std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_heal;
+std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_attack;
+std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_defense;
+std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_speed;
+std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_bomb;
 
 
 void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int stage_id) {
@@ -187,30 +187,30 @@ void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int 
 		ItemType& type = itemCountSetting[difficulty][stage_id - 1];
 
 		for (int i = 0; i < type.heal; i++) {
-			Shared<PowerUpItem> item = std::make_shared<PowerUpItem>(PowerUpItem::TYPE::Heal);
+			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Heal);
 			_powerUpItem_heal.push_back(item);
 		}
 		for (int i = 0; i < type.attack; i++) {
-			Shared<PowerUpItem> item = std::make_shared<PowerUpItem>(PowerUpItem::TYPE::Attack);
+			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Attack);
 			_powerUpItem_attack.push_back(item);
 		}
 		for (int i = 0; i < type.defense; i++) {
-			Shared<PowerUpItem> item = std::make_shared<PowerUpItem>(PowerUpItem::TYPE::Defense);
+			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Defense);
 			_powerUpItem_defense.push_back(item);
 		}
 		for (int i = 0; i < type.speed; i++) {
-			Shared<PowerUpItem> item = std::make_shared<PowerUpItem>(PowerUpItem::TYPE::Speed);
+			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Speed);
 			_powerUpItem_speed.push_back(item);
 		}
 		for (int i = 0; i < type.bomb; i++) {
-			Shared<PowerUpItem> item = std::make_shared<PowerUpItem>(PowerUpItem::TYPE::Bomb);
+			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Bomb);
 			_powerUpItem_bomb.push_back(item);
 		}
 	}
 }
 
 
-void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems) {
+void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
 	for (auto it : powerUpItems) {
 
@@ -220,7 +220,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpIt
 
 				switch (it->type)
 				{
-				case PowerUpItem::TYPE::Heal:
+				case inl::PowerUpItem::TYPE::Heal:
 				{
 					if (_player_ref->GetHP() < _player_ref->GetMaxHP()) {
 
@@ -236,28 +236,28 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<PowerUpIt
 					}
 					break;
 				}
-				case PowerUpItem::TYPE::Attack:
+				case inl::PowerUpItem::TYPE::Attack:
 				{
 					EventNotify_OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
 
 					_player_ref->AddAT(2);
 					break;
 				}
-				case PowerUpItem::TYPE::Defense:
+				case inl::PowerUpItem::TYPE::Defense:
 				{
 					EventNotify_OnCaughtItem("防御強化アイテム", "防御力が上昇。");
 
 					_player_ref->AddDEF(2); // 防御力が敵の攻撃力を上回らないように
 					break;
 				}
-				case PowerUpItem::TYPE::Speed:
+				case inl::PowerUpItem::TYPE::Speed:
 				{
 					EventNotify_OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
 
 					_player_ref->AddSpeed(0.1f);
 					break;
 				}
-				case PowerUpItem::TYPE::Bomb:
+				case inl::PowerUpItem::TYPE::Bomb:
 				{
 					EventNotify_OnCaughtItem("ボム", "");
 
@@ -297,16 +297,17 @@ void ItemManager::EventNotify_OnCaughtItem(const std::string item_name, const st
 
 	std::string msg = item_name + "を獲得。 \n" + effect;
 
-	Shared<EventNoticeText> event_msg = std::make_shared<EventNoticeText>(msg, GetColor(0, 255, 0), 16, 35);
+	Shared<inl::EventNoticeText> event_msg = 
+		std::make_shared<inl::EventNoticeText>(msg, GetColor(0, 255, 0), 16, 35);
 
-	EventNoticeText::_messageQueue.push_back(event_msg);
+	inl::EventNoticeText::_messageQueue.push_back(event_msg);
 }
 
 
 void ItemManager::RenderEventHitText() const {
 
 	int index = 0;
-	for (auto msg : EventNoticeText::_messageQueue) {
+	for (auto msg : inl::EventNoticeText::_messageQueue) {
 		msg->Render(index);
 		index++;
 	}
@@ -315,15 +316,15 @@ void ItemManager::RenderEventHitText() const {
 
 void ItemManager::UpdateEventHitText(const float deltaTime) {
 
-	for (auto msg : EventNoticeText::_messageQueue) {
+	for (auto msg : inl::EventNoticeText::_messageQueue) {
 		msg->Update(deltaTime);
 	}
 
-	auto it = EventNoticeText::_messageQueue.begin();
-	while (it != EventNoticeText::_messageQueue.end()) {
+	auto it = inl::EventNoticeText::_messageQueue.begin();
+	while (it != inl::EventNoticeText::_messageQueue.end()) {
 
 		if ((*it)->IsExpired()) {
-			it = EventNoticeText::_messageQueue.erase(it);
+			it = inl::EventNoticeText::_messageQueue.erase(it);
 		}
 		else {
 			++it;
@@ -332,7 +333,9 @@ void ItemManager::UpdateEventHitText(const float deltaTime) {
 }
 
 // 当たり判定-----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::AvoidOverlap_ScoreItemAndScoreItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems_1, std::vector<Shared<ScoreItem>>& scoreItems_2) {
+void ItemManager::AvoidOverlap_ScoreItemAndScoreItem_DRY(
+	std::vector<Shared<inl::ScoreItem>>& scoreItems_1, 
+	std::vector<Shared<inl::ScoreItem>>& scoreItems_2) {
 
 	for (auto it : scoreItems_1) {
 		for (auto& it2 : scoreItems_2) {
@@ -352,7 +355,9 @@ void ItemManager::AvoidOverlap_ScoreItemAndScoreItem()
 }
 
 
-void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems_1, std::vector<Shared<PowerUpItem>>& powerUpItems_2) {
+void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1, 
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2) {
 
 	for (auto it : powerUpItems_1) {
 		for (auto& it2 : powerUpItems_2) {
@@ -384,7 +389,9 @@ void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem() {
 }
 
 
-void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem_DRY(std::vector<Shared<ScoreItem>>& scoreItems, std::vector<Shared<PowerUpItem>>& powerUpItems) {
+void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
+	std::vector<Shared<inl::ScoreItem>>& scoreItems, 
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
 	for (auto it : scoreItems) {
 		for (auto& it2 : powerUpItems) {
@@ -416,7 +423,9 @@ void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem() {
 
 
 // 描画-----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::RenderPowerUpItems(std::vector<Shared<PowerUpItem>>& powerUpItems, const Shared<dxe::Camera>& camera) {
+void ItemManager::RenderPowerUpItems(
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems, 
+	const Shared<dxe::Camera>& camera) {
 
 	if (!powerUpItems.empty()) {
 		for (auto it_scrItm_large : powerUpItems) {
@@ -426,7 +435,9 @@ void ItemManager::RenderPowerUpItems(std::vector<Shared<PowerUpItem>>& powerUpIt
 	}
 }
 
-void ItemManager::RenderScoreItems(std::vector<Shared<ScoreItem>>& scoreItems, const Shared<dxe::Camera>& camera) {
+void ItemManager::RenderScoreItems(
+	std::vector<Shared<inl::ScoreItem>>& scoreItems, 
+	const Shared<dxe::Camera>& camera) {
 
 	if (!scoreItems.empty()) {
 		for (auto it_scrItm_small : scoreItems) {
@@ -453,7 +464,8 @@ void ItemManager::Render(const Shared<dxe::Camera>& camera) {
 
 
 // 更新-----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::UpdatePowerUpItem_DRY(std::vector<Shared<PowerUpItem>>& powerUpItems) {
+void ItemManager::UpdatePowerUpItem_DRY(
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
 	if (!powerUpItems.empty()) {
 		for (auto it_powItm = powerUpItems.begin(); it_powItm != powerUpItems.end();) {
@@ -502,7 +514,7 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 		rnd_offset.y = (float)rnd_valY(mt);
 		rnd_offset.z = (float)rnd_valZ(mt);
 
-		std::vector<Shared<ScoreItem>>* scoreItems = nullptr;
+		std::vector<Shared<inl::ScoreItem>>* scoreItems = nullptr;
 
 		int chooseScoreItem = rnd_scoreItem_num(mt);
 
@@ -527,7 +539,7 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 			}
 		}
 
-		std::vector<Shared<PowerUpItem>>* powerUpItems = nullptr;
+		std::vector<Shared<inl::PowerUpItem>>* powerUpItems = nullptr;
 
 		int choosePowerUpItem = rnd_powerUpItem_num(mt);
 

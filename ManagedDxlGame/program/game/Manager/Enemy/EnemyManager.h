@@ -1,163 +1,158 @@
 #pragma once
 #include "../../Loader/CsvLoader.h"
 
-class Collision;
-class Score;
-class EnemyZakoBox;
-class EnemyZakoDome;
-class EnemyZakoCylinder;
-class EnemyZakoBase;
-class EnemyBossBase;
-class Player;
 class ItemManager;
-class StraightBullet;
-class HomingBullet;
-class EnemyBullet;
-class EventNoticeText;
 
-// 生成・削除・更新を管理
-class EnemyManager
-{
-public:
+namespace inl {
 
-	EnemyManager() {}
-	EnemyManager(
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision
-	);
+	class Collision;
+	class EnemyZakoBase;
+	class EnemyBossBase;
 
-	virtual ~EnemyManager() {
-		_enemyZakoList.clear();
-		_enemyBossList.clear();
-	}
+	// 生成・削除・更新を管理
+	class EnemyManager
+	{
+	public:
 
-	// 敵座標取得------------------------------------------------------------
-	const std::vector<tnl::Vector3>& GetEnemyZakoPosition();
-	const tnl::Vector3& GetEnemyBossPosition();
+		EnemyManager() {}
+		EnemyManager(
+			const Shared<Player>& player,
+			const Shared<dxe::Camera>& camera,
+			const Shared<Collision>& collision
+		);
 
-	// 残りの敵数取得------------------------------------------------------------
-	const int GetRemainingEnemyCount() const noexcept { return _zakoEnemyTotalLeftCount; }
+		virtual ~EnemyManager() {
+			_enemyZakoList.clear();
+			_enemyBossList.clear();
+		}
 
-	//------------------------------------------------------------
-	void Render(const Shared<dxe::Camera>& camera) const;
-	void Update(const float deltaTime);
+		// 敵座標取得------------------------------------------------------------
+		const std::vector<tnl::Vector3>& GetEnemyZakoPosition();
+		const tnl::Vector3& GetEnemyBossPosition();
 
-private:
+		// 残りの敵数取得------------------------------------------------------------
+		const int GetRemainingEnemyCount() const noexcept { return _zakoEnemyTotalLeftCount; }
 
-	// ザコのみ------------------------------------------------------------------------------------------------------
-	void InitEnemyZakoInfo();                          // 初期化
-	void UpdateEnemyZakoList(const float deltaTime);  // 更新
-	void SetMaxEnemySpawnCount() noexcept;             // 1度に生成可能な敵数を設定（難易度ごとに調整）
+		//------------------------------------------------------------
+		void Render(const Shared<dxe::Camera>& camera) const;
+		void Update(const float deltaTime);
 
-	// ボスのみ------------------------------------------------------------------------------------------------------
-	void InitEnemyBossInfo();                          // 初期化
-	void UpdateEnemyBossList(const float deltaTime);  // 更新
+	private:
 
-	// 生成はするが、ザコが全滅するまでボスは非アクティブ
-	void SetSpawnEnemyBoss();
+		// ザコのみ------------------------------------------------------------------------------------------------------
+		void InitEnemyZakoInfo();                          // 初期化
+		void UpdateEnemyZakoList(const float deltaTime);  // 更新
+		void SetMaxEnemySpawnCount() noexcept;             // 1度に生成可能な敵数を設定（難易度ごとに調整）
 
-	// ボスが出現したときに一定時間表示するテキスト
-	void ShowBossAppearanceText() noexcept;
+		// ボスのみ------------------------------------------------------------------------------------------------------
+		void InitEnemyBossInfo();                          // 初期化
+		void UpdateEnemyBossList(const float deltaTime);  // 更新
 
-	// ShowBossAppearanceText 関数の有効時間を計測
-	void UpdateBossAppearanceTextTimer(const float deltaTime) noexcept;
+		// 生成はするが、ザコが全滅するまでボスは非アクティブ
+		void SetSpawnEnemyBoss();
 
-	// 更新処理開始
-	void SummonBoss();
+		// ボスが出現したときに一定時間表示するテキスト
+		void ShowBossAppearanceText() noexcept;
 
-	// ザコ・ボス共通-------------------------------------------------------------------------------------------------
-	void CheckDoSpawnEnemy();           // 一定数のザコ敵を倒すことで、ボスもしくは新たなザコ敵を召喚
-	void LoadEnemyDataFromCsv();        // CSVファイルから敵初期化に必要な情報を取得
-	bool IsKilledStageBoss(); 	        // ザコリスト及びボスリストのオブジェクトがどちらも０になったら true
+		// ShowBossAppearanceText 関数の有効時間を計測
+		void UpdateBossAppearanceTextTimer(const float deltaTime) noexcept;
 
-	// 当たり判定-----------------------------------------------------------------------------------------------------
-	void EnemyZakoCollisionPairLists();
-	void EnemyBossCollisionPairLists();
+		// 更新処理開始
+		void SummonBoss();
 
-	// アイテム取得イベント通知---------------------------------------------------------------------------------------
-	void AttachItemManagerInstance(const Shared<ItemManager>& observer);
-	void NotifyEnemyPosition_ToItemManager();                             // アイテムスポーンに必要な敵の位置情報を通達
-	void SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyActive);
+		// ザコ・ボス共通-------------------------------------------------------------------------------------------------
+		void CheckDoSpawnEnemy();           // 一定数のザコ敵を倒すことで、ボスもしくは新たなザコ敵を召喚
+		void LoadEnemyDataFromCsv();        // CSVファイルから敵初期化に必要な情報を取得
+		bool IsKilledStageBoss(); 	        // ザコリスト及びボスリストのオブジェクトがどちらも０になったら true
 
-	// 敵殺傷イベント通知---------------------------------------------------------------------------------------------
-	void EventNotify_OnEnemyKilled(const std::string enemyName);         // 敵の撃破情報を通達
-	void RenderEventHitText() const;
-	void UpdateEventHitText(const float deltaTime);
+		// 当たり判定-----------------------------------------------------------------------------------------------------
+		void EnemyZakoCollisionPairLists();
+		void EnemyBossCollisionPairLists();
 
-	// ステージ移動---------------------------------------------------------------------------------------------------
-	tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
-	bool SeqMoveToNextStage(const float deltaTime);
-	bool SeqMoveToResult(const float deltaTime);
+		// アイテム取得イベント通知---------------------------------------------------------------------------------------
+		void AttachItemManagerInstance(const Shared<ItemManager>& observer);
+		void NotifyEnemyPosition_ToItemManager();                             // アイテムスポーンに必要な敵の位置情報を通達
+		void SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyActive);
 
-public:
+		// 敵殺傷イベント通知---------------------------------------------------------------------------------------------
+		void EventNotify_OnEnemyKilled(const std::string enemyName);         // 敵の撃破情報を通達
+		void RenderEventHitText() const;
+		void UpdateEventHitText(const float deltaTime);
 
-	std::vector<Shared<EnemyZakoBase>>     _enemyZakoList{};
-	std::vector<Shared<EnemyBossBase>>     _enemyBossList{};
+		// ステージ移動---------------------------------------------------------------------------------------------------
+		tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
+		bool SeqMoveToNextStage(const float deltaTime);
+		bool SeqMoveToResult(const float deltaTime);
 
-	std::vector<Shared<EnemyZakoBase>>::iterator _itZako{};
-	std::vector<Shared<EnemyBossBase>>::iterator _itBoss{};
+	public:
 
-private:
+		std::vector<Shared<EnemyZakoBase>>     _enemyZakoList{};
+		std::vector<Shared<EnemyBossBase>>     _enemyBossList{};
 
-	Shared<ItemManager>                    _itemManager = nullptr;
-	Shared<CsvLoader>                      _csvLoader = nullptr;
+		std::vector<Shared<EnemyZakoBase>>::iterator _itZako{};
+		std::vector<Shared<EnemyBossBase>>::iterator _itBoss{};
 
-	// 参照				                   
-	Shared<Player>                         _player_ref = nullptr;
-	Shared<dxe::Camera>                    _mainCamera_ref = nullptr;
-	Shared<Collision>                      _collision_ref = nullptr;
+	private:
 
-	// Zako
-	std::unordered_map<int, EnemyZakoInfo> _enemyZakoData_map{};
-	EnemyZakoInfo                          _sEnemy_zakoBox_info{};
-	EnemyZakoInfo                          _sEnemy_zakoDome_info{};
-	EnemyZakoInfo                          _sEnemy_zakoCylinder_info{};
+		Shared<ItemManager>                    _itemManager = nullptr;
+		Shared<CsvLoader>                      _csvLoader = nullptr;
 
-	// Boss
-	std::unordered_map<int, EnemyBossInfo> _enemyBossData_map{};
-	EnemyBossInfo                          _sBoss_PatchouliKnowledge_info{};
-	EnemyBossInfo                          _sBoss_Cirno_info{};
-	EnemyBossInfo                          _sBoss_MoriyaSuwako_info{};
+		// 参照				                   
+		Shared<Player>                         _player_ref = nullptr;
+		Shared<dxe::Camera>                    _mainCamera_ref = nullptr;
+		Shared<Collision>                      _collision_ref = nullptr;
 
-private:
+		// Zako
+		std::unordered_map<int, EnemyZakoInfo> _enemyZakoData_map{};
+		EnemyZakoInfo                          _sEnemy_zakoBox_info{};
+		EnemyZakoInfo                          _sEnemy_zakoDome_info{};
+		EnemyZakoInfo                          _sEnemy_zakoCylinder_info{};
 
-	// オブザーバーパターン。敵の位置からアイテムをスポーン
-	std::vector<Shared<ItemManager>>       _observerItems;
-	tnl::Vector3                           _enemyZako_position{};
-	bool                                   _isEnemyZako_dead{};
+		// Boss
+		std::unordered_map<int, EnemyBossInfo> _enemyBossData_map{};
+		EnemyBossInfo                          _sBoss_PatchouliKnowledge_info{};
+		EnemyBossInfo                          _sBoss_Cirno_info{};
+		EnemyBossInfo                          _sBoss_MoriyaSuwako_info{};
 
-private:
+	private:
 
-	//　ザコ---------------------------------------------------------------------------------------------------
+		// オブザーバーパターン。敵の位置からアイテムをスポーン
+		std::vector<Shared<ItemManager>>       _observerItems;
+		tnl::Vector3                           _enemyZako_position{};
+		bool                                   _isEnemyZako_dead{};
 
-	// 敵の残り生成可能数（_remainingEnemyZako_spawnCount - 生成した数）
-	int                        _remainingEnemyZako_spawnCount{};
+	private:
 
-	// PlaySceneにGetterで渡す、プレイヤーとまだ戦闘可能な敵の総数（生成済み・未生成両方を含む）
-	int                        _zakoEnemyTotalLeftCount{};
+		//　ザコ---------------------------------------------------------------------------------------------------
 
-	// 1度に生成が可能な最大数
-	int                        _maxEnemySpawnCount_PerInterval{};
+		// 敵の残り生成可能数（_remainingEnemyZako_spawnCount - 生成した数）
+		int                        _remainingEnemyZako_spawnCount{};
 
-	std::vector<tnl::Vector3>  _enemyPosList{};
+		// PlaySceneにGetterで渡す、プレイヤーとまだ戦闘可能な敵の総数（生成済み・未生成両方を含む）
+		int                        _zakoEnemyTotalLeftCount{};
 
-	//　ボス---------------------------------------------------------------------------------------------------
-	static float   _showBossAppearanceText_timer;       // ボス出現警告テキストのタイマー
-	bool           _isShowBossAppearanceText{};         // ボス出現警告テキストのフラグ
+		// 1度に生成が可能な最大数
+		int                        _maxEnemySpawnCount_PerInterval{};
 
-	bool           _isSummonBoss{ false };              // ボス生成フラグ
-	bool           _isInitializedBossInfo{ false };	    // ボス初期化フラグ
+		std::vector<tnl::Vector3>  _enemyPosList{};
 
-	bool           _isDefeatedAllStageEnemy{};          // 敵を全滅させたかのフラグ
+		//　ボス---------------------------------------------------------------------------------------------------
+		static float   _showBossAppearanceText_timer;       // ボス出現警告テキストのタイマー
+		bool           _isShowBossAppearanceText{};         // ボス出現警告テキストのフラグ
 
-	tnl::Vector3   _enemyBossPos{};
+		bool           _isSummonBoss{ false };              // ボス生成フラグ
+		bool           _isInitializedBossInfo{ false };	    // ボス初期化フラグ
 
-	//　SE・BGMハンドル	---------------------------------------------------------------------------------------------------
-	int            _alertSE_hdl{};
-	int            _bossBattleBGM_hdl{};
-	int            _battleBGM_hdl{};
+		bool           _isDefeatedAllStageEnemy{};          // 敵を全滅させたかのフラグ
 
-	//　スコア---------------------------------------------------------------------------------------------------
-	int            _CURRENT_SCORE_REF{};	// PlayerSceneからのスコア参照変数
-};
+		tnl::Vector3   _enemyBossPos{};
+
+		//　SE・BGMハンドル	---------------------------------------------------------------------------------------------------
+		int            _alertSE_hdl{};
+		int            _bossBattleBGM_hdl{};
+		int            _battleBGM_hdl{};
+
+		//　スコア---------------------------------------------------------------------------------------------------
+		int            _CURRENT_SCORE_REF{};	// PlayerSceneからのスコア参照変数
+	};
+}

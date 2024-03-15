@@ -1,17 +1,20 @@
 #pragma once
 
-class ShiningStar
-{
-private:
+namespace inl {
 
-	struct S_ShiningStar
+	class ShiningStar
 	{
-		float x, y, z;
+	private:
+
+		struct S_ShiningStar
+		{
+			float x, y, z;
+		};
+
+	public:
+
+		S_ShiningStar star[1000];
+
+		void Render();
 	};
-
-public:
-
-	S_ShiningStar star[1000];
-
-	void Render();
-};
+}

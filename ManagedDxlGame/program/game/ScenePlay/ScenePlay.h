@@ -1,20 +1,22 @@
 #pragma once
 #include "../Manager/Scene/SceneBase.h"
 
-class Player;
-class SkyBox;
 class HeightMap;
-class Collision;
 class ItemManager;
-class EnemyManager;
-class Score;
-class PauseMenu;
-class FreeLookCamera;
-class EnemyBullet;
-class BulletHellFactory;
-class StraightBullet;
-class HomingBullet;
 
+namespace inl {
+	class SkyBox;
+	class FreeLookCamera;
+	class PauseMenu;
+	class EnemyBullet;
+	class BulletHellFactory;
+	class StraightBullet;
+	class HomingBullet;
+	class Collision;
+	class EnemyManager;
+	class Score;
+	class Player;
+}
 
 class ScenePlay : public SceneBase
 {
@@ -94,23 +96,23 @@ public:
 
 private:
 
-	Shared<FreeLookCamera>    _mainCamera = nullptr;
+	Shared<inl::FreeLookCamera>    _mainCamera = nullptr;
 
-	Shared<Player>            _player = nullptr;
+	Shared<inl::Player>            _player = nullptr;
 
-	Shared<EnemyManager>      _enemyManager = nullptr;
+	Shared<inl::EnemyManager>      _enemyManager = nullptr;
 
-	Shared<SkyBox>            _skyBox = nullptr;
+	Shared<inl::SkyBox>            _skyBox = nullptr;
 
-	Shared<Collision>         _collision = nullptr;
+	Shared<inl::Collision>         _collision = nullptr;
 
-	Shared<Score>             _score = nullptr;
+	Shared<inl::Score>             _score = nullptr;
 
-	Shared<dxe::ScreenEffect> _screenEffect = nullptr;
+	Shared<inl::BulletHellFactory> _bltHellFactory = nullptr;
 
-	Shared<BulletHellFactory> _bltHellFactory = nullptr;
+	Shared<inl::PauseMenu>         _pauseMenu = nullptr;
 
-	Shared<PauseMenu>         _pauseMenu = nullptr;
+	Shared<dxe::ScreenEffect>      _screenEffect = nullptr;
 
 private:
 

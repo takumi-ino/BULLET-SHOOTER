@@ -2,15 +2,15 @@
 #include "CsvLoader.h"
 
 
-std::unordered_map<int, EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(const std::string enemy_csv) {
+std::unordered_map<int, inl::EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(const std::string enemy_csv) {
 
-	std::unordered_map<int, EnemyZakoInfo> infos;
+	std::unordered_map<int, inl::EnemyZakoInfo> infos;
 
 	auto csv = tnl::LoadCsv(enemy_csv);
 
 	for (int i = 1; i < csv.size(); i++) {
 
-		EnemyZakoInfo data;
+		inl::EnemyZakoInfo data;
 
 		data._id = csv[i][0].getInt();
 		data._stageID = csv[i][1].getInt();
@@ -62,15 +62,15 @@ std::unordered_map<int, EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(const std::
 
 
 
-std::unordered_map<int, EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(const std::string enemy_csv) {
+std::unordered_map<int, inl::EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(const std::string enemy_csv) {
 
-	std::unordered_map<int, EnemyBossInfo> infos;
+	std::unordered_map<int, inl::EnemyBossInfo> infos;
 
 	auto csv = tnl::LoadCsv(enemy_csv);
 
 	for (int i = 1; i < csv.size(); i++) {
 
-		EnemyBossInfo data;
+		inl::EnemyBossInfo data;
 
 		data._id = csv[i][0].getInt();
 		data._stageID = csv[i][1].getInt();
@@ -106,15 +106,15 @@ std::unordered_map<int, EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(const std::
 
 
 
-std::unordered_map<int, BulletHellType_Info> CsvLoader::LoadBulletHellTypeInfos(const std::string bulletHell_csv) {
+std::unordered_map<int, inl::BulletHellType_Info> CsvLoader::LoadBulletHellTypeInfos(const std::string bulletHell_csv) {
 
-	std::unordered_map<int, BulletHellType_Info> info;
+	std::unordered_map<int, inl::BulletHellType_Info> info;
 
 	auto csv = tnl::LoadCsv(bulletHell_csv);
 
 	for (int i = 1; i < csv.size(); i++) {
 
-		BulletHellType_Info data;
+		inl::BulletHellType_Info data;
 
 		data._id = csv[i][0].getInt();
 		data._typeName = csv[i][1].getString();
@@ -144,10 +144,10 @@ std::unordered_map<int, BulletHellType_Info> CsvLoader::LoadBulletHellTypeInfos(
 
 
 
-PlayerStatus& CsvLoader::LoadPlayerStatus(const std::string status_csv) {
+inl::PlayerStatus& CsvLoader::LoadPlayerStatus(const std::string status_csv) {
 
 	auto csv = tnl::LoadCsv(status_csv);
-	PlayerStatus data;
+	inl::PlayerStatus data;
 
 	if (_SELECTED_DIFFICULTY == "Easy") {
 		data._hp = csv[1][0].getInt();

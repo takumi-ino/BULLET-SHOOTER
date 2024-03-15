@@ -1,21 +1,24 @@
 #pragma once
 
-class Gunport
-{
-public:
+namespace inl {
 
-	Gunport();
+	class Gunport
+	{
+	public:
 
-	// PlayerBullet::_bulletPowerRateの値が一定以上増えるごとに連装砲を追加する
-	void ManageGunportCount(std::vector<Shared<Gunport>>& gunPort);
+		Gunport();
 
-	void Render(const Shared<dxe::Camera> playerCamera);
+		// PlayerBullet::_bulletPowerRateの値が一定以上増えるごとに連装砲を追加する
+		void ManageGunportCount(std::vector<Shared<Gunport>>& gunPort);
 
-public:
+		void Render(const Shared<dxe::Camera> playerCamera);
 
-	Shared<dxe::Mesh> _mesh;
+	public:
 
-private:
+		Shared<dxe::Mesh> _mesh;
 
-	int _bulletPowerPhase{};
-};
+	private:
+
+		int _bulletPowerPhase{};
+	};
+}

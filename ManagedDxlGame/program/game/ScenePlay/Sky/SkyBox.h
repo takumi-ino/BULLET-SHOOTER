@@ -1,15 +1,20 @@
 #pragma once
 
-class FreeLookCamera;
 
-class SkyBox
-{
-public:
+namespace inl {
 
-	SkyBox();
+	class FreeLookCamera;
 
-	Shared<dxe::Mesh> _skybox = nullptr;
 
-	void Update();
-	void Render(const Shared<FreeLookCamera>& camera);
-};
+	class SkyBox
+	{
+	public:
+
+		SkyBox();
+
+		Shared<dxe::Mesh> _skybox = nullptr;
+
+		void Update();
+		void Render(const Shared<inl::FreeLookCamera>& camera);
+	};
+}

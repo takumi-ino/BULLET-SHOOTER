@@ -1,32 +1,34 @@
 #pragma once
 #include "ItemBase.h"
 
+namespace inl {
 
-// プレイヤー強化アイテム
-class PowerUpItem : public ItemBase
-{
-public:
+	// プレイヤー強化アイテム
+	class PowerUpItem : public ItemBase
+	{
+	public:
 
-	enum class TYPE {
+		enum class TYPE {
 
-		Default,
-		Heal,
-		Attack,
-		Defense,
-		Speed,
-		Bomb
+			Default,
+			Heal,
+			Attack,
+			Defense,
+			Speed,
+			Bomb
+		};
+
+		// コンストラクタ・デストラクタ------------------------------------
+		PowerUpItem() {}
+		explicit PowerUpItem(const PowerUpItem::TYPE itemType);
+
+		~PowerUpItem() override {}
+
+		// 更新------------------------------------------------------------
+		bool Update(Shared<PowerUpItem>& item);
+
+	public:
+
+		PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
 	};
-
-	// コンストラクタ・デストラクタ------------------------------------
-	PowerUpItem() {}
-	explicit PowerUpItem(const PowerUpItem::TYPE itemType);
-
-	~PowerUpItem() override {}
-
-	// 更新------------------------------------------------------------
-	bool Update(Shared<PowerUpItem>& item);
-
-public:
-
-	PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
-};
+}

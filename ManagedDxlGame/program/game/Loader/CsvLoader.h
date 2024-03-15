@@ -11,10 +11,10 @@ public:
 
 	CsvLoader() {}
 
-	std::unordered_map<int, EnemyZakoInfo> LoadEnemyZakoInfos(const std::string enemyCsv);
-	std::unordered_map<int, EnemyBossInfo> LoadEnemyBossInfos(const std::string enemyCsv);
-	std::unordered_map<int, BulletHellType_Info> LoadBulletHellTypeInfos(const std::string bulletHellCsv);
-	PlayerStatus& LoadPlayerStatus(const std::string statusCsv);
+	std::unordered_map<int, inl::EnemyZakoInfo> LoadEnemyZakoInfos(const std::string enemyCsv);
+	std::unordered_map<int, inl::EnemyBossInfo> LoadEnemyBossInfos(const std::string enemyCsv);
+	std::unordered_map<int, inl::BulletHellType_Info> LoadBulletHellTypeInfos(const std::string bulletHellCsv);
+	inl::PlayerStatus& LoadPlayerStatus(const std::string statusCsv);
 
 private:
 
