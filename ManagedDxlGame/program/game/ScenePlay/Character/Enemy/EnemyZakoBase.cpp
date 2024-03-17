@@ -7,6 +7,7 @@
 #include "../game/ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletFactory.h"
 #include "../game/ScenePlay/Collision/Collision.h"
+#include "../game/Utility/CustomException.h"
 
 
 namespace inl {
@@ -31,6 +32,13 @@ namespace inl {
 		const Shared<dxe::Camera>& camera,
 		const Shared<Collision>& collision)
 	{
+
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		auto path = cus->TryLoadSound("sound/se/shot.wav", "inl::EnemyZakoBase::EnemyZakoBase()");
+
+		_shotSE_hdl = path;
+
 		_id = data._id;
 		_name = data._name;
 		_scale = data._scale;
@@ -40,18 +48,245 @@ namespace inl {
 
 		_maxBulletSpawnCount = data._maxBulletSpawnCount;
 		_maxTotalEnemy_spawnCount = data._maxTotalEnemy_spawnCount;
-		_bullet_moveSpeed = data._bullet_moveSpeed;
-		_bullet_fireInterval = data._bullet_fireInterval;
-		_bullet_reloadTimeInterval = data._bullet_reloadTimeInterval;
+		_bulletMoveSpeed = data._bulletMoveSpeed;
+		_bulletFireInterval = data._bulletFireInterval;
+		_bulletReloadTimeInterval = data._bulletReloadTimeInterval;
 
 		_player_ref = player;
 		_enemyCamera = camera;
 		_collision_ref = collision;
-
-		_shotSE_hdl = LoadSoundMem("sound/se/shot.wav");
 	}
 
 
+	bool EnemyZakoBase::DecreaseHP(int damage, const Shared<dxe::Camera> camera) {
+
+		if (_hp > 0) {
+
+			damage = max(damage, 1);
+
+			_hp -= damage;
+			return true;
+		}
+
+		if (_hp <= 0) {
+
+			dxe::DirectXRenderBegin();
+			_explode_particle->setPosition(_mesh->pos_);
+			_explode_particle->start();
+			_explode_particle->render(camera);
+			dxe::DirectXRenderEnd();
+
+			ScoreManager::GetInstance().AddKillBonus(1000);
+			_isDead = true;
+		}
+		return false;
+	}
+
+	//　弾---------------------------------------------------------------------------------------------------------------------------
+	void EnemyZakoBase::ShotStraightBullet(const float deltaTime) {              // 直行弾
+
+		_straightBullet_count++;
+
+		//_straightBullet_count が　_bullet_fireIntervalの倍数になった時
+		if (_straightBullet_count % _bulletFireInterval == 0 && !_straightBullet_queue.empty()) {
+
+			Shared<StraightBullet> bullet = _straightBullet_queue.front();
+			_straightBullet_queue.pop_front();
+
+			bullet->_mesh->pos_ = _mesh->pos_;   //　位置
+			bullet->_mesh->rot_ = _mesh->rot_;   //　回転
+
+			_straight_bullets.push_back(bullet);
+			_straightBullet_count = 0;
+
+			PlaySoundMem(_shotSE_hdl, DX_PLAYTYPE_BACK);  // 発射音
+		}
+
+		ReloadStraightBulletByTimer(deltaTime);           //　リロード
+	}
+
+
+	void EnemyZakoBase::ShotHomingBullet(const float deltaTime) {              // 追尾弾
+
+		_homingBullet_count++;
+
+		if (_homingBullet_count % _bulletFireInterval == 0 && !_homingBullet_queue.empty()) {
+
+			Shared<HomingBullet> bullet = _homingBullet_queue.front();
+			_homingBullet_queue.pop_front();
+
+			bullet->_mesh->pos_ = _mesh->pos_;  //　位置
+			bullet->_mesh->rot_ = _mesh->rot_;  //　回転
+
+			_homing_bullets.push_back(bullet);
+			_homingBullet_count = 0;
+
+			PlaySoundMem(_shotSE_hdl, DX_PLAYTYPE_BACK);
+		}
+
+		ReloadHomingBulletByTimer(deltaTime);
+	}
+
+	void EnemyZakoBase::ReloadStraightBulletByTimer(const float deltaTime)              // 直行弾
+	{
+		if (!_straightBullet_queue.empty()) return;         // 弾がまだあればリターン
+
+		_reloadStraightBullet_timeCounter += deltaTime;
+
+		//　リロードタイマーがまだ溜まっていなければリターン
+		if (_reloadStraightBullet_timeCounter < _bulletReloadTimeInterval)
+			return;
+
+		std::list<Shared<StraightBullet>> bullets =                 // 弾生成
+			_bulletFactory->CreateStraightBullet(
+				StraightBullet::USER::ZakoBox, _maxBulletSpawnCount
+			);
+
+		for (const auto& bullet : bullets) {                        // 弾装填
+
+			_straightBullet_queue.push_back(bullet);
+		}
+
+		_reloadStraightBullet_timeCounter = 0.0f;                   // リロードタイマーリセット
+	}
+
+
+	void EnemyZakoBase::ReloadHomingBulletByTimer(const float deltaTime) {              // 追尾弾
+
+		if (!_homingBullet_queue.empty()) return; // 弾がまだあればリターン
+
+		_reloadHomingBullet_timeCounter += deltaTime;
+
+		//　リロードタイマーがまだ溜まっていなければリターン
+		if (_reloadHomingBullet_timeCounter < _bulletReloadTimeInterval)
+			return;
+
+		std::list<Shared<HomingBullet>> bullets =                // 弾生成
+			_bulletFactory->CreateHomingBullet(
+				HomingBullet::USER::ZakoBox, _maxBulletSpawnCount
+			);
+
+		for (const auto& bullet : bullets) {                     // 弾装填
+
+			_homingBullet_queue.push_back(bullet);
+		}
+
+		_reloadHomingBullet_timeCounter = 0.0f;
+	}
+
+
+	void EnemyZakoBase::UpdateStraightBullet(const float deltaTime)              // 直行弾
+	{
+		auto it_blt = _straight_bullets.begin();
+
+		while (it_blt != _straight_bullets.end()) {
+
+			if ((*it_blt)->_isActive) {
+
+				// 当たり判定　bool
+				if (_collision_ref->CheckCollision_EnemyStraightBulletAndPlayer((*it_blt), _player_ref)) {
+
+					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
+
+						_player_ref->SetIsInvincible(true);   // 無敵時間
+						_player_ref->PlayDamageHitSE();       // ダメージ音
+					}
+
+					(*it_blt)->_isActive = false;             // 非アクティブ化
+					(*it_blt)->_timer = 0.f;                  // 弾のライフタイマーオフ
+				}
+
+				// 弾の寿命を時間で管理
+				(*it_blt)->_timer += deltaTime;
+
+				tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 }, _mesh->rot_);
+				move_dir.normalize();
+
+				//　更新
+				(*it_blt)->_mesh->pos_ += move_dir * _bulletMoveSpeed * deltaTime;
+
+
+				if ((*it_blt)->_timer > _STRAIGHTBULLET_LIFETIME_LIMIT) {
+
+					(*it_blt)->_isActive = false;            // 非アクティブ化
+					(*it_blt)->_timer = 0.f;				 // 弾のライフタイマーオフ
+				}
+			}
+			else {
+				it_blt = _straight_bullets.erase(it_blt);
+				continue;
+			}
+
+			it_blt++;
+		}
+	}
+
+
+	void EnemyZakoBase::UpdateHomingBullet(const float deltaTime) {              // 追尾弾
+
+		auto it_blt = _homing_bullets.begin();
+
+		while (it_blt != _homing_bullets.end()) {
+
+			if ((*it_blt)->_isActive) {
+
+				// 当たり判定　bool
+				if (_collision_ref->CheckCollision_EnemyHomingBulletAndPlayer((*it_blt), _player_ref)) {
+
+					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
+
+						_player_ref->SetIsInvincible(true);
+						_player_ref->PlayDamageHitSE();
+					}
+
+					(*it_blt)->_isActive = false;
+					(*it_blt)->_timer = 0;
+				}
+
+				// タイマー起動
+				(*it_blt)->_timer += deltaTime;
+
+				// プレイヤーに到達するまでの時間
+				float timeToReachPlayer =
+					_minTimeToReach + (GetDistanceToPlayer() / 1000) * (_maxTimeToReach - _minTimeToReach);
+
+				// 上の時間を指定の範囲内に制限
+				timeToReachPlayer = std::clamp(timeToReachPlayer, _minTimeToReach, _maxTimeToReach);
+
+				tnl::Vector3 targetDir = _player_ref->GetPos() - (*it_blt)->_mesh->pos_;
+				targetDir.normalize();
+
+				// 線形補間で弾を旋回させる
+				(*it_blt)->_moveDirection = tnl::Vector3::UniformLerp(
+					(*it_blt)->_moveDirection,
+					targetDir * _bulletTurnDelayRate,
+					timeToReachPlayer,
+					(*it_blt)->_timer
+				);
+
+				// 更新
+				(*it_blt)->_mesh->pos_ +=
+					(*it_blt)->_moveDirection * deltaTime * _bulletMoveSpeed / 1.5f;
+
+
+				if ((*it_blt)->_timer > _HOMINGBULLET_LIFETIME_LIMIT) {
+
+					(*it_blt)->_isActive = false;
+					(*it_blt)->_timer = 0;
+				}
+			}
+
+			else if (!(*it_blt)->_isActive) {
+
+				it_blt = _homing_bullets.erase(it_blt);
+				continue;
+			}
+
+			it_blt++;
+		}
+	}
+
+	//　挙動---------------------------------------------------------------------------------------------------------------------------
 	void EnemyZakoBase::ChasePlayer(const float deltaTime) {
 
 		//プレイヤー追跡
@@ -66,6 +301,7 @@ namespace inl {
 	void EnemyZakoBase::SearchPlayerMovementState(const float deltaTime)
 	{
 		if (_isNoticedPlayer) {
+
 			_timeCountFrom_noticedPlayer += deltaTime;
 
 			// プレイヤーに気付いてから、気付いた状態を一定時間確実に保持
@@ -186,7 +422,7 @@ namespace inl {
 		_mesh->pos_ += direction * deltaTime * _enemyMoveSpeed;
 
 		// 目的地に近づいたら停止する
-		if ((_investigatePos - _mesh->pos_).length() < FLT_DIG) { // == 6
+		if ((_investigatePos - _mesh->pos_).length() < FLT_DIG) { // FLT_DIG == 6
 
 			// 原点へ戻る
 			_investigatePos = { 0, 0, 0 };
@@ -195,264 +431,10 @@ namespace inl {
 	}
 
 
-	bool EnemyZakoBase::DecreaseHP(int damage, const Shared<dxe::Camera> camera) {
-
-		if (_hp > 0) {
-
-			damage = max(damage, 1);
-
-			_hp -= damage;
-			return true;
-		}
-
-		if (_hp <= 0) {
-
-			dxe::DirectXRenderBegin();
-			_explode_particle->setPosition(_mesh->pos_);
-			_explode_particle->start();
-			_explode_particle->render(camera);
-			dxe::DirectXRenderEnd();
-
-			ScoreManager::GetInstance().AddKillBonus(1000);
-			_isDead = true;
-		}
-		return false;
-	}
-
-
-
-	bool EnemyZakoBase::ShowHpGage_EnemyZako() {
-
-		if (_hp <= 0) return false;
-
-		tnl::Vector3 hpGage_pos = tnl::Vector3::ConvertToScreen
-		(
-			_mesh->pos_,
-			DXE_WINDOW_WIDTH,
-			DXE_WINDOW_HEIGHT,
-			_enemyCamera->view_,
-			_enemyCamera->proj_
-		);
-
-		float x1 = hpGage_pos.x - 30;
-		float x2 = hpGage_pos.x + 30;
-
-		float gage_width = abs(x2 - x1);
-
-		float average = (_MAX_HP > 0) ? gage_width / _MAX_HP : 0;
-
-		x2 = x1 + static_cast<int>(average * _hp);
-
-		DrawBoxAA(x1, hpGage_pos.y - 30, x2, hpGage_pos.y - 25, GetColor(255, 0, 0), true);
-
-		return true;
-	}
-
-
-	void EnemyZakoBase::Render(const Shared<dxe::Camera> camera) {
-
-		if (_isDead) return;
-
-		_mesh->render(camera);
-
-		ShowHpGage_EnemyZako();
-
-		for (auto& blt : _straight_bullets) {
-
-			blt->Render(camera);
-		}
-		for (auto& blt : _homing_bullets) {
-
-			blt->Render(camera);
-		}
-	}
-
-
-	void EnemyZakoBase::ShotStraightBullet(const float deltaTime) {
-
-		_straightBullet_count++;
-
-		//_straightBullet_count が　_bullet_fireIntervalの倍数になった時
-		if (_straightBullet_count % _bullet_fireInterval == 0 && !_straightBullet_queue.empty()) {
-
-			Shared<StraightBullet> bullet = _straightBullet_queue.front();
-			_straightBullet_queue.pop_front();
-
-			bullet->_mesh->pos_ = _mesh->pos_;
-			bullet->_mesh->rot_ = _mesh->rot_;
-
-			_straight_bullets.push_back(bullet);
-			_straightBullet_count = 0;
-
-			PlaySoundMem(_shotSE_hdl, DX_PLAYTYPE_BACK);
-		}
-
-		ReloadStraightBulletByTimer(deltaTime);
-	}
-
-
-	void EnemyZakoBase::ReloadStraightBulletByTimer(const float deltaTime)
-	{
-		if (_straightBullet_queue.empty()) {
-
-			_reloadStraightBullet_timeCounter += deltaTime;
-
-			if (_reloadStraightBullet_timeCounter >= _bullet_reloadTimeInterval) {
-				std::list<Shared<StraightBullet>> bullets =
-					_bulletFactory->CreateStraightBullet(StraightBullet::USER::ZakoBox, _maxBulletSpawnCount);
-
-				for (const auto& bullet : bullets) {
-					_straightBullet_queue.push_back(bullet);
-				}
-				_reloadStraightBullet_timeCounter = 0.0f;
-			}
-		}
-	}
-
-
-	void EnemyZakoBase::UpdateStraightBullet(const float deltaTime)
-	{
-		auto it_blt = _straight_bullets.begin();
-
-		while (it_blt != _straight_bullets.end()) {
-
-			if ((*it_blt)->_isActive) {
-
-				if (_collision_ref->CheckCollision_EnemyStraightBulletAndPlayer((*it_blt), _player_ref)) {
-
-					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
-						_player_ref->SetIsInvincible(true);
-						_player_ref->PlayDamageHitSE();
-					}
-
-					(*it_blt)->_isActive = false;
-					(*it_blt)->_timer = 0;
-				}
-
-				// 弾の寿命を時間で管理
-				(*it_blt)->_timer += deltaTime;
-
-				tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 }, _mesh->rot_);
-				move_dir.normalize();
-
-				(*it_blt)->_mesh->pos_ += move_dir * _bullet_moveSpeed * deltaTime;
-
-
-				if ((*it_blt)->_timer > _STRAIGHTBULLET_LIFETIME_LIMIT) {
-
-					(*it_blt)->_isActive = false;
-					(*it_blt)->_timer = 0;
-				}
-			}
-			else {
-				it_blt = _straight_bullets.erase(it_blt);
-				continue;
-			}
-			it_blt++;
-		}
-	}
-
-
-	void EnemyZakoBase::ShotHomingBullet(const float deltaTime) {
-
-		_homingBullet_count++;
-
-		if (_homingBullet_count % _bullet_fireInterval == 0 && !_homingBullet_queue.empty()) {
-
-			Shared<HomingBullet> bullet = _homingBullet_queue.front();
-			_homingBullet_queue.pop_front();
-
-			bullet->_mesh->pos_ = _mesh->pos_;
-			bullet->_mesh->rot_ = _mesh->rot_;
-
-			_homing_bullets.push_back(bullet);
-			_homingBullet_count = 0;
-
-			PlaySoundMem(_shotSE_hdl, DX_PLAYTYPE_BACK);
-		}
-
-		ReloadHomingBulletByTimer(deltaTime);
-	}
-
-
-	void EnemyZakoBase::ReloadHomingBulletByTimer(const float deltaTime) {
-
-		if (_homingBullet_queue.empty()) {
-
-			_reloadHomingBullet_timeCounter += deltaTime;
-
-			if (_reloadHomingBullet_timeCounter >= _bullet_reloadTimeInterval) {
-				std::list<Shared<HomingBullet>> bullets =
-					_bulletFactory->CreateHomingBullet(HomingBullet::USER::ZakoBox, _maxBulletSpawnCount);
-
-				for (const auto& bullet : bullets) {
-					_homingBullet_queue.push_back(bullet);
-				}
-				_reloadHomingBullet_timeCounter = 0.0f;
-			}
-		}
-	}
-
-
-	void EnemyZakoBase::UpdateHomingBullet(const float deltaTime) {
-
-		auto it_blt = _homing_bullets.begin();
-
-		while (it_blt != _homing_bullets.end()) {
-
-			if ((*it_blt)->_isActive) {
-
-				if (_collision_ref->CheckCollision_EnemyHomingBulletAndPlayer((*it_blt), _player_ref)) {
-
-					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
-						_player_ref->SetIsInvincible(true);
-						_player_ref->PlayDamageHitSE();
-					}
-
-					(*it_blt)->_isActive = false;
-					(*it_blt)->_timer = 0;
-				}
-
-				float timeToReachPlayer =
-					_minTimeToReach + (GetDistanceToPlayer() / 1000) * (_maxTimeToReach - _minTimeToReach);
-
-				timeToReachPlayer = std::clamp(timeToReachPlayer, _minTimeToReach, _maxTimeToReach);
-
-				tnl::Vector3 targetDir = _player_ref->GetPos() - (*it_blt)->_mesh->pos_;
-				targetDir.normalize();
-
-				(*it_blt)->_moveDirection = tnl::Vector3::UniformLerp(
-					(*it_blt)->_moveDirection,
-					targetDir * _bulletTurnDelayRate,
-					timeToReachPlayer,
-					(*it_blt)->_timer
-				);
-
-				(*it_blt)->_mesh->pos_ +=
-					(*it_blt)->_moveDirection * deltaTime * _bullet_moveSpeed / 1.5f;
-
-
-				(*it_blt)->_timer += deltaTime;
-
-				if ((*it_blt)->_timer > _HOMINGBULLET_LIFETIME_LIMIT) {
-					(*it_blt)->_isActive = false;
-					(*it_blt)->_timer = 0;
-				}
-			}
-
-			else if (!(*it_blt)->_isActive) {
-				it_blt = _homing_bullets.erase(it_blt);
-				continue;
-			}
-			it_blt++;
-		}
-	}
-
-
-
 	void EnemyZakoBase::AttackPlayer(const float deltaTime) {
 
-		if (_isShotStraightBullet) {
+		if (_isShotStraightBullet) {              // 直行弾
+
 			ShotStraightBullet(deltaTime);
 
 			if (_straightBullet_queue.empty()) {
@@ -468,8 +450,8 @@ namespace inl {
 				}
 			}
 		}
+		else if (_isShotHomingBullet) {           // 追尾弾
 
-		else if (_isShotHomingBullet) {
 			ShotHomingBullet(deltaTime);
 
 			if (_homingBullet_queue.empty()) {
@@ -512,6 +494,53 @@ namespace inl {
 		else {
 			_isAttacking = false;
 			SearchPlayerMovementState(deltaTime);
+		}
+	}
+
+
+	bool EnemyZakoBase::ShowHpGage_EnemyZako() {
+
+		if (_hp <= 0) return false;
+
+		tnl::Vector3 hpGage_pos = tnl::Vector3::ConvertToScreen
+		(
+			_mesh->pos_,
+			DXE_WINDOW_WIDTH,
+			DXE_WINDOW_HEIGHT,
+			_enemyCamera->view_,
+			_enemyCamera->proj_
+		);
+
+		float x1 = hpGage_pos.x - 30;
+		float x2 = hpGage_pos.x + 30;
+
+		float gage_width = abs(x2 - x1);
+
+		float average = (_MAX_HP > 0) ? gage_width / _MAX_HP : 0;
+
+		x2 = x1 + static_cast<int>(average * _hp);
+
+		DrawBoxAA(x1, hpGage_pos.y - 30, x2, hpGage_pos.y - 25, GetColor(255, 0, 0), true);
+
+		return true;
+	}
+
+
+	void EnemyZakoBase::Render(const Shared<dxe::Camera> camera) {
+
+		if (_isDead) return;
+
+		_mesh->render(camera);
+
+		ShowHpGage_EnemyZako();
+
+		for (const auto& blt : _straight_bullets) {
+
+			blt->Render(camera);
+		}
+		for (const auto& blt : _homing_bullets) {
+
+			blt->Render(camera);
 		}
 	}
 

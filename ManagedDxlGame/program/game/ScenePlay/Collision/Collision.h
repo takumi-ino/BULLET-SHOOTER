@@ -18,19 +18,21 @@ namespace inl {
 	{
 	public:
 
-		// キャラクター同士
+		// キャラクター同士----------------------------------------------------------------------------------
 		bool CheckCollision_PlayerAndEnemyZako(
 			Shared<Player>& player,
 			Shared<EnemyZakoBase>& enemy,
 			const tnl::Vector3 prevPos_player,
 			const tnl::Vector3 prevPos_enemy
 		);
+
 		bool CheckCollision_PlayerAndEnemyBoss(
 			Shared<Player>& player,
 			Shared<EnemyBossBase>& enemy,
 			const tnl::Vector3 prevPos_player,
 			const tnl::Vector3 prevPos_enemy
 		);
+
 		void CheckCollision_EnemyAndEnemy(
 			Shared<EnemyZakoBase>& enemy_type1,
 			Shared<EnemyZakoBase>& enemy_type2,
@@ -39,31 +41,36 @@ namespace inl {
 		);
 
 
-		// キャラクターと弾
+		// キャラクターと弾----------------------------------------------------------------------------------
 		bool CheckCollision_PlayerBulletAndEnemyZako(
 			const Shared<inl::PlayerBullet>& meshA, const Shared<EnemyZakoBase>& meshB
 		);
+
 		bool CheckCollision_PlayerBulletAndEnemyBoss(
 			const Shared<inl::PlayerBullet>& meshA, const Shared<EnemyBossBase>& meshB
 		);
+
 		bool CheckCollision_EnemyStraightBulletAndPlayer(
 			const Shared<StraightBullet>& bullet, const Shared<Player>& player
 		);
+
 		bool CheckCollision_EnemyHomingBulletAndPlayer(
+			
 			const Shared<HomingBullet>& bullet, const Shared<Player>& player
 		);
+
 		bool CheckCollision_BulletHellBulletsAndPlayer(
 			const Shared<EnemyBullet>& bullet, const Shared<Player>& player
 		);
 
 
-		// プレイヤーと得点アイテム
+		// プレイヤーと得点アイテム----------------------------------------------------------------------------------
 		bool CheckCollision_PlayerAndScoreItem(
 			const Shared<inl::ScoreItem>& scoreItem, const Shared<Player>& player
 		);
 
 
-		// 得点アイテムと得点アイテム
+		// 得点アイテムと得点アイテム----------------------------------------------------------------------------------
 		void CheckCollision_ScoreItemAndScoreItem(
 			Shared<inl::ScoreItem>& scoreItem_1,
 			Shared<inl::ScoreItem>& scoreItem_2,
@@ -72,13 +79,13 @@ namespace inl {
 		);
 
 
-		// プレイヤーとプレイヤー強化アイテム
+		// プレイヤーとプレイヤー強化アイテム----------------------------------------------------------------------------
 		bool CheckCollision_PlayerAndPowerUpItem(
 			const Shared<inl::PowerUpItem>& powerUpItem, const Shared<Player>& player
 		);
 
 
-		// プレイヤー強化アイテムとプレイヤー強化アイテム
+		// プレイヤー強化アイテムとプレイヤー強化アイテム----------------------------------------------------------------
 		void CheckCollision_PowerUpItemAndPowerUpItem(
 			Shared<inl::PowerUpItem>& powerUpItem_1,
 			Shared<inl::PowerUpItem>& powerUpItem_2,
@@ -87,7 +94,7 @@ namespace inl {
 		);
 
 
-		// 得点アイテムとプレイヤー強化アイテム
+		// 得点アイテムとプレイヤー強化アイテム--------------------------------------------------------------------------
 		void CheckCollision_ScoreItemAndPowerUpItem(
 			Shared<inl::ScoreItem>& scoreItem,
 			Shared<inl::PowerUpItem>& powerUpItem,

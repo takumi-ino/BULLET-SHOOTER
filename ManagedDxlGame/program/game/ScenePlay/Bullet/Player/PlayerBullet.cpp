@@ -1,4 +1,6 @@
 #include "PlayerBullet.h"
+#include "../game/Utility/CustomException.h"
+
 
 namespace inl {
 
@@ -12,15 +14,21 @@ namespace inl {
 		const float size) : _speed(1000.0f)
 	{
 
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		//　ロードに失敗したら例外発生----------------------------------------------------
+		auto redGraphHandle = cus->TryLoadTexture("graphics/colorTexture/red.bmp", "inl::PlayerBullet::PlayerBullet()");
+		auto whiteGraphHandle = cus->TryLoadTexture("graphics/colorTexture/white.bmp", "inl::PlayerBullet::PlayerBullet()");
+
 		_mesh = dxe::Mesh::CreateSphereMV(size);
 
-		std::map<PlayerBullet::COLOR, std::string> colorMap = {
+		std::map<PlayerBullet::COLOR, Shared<dxe::Texture>> colorMap = {
 
-		   {PlayerBullet::COLOR::Red,    "graphics/colorTexture/red.bmp"},
-		   {PlayerBullet::COLOR::White,  "graphics/colorTexture/white.bmp"},
+		   {PlayerBullet::COLOR::Red,    redGraphHandle},
+		   {PlayerBullet::COLOR::White,  whiteGraphHandle},
 		};
 
-		_mesh->setTexture(dxe::Texture::CreateFromFile(colorMap[color]));
+		_mesh->setTexture(colorMap[color]);
 		_mesh->pos_ = spawn_pos;
 		_moveDirection = direction;
 		_moveDirection.normalize();

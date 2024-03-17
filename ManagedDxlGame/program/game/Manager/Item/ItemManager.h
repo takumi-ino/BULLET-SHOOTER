@@ -4,12 +4,13 @@
 class ScoreManager;
 
 namespace inl {
+
 	class Collision;
 	class EnemyManager;
-
 	class PowerUpItem;
 	class Player;
 }
+
 
 // 主に　得点アイテム・プレイヤー強化アイテムを管理
 class ItemManager
@@ -51,7 +52,7 @@ private:
 
 	/*
 	　   DRY（Don’t Repeat Yourself）・・・重複した処理を避けるべきとする原則
-	　   末尾に　DRY　がついている関数は同じ処理を異なるオブジェクトへまとめて適用している
+	　   末尾に　DRY　がついている関数は同じ処理を異なるオブジェクトへまとめて適用しています
 	*/
 
 	// 得点アイテム-------------------------------------------------------------------------------------------------------------------
@@ -67,16 +68,20 @@ private:
 	void EventHit_ScoreItemAndPlayer_DRY(
 		std::vector<Shared<inl::ScoreItem>>& scoreItems, const inl::ScoreItem::TYPE type);
 
-	void AvoidOverlap_ScoreItemAndScoreItem();
+	void AvoidOverlap_ScoreItemAndScoreItem();       // アイテムどうしが重ならないように補正
 
 	void AvoidOverlap_ScoreItemAndScoreItem_DRY(
-		std::vector<Shared<inl::ScoreItem>>& scoreItems_1, std::vector<Shared<inl::ScoreItem>>& scoreItems_2);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems_1,
+		std::vector<Shared<inl::ScoreItem>>& scoreItems_2
+	);
 
 	// プレイヤー強化アイテム----------------------------------------------------------------------------------------------------------
 
 	// 描画------------------------------------------------------------------------------
 	void RenderPowerUpItems(
-		std::vector<Shared<inl::PowerUpItem>>& powerUpItems, const Shared<dxe::Camera>& camera);
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems,
+		const Shared<dxe::Camera>& camera
+	);
 
 	// 更新------------------------------------------------------------------------------
 	void UpdatePowerUpItem_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
@@ -84,17 +89,21 @@ private:
 	// 当たり判定------------------------------------------------------------------------
 	void EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
-	void AvoidOverlap_PowerUpItemAndPowerUpItem();
+	void AvoidOverlap_PowerUpItemAndPowerUpItem();   // アイテムどうしが重ならないように補正
 
 	void AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
-		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1, std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2);
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1,
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2
+	);
 
 	// 得点アイテム＆プレイヤー強化アイテム-------------------------------------------------------------------------------------------
 
-	void AvoidOverlap_ScoreItemAndPowerUpItem();
+	void AvoidOverlap_ScoreItemAndPowerUpItem();     // アイテムどうしが重ならないように補正
 
 	void AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
-		std::vector<Shared<inl::ScoreItem>>& scoreItems, std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems,
+		std::vector<Shared<inl::PowerUpItem>>& powerUpItems
+	);
 
 	// イベント通知（プレイヤーがアイテムを取得したときに表示するメッセージを通達）---------------------------------------------------
 	void RenderEventHitText() const;

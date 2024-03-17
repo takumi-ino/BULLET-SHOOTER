@@ -1,10 +1,10 @@
 #pragma once
 #include "../Manager/Scene/SceneBase.h"
 
-class HeightMap;
 class ItemManager;
 
 namespace inl {
+
 	class SkyBox;
 	class FreeLookCamera;
 	class PauseMenu;
@@ -16,12 +16,15 @@ namespace inl {
 	class EnemyManager;
 	class Score;
 	class Player;
+	class CustomException;
 }
 
+
+// インゲーム地点。あらゆるモジュールをここで使用可能
 class ScenePlay : public SceneBase
 {
 public:
-
+	
 	ScenePlay() {}
 	ScenePlay(const std::string selectedDifficulty, const int stage);
 
@@ -48,7 +51,7 @@ public:
 private:
 
 	// パーティクル ----------------------------------------------------
-	void InitWeatherParticle();
+	void InitWeatherParticle(const Shared<inl::CustomException>& cus);
 
 	// Setter ----------------------------------------------------------
 	void SetDeltaTime(const float deltaTime) { _deltaTime = deltaTime; };
@@ -58,15 +61,15 @@ private:
 	void TurnOff_SecondStageBulletHellLists();
 	void TurnOff_ThirdStageBulletHellLists();
 
-	//　弾幕描画。現在使用中のもののみ----------------------------------
-	void CheckDoRender_FirstStageBulletHellLists();
-	void CheckDoRender_SecondStageBulletHellLists();
-	void CheckDoRender_ThirdStageBulletHellLists();
+	//　弾幕描画。該当ステージのもののみ実行----------------------------
+	void RenderFirstStageBulletHellLists();
+	void RenderSecondStageBulletHellLists();
+	void RenderThirdStageBulletHellLists();
 
-	//　弾幕更新。現在使用中のもののみ----------------------------------
-	void CheckDoUpdate_FirstStageBulletHellLists();
-	void CheckDoUpdate_SecondStageBulletHellLists();
-	void CheckDoUpdate_ThirdStageBulletHellLists();
+	//　弾幕更新。該当ステージのもののみ実行----------------------------
+	void UpdateFirstStageBulletHellLists();
+	void UpdateSecondStageBulletHellLists();
+	void UpdateThirdStageBulletHellLists();
 
 	//　弾幕を解放------------------------------------------------------
 	void DestroyFirstStageBulletHellLists();
@@ -92,7 +95,7 @@ private:
 
 public:
 
-	static Shared<dxe::Particle> _weatherParticle;
+	static Shared<dxe::Particle>   _weatherParticle;
 
 private:
 

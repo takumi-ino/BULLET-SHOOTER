@@ -1,13 +1,15 @@
 #pragma once
 #include "EnemyBase.h"
+#include "../game/Utility/CustomException.h"
 
 class Player;
 
 namespace inl {
+
 	class BulletHell;
 	class EnemyBullet;
-class Collision;
-struct EnemyBossInfo;
+	class Collision;
+	struct EnemyBossInfo;
 
 
 	class EnemyBossBase : public EnemyBase

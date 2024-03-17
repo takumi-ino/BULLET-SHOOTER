@@ -1,6 +1,4 @@
 #include "Player.h"
-#include <sstream>
-#include <iomanip>
 #include "../../Bullet/Player/PlayerBullet.h"
 #include "../../Sky/SkyBox.h"
 #include "../../ScenePlay.h"
@@ -11,7 +9,10 @@
 #include "../../Pause/PauseMenu.h"
 #include "../game/ScenePlay/Bullet/Player/Gunport.h"
 #include "../game/Loader/CsvLoader.h"
-#include "../../../InputFuncTable.h"
+#include "../../../Utility/InputFuncTable.h"
+#include "../game/Utility/CustomException.h"
+#include "../game/Utility/FilePathChecker.h"
+
 
 namespace inl {
 
@@ -55,28 +56,42 @@ namespace inl {
 	}
 
 
-	Player::Player(const Shared<inl::FreeLookCamera> camera_ref) {
+	Player::Player(const Shared<FreeLookCamera> mainCamera) : _playerCamera(mainCamera) {
 
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		//　ロードに失敗したら例外発生----------------------------------------------------
+		auto textureHandle = cus->TryLoadTexture("graphics/prismatic-star.png", "inl::Player::Player()");
+		auto soundHandle = cus->TryLoadSound("sound/se/getHit.mp3", "inl::Player::Player()");
+		auto particleBinary = cus->TryLoadParticleBinaryFile("particle/preset/bombEffect.bin", "inl::Player::Player()");
+		auto csvData = cus->TryLoadCsvFile("csv/PlayerStatus.csv", "inl::Player::Player()");
+
+		//--------------------------------------------------------------------------------
+
+		InitPlayerStatus(csvData);
+
+		// プレイヤー生成
 		_mesh = dxe::Mesh::CreateSphereMV(20, 10, 10, false);
-		_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/prismatic-star.png"));
+		_mesh->setTexture(textureHandle);
 		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
 		_mesh->pos_ = _START_POSITION;
 
-		InitPlayerStatus();
+		// ダメージSE
+		_getDamageSE_hdl = soundHandle;
 
-		_getDamageSE_hdl = LoadSoundMem("sound/se/getHit.mp3");
+		// 爆発エフェクト
+		_bombParticle = particleBinary;
 
-		_playerCamera = camera_ref;
-
-		_bombParticle = std::make_shared<dxe::Particle>("particle/preset/bombEffect.bin");
+		// 連装砲
 		_playerGunport = std::make_shared<inl::Gunport>();
 	}
 
 
-	void Player::InitPlayerStatus() {
+	void Player::InitPlayerStatus(std::vector<std::vector<tnl::CsvCell>> csv) {
 
 		_csvLoader = std::make_shared<CsvLoader>();
-		auto status = _csvLoader->LoadPlayerStatus("csv/PlayerStatus.csv");
+
+		auto status = _csvLoader->LoadPlayerStatus(csv);
 
 		_hp = status._hp;
 		_MAX_HP = _hp;
@@ -102,6 +117,7 @@ namespace inl {
 			return false;
 		}
 		else if (_hp <= 0) {
+
 			// ゲームオーバー
 			_hp = 0;
 			inl::PauseMenu::_isShowPauseOption = true;
@@ -229,7 +245,7 @@ namespace inl {
 
 			tnl::Vector3 moveDir = GetBulletMoveDirection();
 
-			for (auto& blt : _gunportVec) {
+			for (const auto& blt : _gunportVec) {
 
 				if (blt) {
 
@@ -410,7 +426,7 @@ namespace inl {
 	}
 
 
-	void Player::ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& targetEnemyPos)
+	void Player::ControlCameraWithEnemyFocus(const tnl::Vector3& playerPos, const tnl::Vector3& targetEnemyPos)
 	{
 		// 追従ポインターON（描画）
 		_playerCamera->isShowTargetPointer = true;
@@ -539,7 +555,7 @@ namespace inl {
 
 		if (_gunportVec.empty()) return;
 
-		for (auto& it : _gunportVec) {
+		for (const auto& it : _gunportVec) {
 			it->Render(camera);
 		}
 	}
@@ -621,7 +637,7 @@ namespace inl {
 
 
 	// 更新－-----------------------－-----------------------－-----------------------－-----------------------－-----------------------
-	void Player::UpdateStraightBullet(float deltaTime)
+	void Player::UpdateStraightBullet(const float deltaTime)
 	{
 		auto it_blt = _straightBullets_player.begin();
 
@@ -644,6 +660,7 @@ namespace inl {
 			_invincibleTimer += deltaTime;
 
 			if (_invincibleTimer >= _INVINCIBLE_TIME_LIMIT) {
+
 				_invincibleTimer = 0.0f;
 				_isInvincible = false;
 			}

@@ -41,13 +41,13 @@ namespace inl {
 
 	public:
 
-		static bool _isShowPauseOption;
+		static bool      _isShowPauseOption;
 
 	private:
 
-		int         _MENU_INDEX_COUNT{ 4 };
-		int         _menuIndex{};
+		int              _MENU_INDEX_COUNT{ 4 };
+		int              _menuIndex{};
 
-		bool        _isShowConfigInfo{ false };
+		bool             _isShowConfigInfo{ false };
 	};
 }

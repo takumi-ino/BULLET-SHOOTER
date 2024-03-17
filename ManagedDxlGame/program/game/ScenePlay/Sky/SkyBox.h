@@ -12,9 +12,11 @@ namespace inl {
 
 		SkyBox();
 
-		Shared<dxe::Mesh> _skybox = nullptr;
-
 		void Update();
 		void Render(const Shared<inl::FreeLookCamera>& camera);
+
+	public:
+
+		Shared<dxe::Mesh> _skybox = nullptr;
 	};
 }

@@ -1,5 +1,10 @@
 #pragma once
 
+namespace inl {
+
+	class CustomException;
+}
+
 
 	class SceneTitle : public SceneBase
 	{
@@ -18,7 +23,7 @@
 
 	private:
 
-		void SetupAssetsData() noexcept;         // 画像やエフェクトの初期化
+		void SetupAssetsData(const Shared<inl::CustomException>& cus);      // 画像やエフェクトの初期化
 		void RenderBackGroundAndLogo() noexcept; // 背景とタイトルロゴ描画
 
 		void MoveToSceneSelectDifficulty();

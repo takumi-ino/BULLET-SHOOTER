@@ -16,9 +16,9 @@ namespace inl {
 
 		// ’e
 		int    _maxBulletSpawnCount{};
-		int    _bullet_fireInterval{};
-		float  _bullet_moveSpeed{};
-		float  _bullet_reloadTimeInterval{};
+		int    _bulletFireInterval{};
+		float  _bulletMoveSpeed{};
+		float  _bulletReloadTimeInterval{};
 	};
 
 	struct EnemyBossInfo

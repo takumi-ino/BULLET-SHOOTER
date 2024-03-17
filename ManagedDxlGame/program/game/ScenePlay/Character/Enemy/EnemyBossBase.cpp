@@ -6,6 +6,8 @@
 #include "../game/ScenePlay/Collision/Collision.h"
 #include "../../Bullet/Enemy/EnemyBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletHell.h"
+#include "../game/Utility/FilePathChecker.h"
+#include "../game/Utility/CustomException.h"
 
 
 namespace {
@@ -42,9 +44,10 @@ namespace inl {
 		const EnemyBossInfo& data, 
 		const Shared<Player>& player, 
 		const Shared<dxe::Camera>& camera, 
-		const Shared<Collision>& collision) {
+		const Shared<Collision>& collision) 
+	{
 
-		_bossHp.clear();
+		_bossHp.clear(); //　ボスHPをリセット
 		while (!_remainingLife_indicator.empty()) {
 			_remainingLife_indicator.pop();
 		}
@@ -52,7 +55,7 @@ namespace inl {
 		const int maxHpSize = 4;
 		for (int i = 0; i < maxHpSize; i++) {
 
-			_bossHp.push_back(data._hp);
+			_bossHp.push_back(data._hp);  //　ボスHPを初期化
 			_remainingLife_indicator.push(_bossHp);
 		}
 
@@ -71,27 +74,27 @@ namespace inl {
 	}
 
 
-
 	void EnemyBossBase::ActKeepDistanceToPlayer(const float& delta_time) {
 
 		// 敵とプレイヤーの距離
 		float distance_from_player = GetDistanceToPlayer();
 		// 敵とプレイヤーの距離の差分
-		tnl::Vector3 _diff_vector = _player_ref->_mesh->pos_ - _mesh->pos_;
+		tnl::Vector3 differenceVector = _player_ref->_mesh->pos_ - _mesh->pos_;
 
 		tnl::Vector3 moveDirection;
 
-		if (distance_from_player < _DISTANCE_THRESHOLD) {
+		if (distance_from_player < _DISTANCE_THRESHOLD) { //　プレイヤーに近づく
 
-			moveDirection.x = _diff_vector.x * -1;
-			moveDirection.z = _diff_vector.z * -1;
+			moveDirection.x = differenceVector.x * -1;
+			moveDirection.z = differenceVector.z * -1;
 		}
 		else if (distance_from_player > _DISTANCE_THRESHOLD) {
-			moveDirection.x = _diff_vector.x;
-			moveDirection.z = _diff_vector.z;
+
+			moveDirection.x = differenceVector.x;
+			moveDirection.z = differenceVector.z;
 		}
 		else {
-			moveDirection = tnl::Vector3::Cross(_diff_vector, tnl::Vector3::up);
+			moveDirection = tnl::Vector3::Cross(differenceVector, tnl::Vector3::up);
 		}
 
 		_warpToRandPosTimer += delta_time;
@@ -140,6 +143,7 @@ namespace inl {
 					_player_ref->PlayDamageHitSE();
 				}
 			}
+
 			blt->_isActive = false;
 		}
 	}

@@ -5,7 +5,7 @@
 #include "../../ScenePlay/ScenePlay.h"
 #include "../../SceneSelectDifficulty/SceneSelectDifficulty.h"
 #include "../game/ScenePlay/Character/Player/Player.h"
-#include "../../InputFuncTable.h"
+#include "../../Utility/InputFuncTable.h"
 
 
 namespace inl {
@@ -160,12 +160,12 @@ namespace inl {
 			d = GetColor(baseColor, baseColor, baseColor);
 
 		if (_MENU_INDEX_COUNT == 4) {
-			if (_menuIndex == 0) a = -1;
-			if (_menuIndex == 1) b = -1;
-			if (_menuIndex == 2) c = -1;
-			if (_menuIndex == 3) d = -1;
+			if (_menuIndex == 0) a = -1;  // "再開する"
+			if (_menuIndex == 1) b = -1;  // "操作確認"
+			if (_menuIndex == 2) c = -1;  // "現在のステージをやり直す"
+			if (_menuIndex == 3) d = -1;  // "ゲームを終了する"
 		}
-		else {
+		else {                            
 			if (_menuIndex == 0) b = -1;
 			if (_menuIndex == 1) c = -1;
 			if (_menuIndex == 2) d = -1;
@@ -177,7 +177,7 @@ namespace inl {
 		int leftSide = 120;
 		SetFontSize(25);
 
-		if (_player_ref->GetHP() != 0) {
+		if (_player_ref->GetHP() != 0) {  // プレイヤー死亡時のみ  "再開する" 　がなくなる
 
 			_MENU_INDEX_COUNT = 4;
 			DrawStringEx(leftSide, upSide, a, "再開する");

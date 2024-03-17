@@ -1,13 +1,20 @@
 #include "../game/DxLibEngine.h"
 #include "Gunport.h"
 #include "../game/ScenePlay/Bullet/Player/PlayerBullet.h"
+#include "../game/Utility/CustomException.h"
+
 
 namespace inl {
 
+
 	Gunport::Gunport() {
 
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		auto texture = cus->TryLoadTexture("graphics/colorTexture/silver.jpg", "inl::PlayerBullet::PlayerBullet()");
+
 		_mesh = dxe::Mesh::CreateCylinderMV(5, 15);
-		_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/colorTexture/silver.jpg"));
+		_mesh->setTexture(texture);
 		_mesh->setMtrlEmissive({ 1,1,1 });
 	}
 

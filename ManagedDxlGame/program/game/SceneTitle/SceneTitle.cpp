@@ -1,11 +1,11 @@
 #include "../DxLibEngine.h"
-#include "../library/tnl_sequence.h"
 #include "../Manager/Scene/SceneBase.h"
 #include "SceneTitle.h"
 #include "../SceneSelectDifficulty/SceneSelectDifficulty.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Sound/SoundManager.h"
-#include "../InputFuncTable.h"
+#include "../Utility/InputFuncTable.h"
+#include "../Utility/CustomException.h"
 
 
 namespace {
@@ -27,41 +27,52 @@ namespace {
 }
 
 
-	SceneTitle::SceneTitle() {
+	SceneTitle::SceneTitle() 
+	{
+		Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
 
-		SetupAssetsData();
+		SetupAssetsData(cus);
 
-		SoundManager::GetInstance().LoadBGM("sound/bgm/title.mp3");
+		std::string sound = cus->TryLoadSoundPath("sound/bgm/title.mp3", "SceneTitle::SceneTitle()");
+
+		SoundManager::GetInstance().LoadBGM(sound);
 		SoundManager::GetInstance().PlayBGM();
 	}
 
 
-	void SceneTitle::SetupAssetsData() noexcept
+	void SceneTitle::SetupAssetsData(const Shared<inl::CustomException>& cus) 
 	{
-		_shadowMap = std::make_shared<dxe::ShadowMap>(dxe::ShadowMap::eSize::S2048);
+		// 画像ハンドル取得
+		_backGround_hdl = cus->TryLoadGraph("graphics/Scene/titleBackGround.jpg", "SceneTitle::SetupAssetsData()");
+		_titleLogo_hdl = cus->TryLoadGraph("graphics/Scene/titleLogo_star.png", "SceneTitle::SetupAssetsData()");
+
+		// SEハンドル取得
+		_tapSE_hdl = cus->TryLoadSound("sound/se/tap.mp3", "SceneTitle::SetupAssetsData()");
+
+		// バイナリーファイルロード
+		std::string binary = cus->TryLoadBinaryPath("screenEffect/titleSceneEffect.bin", "SceneTitle::SetupAssetsData()");
+
+		// スクリーンエフェクト生成
 		_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
-		_screenEffect->loadStatus("screenEffect/titleSceneEffect.bin");
+		_screenEffect->loadStatus(binary);
 
-		_backGround_hdl = LoadGraph("graphics/Scene/titleBackGround.jpg");
-		_titleLogo_hdl = LoadGraph("graphics/Scene/titleLogo_star.png");
-
-		_tapSE_hdl = LoadSoundMem("sound/se/tap.mp3");
+		// シャドウマップ生成
+		_shadowMap = std::make_shared<dxe::ShadowMap>(dxe::ShadowMap::eSize::S2048);
 	}
 
 
-	void SceneTitle::MakeFlushEffect_TitleLogo(float deltaTime) noexcept
+	void SceneTitle::MakeFlushEffect_TitleLogo(const float deltaTime) noexcept
 	{
 		_transTime_logoLights += deltaTime;
-
-		// tnl::SingleOscillationy内で
-		// 振動開始位置に + 1.5fの変更を加えているため他の場所で使用する際には注意
+		
+		// tnl::SingleOscillationy 関数内で振動開始位置に + 1.5fの変更を加えている
 		float bloom = tnl::SingleOscillationy(tnl::eOscStart::STOK, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_logoLights);
 
 		_screenEffect->setBloomThreshold(bloom * _TITLELOGO_EFFECT_OSCILLATE_SPEED);
 	}
 
 
-	void SceneTitle::MakeMonoTransition_BackGround(float deltaTime) noexcept
+	void SceneTitle::MakeMonoTransition_BackGround(const float deltaTime) noexcept
 	{
 		_transTime_cb += deltaTime;
 		_transTime_cr -= deltaTime;
@@ -76,7 +87,7 @@ namespace {
 
 	void SceneTitle::MoveToSceneSelectDifficulty()
 	{
-		if (InputFuncTable::IsButtonTrigger_ENTER()) {
+		if (inl::InputFuncTable::IsButtonTrigger_ENTER()) {
 
 			PlaySoundMem(_tapSE_hdl, DX_PLAYTYPE_BACK);
 			SoundManager::GetInstance().DestroyBGM();
@@ -109,14 +120,13 @@ namespace {
 		_screenEffect->renderEnd();
 		_shadowMap->reserveEnd();
 
-
 		// デバッグ情報描画
 		//DrawDefaultLightGuiController();
 		//_screenEffect->drawGuiController({ 0, 0 });
 	}
 
 
-	void SceneTitle::Update(float deltaTime) {
+	void SceneTitle::Update(const float deltaTime) {
 
 		MoveToSceneSelectDifficulty();
 

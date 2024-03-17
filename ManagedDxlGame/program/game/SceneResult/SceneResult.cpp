@@ -3,7 +3,8 @@
 #include "SceneResult.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../Manager/Scene/SceneManager.h"
-#include "../InputFuncTable.h"
+#include "../Utility/InputFuncTable.h"
+#include "../Utility/CustomException.h"
 
 
 namespace {
@@ -28,10 +29,17 @@ namespace {
 
 
 SceneResult::SceneResult(const std::string difficulty, const int totalScore)
-	: _TOTAL_SCORE(totalScore), _DIFFICULTY(difficulty) {
+	: _TOTAL_SCORE(totalScore), _DIFFICULTY(difficulty) 
+{
+	Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
 
-	_backGround_hdl = LoadGraph("graphics/Scene/resultBackGround.png");
-	_resultSE_hdl = LoadSoundMem("sound/se/result.mp3");
+	// 画像ハンドルロード
+	int graph = cus->TryLoadGraph("graphics/Scene/resultBackGround.png", "SceneResult::SceneResult()");
+	// SEハンドルロード
+	int sound = cus->TryLoadSound("sound/se/result.mp3", "SceneResult::SceneResult()");
+
+	_backGround_hdl = graph;
+	_resultSE_hdl = sound;
 
 	PlaySoundMem(_resultSE_hdl, DX_PLAYTYPE_BACK);
 }
@@ -71,7 +79,7 @@ void SceneResult::Render() {
 
 void SceneResult::MoveToSceneTitle()
 {
-	if (InputFuncTable::IsButtonTrigger_ENTER()) {
+	if (inl::InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneTitle());
@@ -79,7 +87,7 @@ void SceneResult::MoveToSceneTitle()
 }
 
 
-void SceneResult::Update(float deltaTime) {
-
+void SceneResult::Update(const float deltaTime)
+{
 	MoveToSceneTitle();
 }

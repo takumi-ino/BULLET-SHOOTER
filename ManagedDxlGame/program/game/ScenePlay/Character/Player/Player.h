@@ -3,7 +3,6 @@
 
 class CsvLoader;
 
-  //  敵ザコおよび敵ボスをまとめて管理
 
 
 namespace inl {
@@ -19,7 +18,7 @@ namespace inl {
 	public:
 
 		Player() {}
-		explicit Player(const Shared<FreeLookCamera> cameraRef);
+		explicit Player(const Shared<FreeLookCamera> mainCamera);
 
 		~Player() override { DeleteSoundMem(_getDamageSE_hdl); }
 
@@ -61,13 +60,13 @@ namespace inl {
 		void ActivateDarkSoulsCamera();               // ダークソウルのようなカメラワークに近づけた処理
 		void NormalizeCameraSpeed(const float speed); // スピード調整
 		void ControlCameraWithoutEnemyFocus();
-		void ControlCameraWithEnemyFocus(tnl::Vector3& playerPos, tnl::Vector3& targetEnemyPos);
+		void ControlCameraWithEnemyFocus(const tnl::Vector3& playerPos, const tnl::Vector3& targetEnemyPos);
 		void ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y);
 
 		// プレイヤー ----------------------------------------------------------------------------------------------------------
 
 		// HP、AT、DEFなどのステータス初期化----------------------
-		void InitPlayerStatus();
+		void InitPlayerStatus(std::vector<std::vector<tnl::CsvCell>>);
 
 		// 無敵時間-----------------------------------------------
 		void WatchInvincibleTimer(const float deltaTime) noexcept;

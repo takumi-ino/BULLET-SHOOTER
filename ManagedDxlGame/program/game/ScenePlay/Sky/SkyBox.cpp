@@ -2,30 +2,48 @@
 #include "SkyBox.h"
 #include "../game/ScenePlay/ScenePlay.h"
 #include "../Camera/FreeLookCamera.h"
+#include "../game/Utility/CustomException.h"
 
 
 namespace inl {
 
 	SkyBox::SkyBox() {
 
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		auto binaryPath = cus->TryLoadBinaryPath("directional_light_parameter.bin", "inl::SkyBox::SkyBox()");		
+
 		// ディレクショナルライト
 		ChangeLightTypeDir(VGet(0.0f, -1.0f, 0.0f));
 
-		SetDefaultLightParameter("directional_light_parameter.bin");
+		SetDefaultLightParameter(binaryPath);
 
 		_skybox = dxe::Mesh::CreateCubeMV(50000, 20, 20);
 
 		switch (ScenePlay::GetStageID())
 		{
-		case 1:
-			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_c.png"));
+		case 1: 
+		{
+			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_c.png", "inl::Player::Player()");
+
+			_skybox->setTexture(textureHandle);
 			break;
+		}
 		case 2:
-			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_b.png"));
+		{
+			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_b.png", "inl::Player::Player()");
+
+			_skybox->setTexture(textureHandle);
 			break;
+
+		}
 		case 3:
-			_skybox->setTexture(dxe::Texture::CreateFromFile("graphics/skybox/_skybox_a.png"));
+		{
+			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_a.png", "inl::Player::Player()");
+
+			_skybox->setTexture(textureHandle);
 			break;
+		}
 		}
 	}
 

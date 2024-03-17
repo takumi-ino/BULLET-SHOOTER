@@ -24,8 +24,12 @@ namespace inl {
 
 	void EnemyBoss_MoriyaSuwako::SetMeshInfo() {
 
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		auto texture = cus->TryLoadTexture("graphics/bossTexture/Suwako.jpg", "inl::EnemyBoss_Suwako::SetMeshInfo()");
+
 		_mesh = dxe::Mesh::CreateCubeMV(100);
-		_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/bossTexture/Suwako.jpg"));
+		_mesh->setTexture(texture);
 
 		_mesh->pos_ = { 0, 0, 0 };
 		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
@@ -97,11 +101,11 @@ namespace inl {
 		switch (EnemyBossBase::_bossHp.size())
 		{
 		case 4:
-			DrawFormatString(x, y, -1, "%sNormal", spell.c_str()); break;
+			DrawFormatString(x, y, -1, "%sNormal", spell.c_str());                             break;
 		case 3:
-			DrawFormatString(x, y, -1, "%sIronRingOfMoriya", spell.c_str()); break;
+			DrawFormatString(x, y, -1, "%sIronRingOfMoriya", spell.c_str());                   break;
 		case 2:
-			DrawFormatString(x, y, -1, "%sNormal", spell.c_str()); break;
+			DrawFormatString(x, y, -1, "%sNormal", spell.c_str());                             break;
 		case 1:
 			DrawFormatString(x, y, -1, "%s_keroChanStandsFirmAgainstTheStorm", spell.c_str()); break;
 		}

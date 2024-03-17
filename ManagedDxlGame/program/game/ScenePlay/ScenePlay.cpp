@@ -1,23 +1,22 @@
 #include "../DxLibEngine.h"
 #include "ScenePlay.h"
-#include "Pause/PauseMenu.h"
+#include "../SceneResult/SceneResult.h"
 #include "../Manager/Item/ItemManager.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Enemy/EnemyManager.h"
-#include "Collision/Collision.h"
+#include "../Manager/Score/ScoreManager.h"
 #include "Sky/SkyBox.h"
-#include "Ground/HeightMap.h"
+#include "Pause/PauseMenu.h"
 #include "Star/ShiningStar.h"
+#include "Collision/Collision.h"
+#include "Camera/FreeLookCamera.h"
+#include "../Utility/CustomException.h"
 #include "Bullet/Enemy/EnemyBullet.h"
+#include "Bullet/Enemy/BulletHell.h"
+#include "Bullet/Enemy/BulletHellFactory.h"
 #include "../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../ScenePlay/Bullet/Enemy/HomingBullet.h"
-#include "../SceneResult/SceneResult.h"
-#include "../Manager/Score/ScoreManager.h"
-#include "Camera/FreeLookCamera.h"
-#include "Bullet/Enemy/BulletHell.h"
-#include "Bullet/Enemy/BulletHellFactory.h"
-#include "Character/Enemy/EnemyZako/EnemyZakoBox.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_PatchouliKnowledge.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_Cirno.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
@@ -52,25 +51,28 @@ namespace {
 }
 
 
-ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
+ScenePlay::ScenePlay(const std::string selectedDifficulty, const int stage)
 {
+	Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
+	int graph = cus->TryLoadGraph("graphics/miniMap/radar.jpg", "ScenePlay::ScenePlay()");
+
+	_miniMap_hdl = graph; // ミニマップ画像ロード
+
+	_GAME_DIFFICULTY = selectedDifficulty;
+	_STAGE_ID = stage;
+
+	InitWeatherParticle(cus); // 雪や雨などのパーティクル
+
 	_isShowGameBeginText = true;
 	inl::PauseMenu::_isShowPauseOption = false;
 
-	_GAME_DIFFICULTY = selected_difficulty;
-	_STAGE_ID = stage;
-
 	_mainCamera = std::make_shared<inl::FreeLookCamera>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
-
-	InitWeatherParticle();
-
-	_miniMap_hdl = LoadGraph("graphics/miniMap/radar.jpg"); // ミニマップ画像ロード
 
 	// プレイヤー
 	_player = std::make_shared<inl::Player>(_mainCamera);
 	_player->SetPlayerRef(_player);
 
-	InitPlayersBombCount(selected_difficulty);
+	InitPlayersBombCount(selectedDifficulty);
 
 	// スカイボックス(天空)
 	_skyBox = std::make_shared<inl::SkyBox>();
@@ -78,25 +80,28 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 	// 当たり判定
 	_collision = std::make_shared<inl::Collision>();
 
-	// 敵に関するあらゆる処理を全て管理
+	// 敵に関するあらゆる処理を管理
 	_enemyManager = std::make_shared<inl::EnemyManager>(_player, _mainCamera, _collision);
 
+	// 弾幕工場
 	_bltHellFactory = std::make_shared<inl::BulletHellFactory>();
+
 	// 生成する弾幕を最初に選び、初期化
 	CheckDoInit_FirstStageBulletHellLists();
 	CheckDoInit_SecondStageBulletHellLists();
 	CheckDoInit_ThirdStageBulletHellLists();
 
+	// 弾幕のアクティブフラグを全てリセット
 	TurnOff_FirstStageBulletHellLists();
 	TurnOff_SecondStageBulletHellLists();
 	TurnOff_ThirdStageBulletHellLists();
 
 	_player->SetEnemyManagerRef(_enemyManager);
 
-	ItemManager::GetInstance().DestroyAllItems();
-
-	ItemManager::GetInstance().CreateScoreItemPool(selected_difficulty, _STAGE_ID);
-	ItemManager::GetInstance().CreatePowerUpItemPool(selected_difficulty, _STAGE_ID);
+	// アイテム-----------------------------------------
+	ItemManager::GetInstance().DestroyAllItems(); // 初期化
+	ItemManager::GetInstance().CreateScoreItemPool(selectedDifficulty, _STAGE_ID);   // 生成
+	ItemManager::GetInstance().CreatePowerUpItemPool(selectedDifficulty, _STAGE_ID); // 生成
 
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
@@ -104,12 +109,18 @@ ScenePlay::ScenePlay(const std::string selected_difficulty, const int stage)
 }
 
 
-void ScenePlay::InitWeatherParticle()
+void ScenePlay::InitWeatherParticle(const Shared<inl::CustomException>& cus)
 {
-	if (_STAGE_ID == 1)
-		_weatherParticle = std::make_shared<dxe::Particle>("particle/preset/snow.bin");
-	else if (_STAGE_ID == 2)
-		_weatherParticle = std::make_shared<dxe::Particle>("particle/preset/customRain.bin");
+	if (_STAGE_ID == 1) {
+
+		auto particle = cus->TryLoadParticleBinaryFile("particle/preset/snow.bin", "ScenePlay::InitWeatherParticle()");
+		_weatherParticle = particle;
+	}
+	else if (_STAGE_ID == 2) {
+
+		auto particle = cus->TryLoadParticleBinaryFile("particle/preset/customRain.bin", "ScenePlay::InitWeatherParticle()");
+		_weatherParticle = particle;
+	}
 }
 
 
@@ -208,12 +219,12 @@ void ScenePlay::DeactivateAllEnemyBullets() {
 }
 
 
-void ScenePlay::InitPlayersBombCount(const std::string selected_difficulty) noexcept
+void ScenePlay::InitPlayersBombCount(const std::string selectedDifficulty) noexcept
 {
-	if (selected_difficulty == "Easy")	       _player->InitBombCount(4);
-	else if (selected_difficulty == "Normal")  _player->InitBombCount(3);
-	else if (selected_difficulty == "Hard")    _player->InitBombCount(2);
-	else if (selected_difficulty == "Lunatic") _player->InitBombCount(1);
+	if (selectedDifficulty == "Easy")	      _player->InitBombCount(4);
+	else if (selectedDifficulty == "Normal")  _player->InitBombCount(3);
+	else if (selectedDifficulty == "Hard")    _player->InitBombCount(2);
+	else if (selectedDifficulty == "Lunatic") _player->InitBombCount(1);
 }
 
 
@@ -249,13 +260,14 @@ void ScenePlay::DestroyFirstStageBulletHellLists() {
 }
 
 
-void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
+void ScenePlay::RenderFirstStageBulletHellLists()
 {
 	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
 		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			if (blt->_isActive)	blt->Render(_mainCamera);
 		}
-		//std::string s = std::to_string(_bullet_normal_patchouli.size());
+
+		//std::string s = std::to_string(_bullet_normal_patchouli.size());　　		// 弾が何個生成されているかを表示するデバッグ用
 		//DrawFormatString(1000, 50, -1, "%s個 normal", s.c_str());
 	}
 
@@ -264,7 +276,7 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());
+		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());　 // 弾が何個生成されているかを表示するデバッグ用
 		//DrawFormatString(1000, 50, -1, "%s個 metalFatigue", s.c_str());
 	}
 
@@ -273,14 +285,14 @@ void ScenePlay::CheckDoRender_FirstStageBulletHellLists()
 		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			if (blt->_isActive)  blt->Render(_mainCamera);
 		}
-		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());
+		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());　　// 弾が何個生成されているかを表示するデバッグ用
 		//DrawFormatString(1000, 50, -1, "%s個 silentSerena", s.c_str());
 	}
 }
 
 
 
-void ScenePlay::CheckDoUpdate_FirstStageBulletHellLists()
+void ScenePlay::UpdateFirstStageBulletHellLists()
 {
 	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
 
@@ -333,15 +345,16 @@ void ScenePlay::CheckDoInit_SecondStageBulletHellLists()
 }
 
 
-void ScenePlay::TurnOff_SecondStageBulletHellLists() {
+void ScenePlay::TurnOff_SecondStageBulletHellLists() 
+{
 	inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno = false;
 	inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno = false;
 	inl::EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno = false;
 }
 
 
-void ScenePlay::DestroySecondStageBulletHellLists() {
-
+void ScenePlay::DestroySecondStageBulletHellLists()
+{
 	inl::EnemyBoss_Cirno::_bullet_normal_cirno.clear();
 	inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno.clear();
 	inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno.clear();
@@ -349,7 +362,7 @@ void ScenePlay::DestroySecondStageBulletHellLists() {
 
 
 
-void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
+void ScenePlay::RenderSecondStageBulletHellLists()
 {
 	if (inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
 		for (auto blt : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
@@ -380,7 +393,7 @@ void ScenePlay::CheckDoRender_SecondStageBulletHellLists()
 
 
 
-void ScenePlay::CheckDoUpdate_SecondStageBulletHellLists()
+void ScenePlay::UpdateSecondStageBulletHellLists()
 {
 	if (inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
 
@@ -449,7 +462,7 @@ void ScenePlay::DestroyThirdStageBulletHellLists() {
 }
 
 
-void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
+void ScenePlay::RenderThirdStageBulletHellLists() {
 
 	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
 		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
@@ -480,7 +493,7 @@ void ScenePlay::CheckDoRender_ThirdStageBulletHellLists() {
 
 
 
-void ScenePlay::CheckDoUpdate_ThirdStageBulletHellLists() {
+void ScenePlay::UpdateThirdStageBulletHellLists() {
 
 	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
 
@@ -585,6 +598,7 @@ void ScenePlay::Render() {
 	_enemyManager->Render(_mainCamera);
 
 
+	//　天候パーティクル----------------------------------------------------------------------
 	if (_STAGE_ID == 1 || _STAGE_ID == 2) {
 
 		dxe::DirectXRenderBegin();
@@ -597,6 +611,7 @@ void ScenePlay::Render() {
 	}
 
 
+	//　ボムパーティクル----------------------------------------------------------------------
 	if (_player->GetIsTriggeredBombEffect()) {
 
 		dxe::DirectXRenderBegin();
@@ -606,10 +621,12 @@ void ScenePlay::Render() {
 		dxe::DirectXRenderEnd();
 	}
 
-	CheckDoRender_FirstStageBulletHellLists();
-	CheckDoRender_SecondStageBulletHellLists();
-	CheckDoRender_ThirdStageBulletHellLists();
+	//　弾幕----------------------------------------------------------------------------------
+	RenderFirstStageBulletHellLists();
+	RenderSecondStageBulletHellLists();
+	RenderThirdStageBulletHellLists();
 
+	//　スコア--------------------------------------------------------------------------------
 	ScoreManager::GetInstance().RenderTotalScore();
 
 	_screenEffect->renderEnd();
@@ -617,12 +634,14 @@ void ScenePlay::Render() {
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+	//　ステージのグリッド線
 	RenderStageGrindGround();
 
 	// ミニマップ
 	DrawRotaGraph(_miniMap_centerPos.x, _miniMap_centerPos.y, _miniMap_extendRate, 0, _miniMap_hdl, 1);
 	RenderEnemyRadarOnMiniMap();
 
+	//　ポーズメニュー
 	RenderPauseMenu();
 }
 
@@ -675,7 +694,7 @@ void ScenePlay::UpdateShowBeginTextTimer(const float deltaTime) noexcept
 }
 
 
-void ScenePlay::Update(float deltaTime) {
+void ScenePlay::Update(const float deltaTime) {
 
 	SetDeltaTime(deltaTime);
 
@@ -683,20 +702,25 @@ void ScenePlay::Update(float deltaTime) {
 
 	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LALT)) {
 
-		if (!inl::PauseMenu::_isShowPauseOption) {
+		if (!inl::PauseMenu::_isShowPauseOption) { 
+			
+			// ポーズメニューオープン
 			inl::PauseMenu::_isShowPauseOption = true;
 		}
 	}
 
-	if (inl::PauseMenu::_isShowPauseOption) {
+	if (inl::PauseMenu::_isShowPauseOption) {   
 		_pauseMenu->Update();
 	}
 	else {
-		_enemyManager->Update(deltaTime);
-		_player->Update(deltaTime);
-		CheckDoUpdate_FirstStageBulletHellLists();
-		CheckDoUpdate_SecondStageBulletHellLists();
-		CheckDoUpdate_ThirdStageBulletHellLists();
+
+		_enemyManager->Update(deltaTime);		//　敵
+
+		_player->Update(deltaTime);		        //　プレイヤー
+
+		UpdateFirstStageBulletHellLists();      //　弾幕
+		UpdateSecondStageBulletHellLists();
+		UpdateThirdStageBulletHellLists();
 	}
 
 	UpdateShowBeginTextTimer(deltaTime);

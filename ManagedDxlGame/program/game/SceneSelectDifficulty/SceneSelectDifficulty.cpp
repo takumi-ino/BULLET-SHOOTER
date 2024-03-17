@@ -4,7 +4,8 @@
 #include "../ScenePlay/ScenePlay.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Score/ScoreManager.h"
-#include "../InputFuncTable.h"
+#include "../Utility/InputFuncTable.h"
+#include "../Utility/CustomException.h"
 
 
 namespace {
@@ -28,20 +29,25 @@ namespace {
 
 SceneSelectDifficulty::SceneSelectDifficulty() {
 
-	_backGround_hdl = LoadGraph("graphics/Scene/select.jpg");
+	Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
+
+	// 画像ハンドルロード
+	int graph = cus->TryLoadGraph("graphics/Scene/select.jpg", "inl::SceneSelectDifficulty::SceneSelectDifficulty()");
+
+	_backGround_hdl = graph;
 }
 
 
 void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() noexcept {
 
-	if (InputFuncTable::IsButtonDownTrigger_UP())
+	if (inl::InputFuncTable::IsButtonDownTrigger_UP())
 	{
 		_difficultyItemIndex--;
 
 		if (_difficultyItemIndex < 0)
 			_difficultyItemIndex = _DIFFICULTY_COUNT - 1;
 	}
-	if (InputFuncTable::IsButtonDownTrigger_DOWN())
+	if (inl::InputFuncTable::IsButtonDownTrigger_DOWN())
 	{
 		_difficultyItemIndex++;
 
@@ -88,7 +94,7 @@ void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() noexcept {
 
 void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
-	if (InputFuncTable::IsButtonTrigger_ENTER()) {
+	if (inl::InputFuncTable::IsButtonTrigger_ENTER()) {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
@@ -131,9 +137,9 @@ void SceneSelectDifficulty::Render() {
 }
 
 
-void SceneSelectDifficulty::Update(float deltaTime) {
+void SceneSelectDifficulty::Update(const float deltaTime) {
 
-	if (InputFuncTable::IsButtonTrigger_CANCEL()) {
+	if (inl::InputFuncTable::IsButtonTrigger_CANCEL()) {
 
 		auto mgr = SceneManager::GetInstance();
 		mgr->ChangeScene(new SceneTitle());

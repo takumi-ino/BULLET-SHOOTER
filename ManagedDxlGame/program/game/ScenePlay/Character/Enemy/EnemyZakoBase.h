@@ -5,12 +5,13 @@
 class Player;
 
 namespace inl {
+
 	class StraightBullet;
 	class HomingBullet;
 	class EnemyBullet;
 	class BulletFactory;
-class Collision;
-struct EnemyZakoInfo;
+	class Collision;
+	struct EnemyZakoInfo;
 
 
 	class EnemyZakoBase : public EnemyBase
@@ -104,9 +105,9 @@ struct EnemyZakoInfo;
 		// CSVからロード-----------------------
 		int         _hp{};                         // HP
 		int         _maxTotalEnemy_spawnCount{};   // 敵の総数
-		int         _bullet_fireInterval{};        // 弾の発射間隔
-		float       _bullet_moveSpeed{};           // 弾の移動スピード
-		float       _bullet_reloadTimeInterval{};  // リロード間隔
+		int         _bulletFireInterval{};        // 弾の発射間隔
+		float       _bulletMoveSpeed{};           // 弾の移動スピード
+		float       _bulletReloadTimeInterval{};  // リロード間隔
 
 	protected:
 

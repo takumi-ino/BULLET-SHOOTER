@@ -1,13 +1,19 @@
 #include "BulletHell.h"
 #include "EnemyBullet.h"
 #include "BulletHellFactory.h"
+#include "../game/Utility/CustomException.h"
+
 
 namespace inl {
 
 
 	BulletHellFactory::BulletHellFactory() {
 
-		_bulletHellData_map = _csvLoader->LoadBulletHellTypeInfos("BulletHellType.csv");
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+
+		auto csv = cus->TryLoadCsvFile("BulletHellType.csv", "inl::BulletHellFactory::BulletHellFactory()");
+
+		_bulletHellData_map = _csvLoader->LoadBulletHellTypeInfos(csv);
 		InitBulletHellInfo();
 	}
 
@@ -48,8 +54,8 @@ namespace inl {
 		for (int i = 0; i < ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI; i++) {
 
 			// ‹…‘Ì--------------------------------------------------------------------------------------------------------------------------
-			Shared<inl::EnemyBullet> round_bullet =
-				std::make_shared<inl::EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 20.0f);
+			Shared<EnemyBullet> round_bullet =
+				std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Blue, 20.0f);
 
 			round_bullet->_angle = (2.0f * tnl::PI / ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI) * i;
 

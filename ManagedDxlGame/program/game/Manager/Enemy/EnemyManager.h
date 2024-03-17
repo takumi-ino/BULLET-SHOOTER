@@ -82,7 +82,9 @@ namespace inl {
 		// ステージ移動---------------------------------------------------------------------------------------------------
 		tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
 		bool SeqMoveToNextStage(const float deltaTime);
-		bool SeqMoveToResult(const float deltaTime);
+		bool SeqMoveToResult(const float deltaTime);    // リザルトへ飛ぶ前に必要な処理をまとめて実行
+
+		void MoveToResult(); // 純粋なリザルト移行機能のみ
 
 	public:
 
