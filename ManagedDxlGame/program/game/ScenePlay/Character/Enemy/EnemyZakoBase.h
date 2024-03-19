@@ -38,7 +38,7 @@ namespace inl {
 			const Shared<Collision>& collision
 		);
 
-		// Init ------------------------------------------------------------------
+		// 初期化 ------------------------------------------------------------------
 		virtual void InitBulletFactoryInstance() {}
 
 		// HP ------------------------------------------------------------------
@@ -51,25 +51,31 @@ namespace inl {
 	protected:
 
 		// 直行弾 ------------------------------------------------------------
-		void ShotStraightBullet(const float deltaTime);
-		void ReloadStraightBulletByTimer(const float deltaTime);
-		void UpdateStraightBullet(const float deltaTime);
+		void ShotStraightBullet(const float deltaTime);           // 発射
+		void ReloadStraightBulletByTimer(const float deltaTime);  // リロード
+		void UpdateStraightBullet(const float deltaTime);         // 更新
 
 		// 追尾弾 ------------------------------------------------------------
-		void ShotHomingBullet(const float deltaTime);
-		void ReloadHomingBulletByTimer(const float deltaTime);
-		void UpdateHomingBullet(const float deltaTime);
+		void ShotHomingBullet(const float deltaTime);             // 発射
+		void ReloadHomingBulletByTimer(const float deltaTime);	  // リロード
+		void UpdateHomingBullet(const float deltaTime);			  // 更新
 
-		// プレイヤーへ攻撃 ---------------------------------------------------
+		// プレイヤーへ攻撃 -------------------------------------------------------------------
 		void AttackPlayer(const float deltaTime);
 
-		// 挙動	----------------------------------------------------------------------------------
-		void DoRoutineMoves(const float deltaTime);              // 追跡、攻撃、待機を使い分ける
+		// 挙動	-------------------------------------------------------------------------------
 
-		void SearchPlayerMovementState(const float deltaTime);   // 待機状態中、STOP・ MOVE・ TURNのステートによって行動
-		void MoveToRandomInvestigatePos(const float deltaTime);  // 待機状態中、ランダム移動
+		 // 追跡、攻撃、待機を使い分ける
+		void DoRoutineMoves(const float deltaTime);             
 
-		void ChasePlayer(const float deltaTime);                 // プレイヤー追跡
+		// 待機状態中、STOP・ MOVE・ TURNのステートによって行動
+		void SearchPlayerMovementState(const float deltaTime);  
+
+		// 待機状態中、ランダム移動
+		void MoveToRandomInvestigatePos(const float deltaTime); 
+
+		// プレイヤー追跡
+		void ChasePlayer(const float deltaTime);                 
 
 	private:
 

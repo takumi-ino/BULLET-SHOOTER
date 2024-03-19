@@ -39,14 +39,14 @@ namespace inl {
 
 	private:
 
-		// ザコのみ------------------------------------------------------------------------------------------------------
+		// ザコ敵のみの処理----------------------------------------------------------------------------------------
 		void InitEnemyZakoInfo();                          // 初期化
-		void UpdateEnemyZakoList(const float deltaTime);  // 更新
+		void UpdateEnemyZakoList(const float deltaTime);   // 更新
 		void SetMaxEnemySpawnCount() noexcept;             // 1度に生成可能な敵数を設定（難易度ごとに調整）
 
-		// ボスのみ------------------------------------------------------------------------------------------------------
+		// ボスのみの処理------------------------------------------------------------------------------------------
 		void InitEnemyBossInfo();                          // 初期化
-		void UpdateEnemyBossList(const float deltaTime);  // 更新
+		void UpdateEnemyBossList(const float deltaTime);   // 更新
 
 		// 生成はするが、ザコが全滅するまでボスは非アクティブ
 		void SetSpawnEnemyBoss();
@@ -71,20 +71,25 @@ namespace inl {
 
 		// アイテム取得イベント通知---------------------------------------------------------------------------------------
 		void AttachItemManagerInstance(const Shared<ItemManager>& observer);
-		void NotifyEnemyPosition_ToItemManager();                             // アイテムスポーンに必要な敵の位置情報を通達
+
+		// アイテムスポーンに必要な敵の位置情報を通達
+		void NotifyEnemyPosition_ToItemManager();                 
+
 		void SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyActive);
 
 		// 敵殺傷イベント通知---------------------------------------------------------------------------------------------
-		void EventNotify_OnEnemyKilled(const std::string enemyName);         // 敵の撃破情報を通達
-		void RenderEventHitText() const;
-		void UpdateEventHitText(const float deltaTime);
+		void EventNotify_OnEnemyKilled(const std::string enemyName);    // 敵の撃破情報を通達
+		void RenderEventHitText() const;								// テキスト描画
+		void UpdateEventHitText(const float deltaTime);					// テキスト更新
 
 		// ステージ移動---------------------------------------------------------------------------------------------------
 		tnl::Sequence<EnemyManager> _sequence = tnl::Sequence<EnemyManager>(this, &EnemyManager::SeqMoveToNextStage);
 		bool SeqMoveToNextStage(const float deltaTime);
-		bool SeqMoveToResult(const float deltaTime);    // リザルトへ飛ぶ前に必要な処理をまとめて実行
 
-		void MoveToResult(); // 純粋なリザルト移行機能のみ
+		// リザルトへ飛ぶ前に必要な処理をまとめて実行
+		bool SeqMoveToResult(const float deltaTime);    
+
+		void MoveToResult(); // 純粋なリザルト移行機能
 
 	public:
 

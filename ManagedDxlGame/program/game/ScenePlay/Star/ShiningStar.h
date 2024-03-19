@@ -3,6 +3,7 @@
 namespace inl {
 
 	//　ステージ３で使用する自前のパーティクルクラス
+
 	class ShiningStar
 	{
 	private:

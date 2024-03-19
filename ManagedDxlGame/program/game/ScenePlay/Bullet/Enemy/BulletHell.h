@@ -25,14 +25,17 @@ namespace inl {
 	public:
 
 		enum class TYPE {
+
 			// パチュリー（ステージ１ボス）
 			Normal_Patchouli,
 			MetalFatigue_Patchouli,
 			SilentSerena_Patchouli,
+
 			// チルノ（ステージ２ボス）
 			Normal_Cirno,
 			IcicleFall_Cirno,
 			Perfect_Freeze_Cirno,
+
 			// 諏訪子（ステージ３ボス）
 			Normal_Suwako,
 			IronRingOfMoriya_Suwako,
@@ -46,6 +49,7 @@ namespace inl {
 		BulletHell() {}
 		BulletHell(const Shared<dxe::Mesh>& bossMesh, const Shared<Player>& player)
 			: _bossMesh_ref(bossMesh) {
+
 			_player_ref = player;
 		}
 

@@ -8,7 +8,7 @@ public:
 	SceneResult() {}
 	SceneResult(const std::string difficulty, const int totalScore);
 
-	virtual ~SceneResult() {
+	~SceneResult() override {
 		DeleteGraph(_backGround_hdl);
 		DeleteSoundMem(_resultSE_hdl);
 	}
@@ -18,15 +18,18 @@ public:
 
 private:
 	 
-	void RenderBackGround() noexcept;  // ”wŒi
-	void RenderResult() noexcept;      // ƒeƒLƒXƒg
+	// ”wŒi•`‰æ
+	void RenderBackGround() noexcept;
+
+	// ƒeƒLƒXƒg•`‰æ
+	void RenderLiteralResult() noexcept;
 
 	void MoveToSceneTitle();
 
 private:
 
 	int         _backGround_hdl{};	// ”wŒi‰æ‘œ
-	int         _resultSE_hdl{};   // SE
+	int         _resultSE_hdl{};    // SE
 	const int   _TOTAL_SCORE{};
 
 	bool        _isResultScene{ true };

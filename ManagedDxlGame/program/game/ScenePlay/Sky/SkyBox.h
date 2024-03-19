@@ -5,6 +5,7 @@ namespace inl {
 
 	class FreeLookCamera;
 
+	// ステージのテクスチャ　空模様
 
 	class SkyBox
 	{

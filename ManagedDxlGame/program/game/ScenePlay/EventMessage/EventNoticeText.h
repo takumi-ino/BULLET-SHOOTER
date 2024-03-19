@@ -3,6 +3,8 @@
 
 namespace inl {
 
+
+	//　敵を倒したときや、アイテムを取得したときなどに画面に表示するイベント通知を担当
 	class EventNoticeText
 	{
 	public:

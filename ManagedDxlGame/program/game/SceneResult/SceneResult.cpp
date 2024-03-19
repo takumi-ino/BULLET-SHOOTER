@@ -45,7 +45,7 @@ SceneResult::SceneResult(const std::string difficulty, const int totalScore)
 }
 
 
-void SceneResult::RenderResult() noexcept
+void SceneResult::RenderLiteralResult() noexcept
 {
 	SetFontSize(70);
 	DrawString(_resultText_posX, _resultText_posY, "Result", GetColor(0, 200, 100));
@@ -71,7 +71,7 @@ void SceneResult::Render() {
 
 	RenderBackGround();
 
-	RenderResult();
+	RenderLiteralResult();
 
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

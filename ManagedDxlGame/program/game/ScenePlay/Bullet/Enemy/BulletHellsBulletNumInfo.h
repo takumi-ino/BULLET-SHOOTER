@@ -1,3 +1,9 @@
+
+
+//　一つの弾幕内から更にグループ分けをすることで、弾一つ一つに独自の動きを実現させる
+
+
+
 // パチュリー（ノーマル）
 constexpr int ROUND_BULLETCOUNT_T_NORMAL_PATCHOULI = 8;
 constexpr int EVERYDIRECTION_BULLETCOUNT_T_NORMAL_PATCHOULI = 192;

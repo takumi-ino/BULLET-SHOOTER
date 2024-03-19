@@ -23,10 +23,10 @@ namespace inl {
 		~Player() override { DeleteSoundMem(_getDamageSE_hdl); }
 
 
-		// Init--------------------------------------------------------------------------------------------
+		// 初期化--------------------------------------------------------------------------------------------
 		void InitBombCount(const int count) { _currentBomb_stockCount = count; }
 
-		// Getter--------------------------------------------------------------------------------------------
+		// ゲッター--------------------------------------------------------------------------------------------
 		const int GetHP() const noexcept { return _hp; }
 		const int GetMaxHP() const noexcept { return _MAX_HP; }
 		const int GetAT() const noexcept { return _at; }
@@ -34,13 +34,13 @@ namespace inl {
 		const tnl::Vector3 GetPos() const { return _mesh->pos_; }
 		const bool GetIsTriggeredBombEffect() const noexcept { return _isTriggered_playersBombEffect; }
 
-		// Setter--------------------------------------------------------------------------------------------
+		// セッター--------------------------------------------------------------------------------------------
 		void SetHP(int val) { _hp = val; }
 		void SetIsInvincible(const bool flag) { _isInvincible = flag; }
 		void SetEnemyManagerRef(const Shared<EnemyManager>& enemyManager) { _enemyManager_ref = enemyManager; };
 		void SetPlayerRef(const Shared<Player>& playerRef) { _player_ref = playerRef; }
 
-		// UpdateStatus--------------------------------------------------------------------------------------------
+		// ステータス更新--------------------------------------------------------------------------------------------
 		void HealHP(int heal) { _hp += heal; }
 		bool DecreaseHP(int damage);
 		void AddAT(int val) { _at += val; }
@@ -57,10 +57,16 @@ namespace inl {
 	private:
 
 		// カメラ--------------------------------------------------------------------------------------------------------------
-		void ActivateDarkSoulsCamera();               // ダークソウルのようなカメラワークに近づけた処理
-		void NormalizeCameraSpeed(const float speed); // スピード調整
+
+		// ダークソウルのようなカメラワークに近づけた処理
+		void ActivateDarkSoulsCamera();              
+		// スピード調整
+		void NormalizeCameraSpeed(const float speed); 
+		// カメラ固定
 		void ControlCameraWithoutEnemyFocus();
+		// カメラ非固定
 		void ControlCameraWithEnemyFocus(const tnl::Vector3& playerPos, const tnl::Vector3& targetEnemyPos);
+		// カメラ固定時プレイヤー操作
 		void ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y);
 
 		// プレイヤー ----------------------------------------------------------------------------------------------------------
@@ -76,14 +82,14 @@ namespace inl {
 		void RenderPlayerHp();
 
 		// 移動 ---------------------------------------------------
-		void ControlPlayerMoveByInput(const float deltaTime);    // 移動操作
-		void AdjustPlayerVelocity();                             // 速度調整
-		void ControlRotationByPadOrMouse();                      // 視点操作
+		void ControlPlayerMoveByInput(const float deltaTime);  // 移動操作
+		void AdjustPlayerVelocity();                           // 速度調整
+		void ControlRotationByPadOrMouse();                    // 視点操作
 
-		// 弾 --------------------------------------------------------------------------------------------------------------------
-		void ShotPlayerBullet();                          // 弾を撃つ処理
-		void UpdateStraightBullet(const float deltaTime); // 弾の更新処理
-		const tnl::Vector3& GetBulletMoveDirection();     // 弾の移動方向取得
+		// 弾 ------------------------------------------------------------------------------------------------------------------
+		void ShotPlayerBullet();                               // 弾を撃つ処理
+		void UpdateStraightBullet(const float deltaTime);      // 弾の更新処理
+		const tnl::Vector3& GetBulletMoveDirection();          // 弾の移動方向取得
 
 		bool IsShooting() noexcept {
 			return
@@ -91,20 +97,22 @@ namespace inl {
 				tnl::Input::IsPadDown(ePad::KEY_1);
 		}
 
-		// 連装砲------------------------------------------------------------------------------------------------------------------
+		// 連装砲---------------------------------------------------------------------------------------------------------------
 		void ShotGunportBullet();                                  // 発射処理
 		void RenderBulletPowerRate();                              // 弾の現在のパワーを表示
 		void RenderGunport(const Shared<FreeLookCamera> camera);   // 描画
 		void UpdateGunport();                                      // 更新
-		void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords); // DRY原則につき、同じ処理をまとめて実行
 
-		// ボム--------------------------------------------------------------------------------------------------------------------
+		// DRY原則につき、同じ処理をまとめて実行
+		void UpdateGunport_DRY(Shared<Gunport>& gunportVec, const tnl::Vector3 coords);
+
+		// ボム-----------------------------------------------------------------------------------------------------------------
 		void UseBomb();                                            // 使用
 		void ValidateBombEffect();                                 // エフェクト有効化
 		void InvalidateBombEffect(const float deltaTime);          // エフェクト無効化
 		void RenderBombRemainCount() noexcept;                     // ボム残数描画
 
-		// 敵位置------------------------------------------------------------------------------------------------------------------
+		// 敵位置---------------------------------------------------------------------------------------------------------------
 		void ChangeTarget_ByMouseWheel();                          // マウスホイールでターゲット変更処理
 		void RenderFollowPointer();                                // ターゲット位置に合わせて描画するポインター
 		void AssignEnemyPosition(tnl::Vector3& enemyPos);          // ローカル変数に敵座標位置を割り当てる

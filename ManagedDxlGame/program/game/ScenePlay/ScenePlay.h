@@ -28,6 +28,8 @@ public:
 	ScenePlay() {}
 	ScenePlay(const std::string selectedDifficulty, const int stage);
 
+	~ScenePlay() override {}
+
 	// ステージ移動----------------------------------------------------------------------
 	void MoveToNextStage(const int stage, const std::string difficulty);
 
@@ -44,9 +46,14 @@ public:
 	static void DestroyThirdStageBulletHellLists();
 
 	// Getter ----------------------------------------------------------------------
-	static const int GetStageID() noexcept { return _STAGE_ID; }                       // ステージID
-	static const std::string GetGameDifficulty() noexcept { return _GAME_DIFFICULTY; } // 選択難易度
-	static const float GetDeltaTime() noexcept { return _deltaTime; };                 // デルタタイム
+	// ステージID
+	static const int GetStageID() noexcept { return _STAGE_ID; }
+
+	// 選択難易度
+	static const std::string GetGameDifficulty() noexcept { return _GAME_DIFFICULTY; }
+
+	// デルタタイム
+	static const float GetDeltaTime() noexcept { return _deltaTime; };
 
 private:
 

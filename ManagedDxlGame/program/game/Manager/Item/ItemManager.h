@@ -39,11 +39,13 @@ public:
 	void EventHit_PowerUpItemAndPlayer();	                                       // プレイヤーとの当たり判定処理
 	void UpdatePowerUpItem();		                                               // 更新処理
 
-	// その他関数-------------------------------------------------------------
+	// その他関数---------------------------------------------------------------------------------------
 
-	void SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const bool isEnemyDead); // 敵の消滅地点にアイテムをスポーン
+	// 敵の消滅地点にアイテムをスポーン
+	void SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const bool isEnemyDead);
 
-	void DestroyAllItems() noexcept;		                                           // 全てのアイテムを削除
+	// 全てのアイテムを削除
+	void DestroyAllItems() noexcept;		                                           
 
 	void Render(const Shared<dxe::Camera>& camera);
 	void Update(const float deltaTime);
