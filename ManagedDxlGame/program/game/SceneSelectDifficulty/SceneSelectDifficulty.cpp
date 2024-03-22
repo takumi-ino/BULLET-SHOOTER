@@ -98,7 +98,7 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
-		int startStage = 1;
+		int startStage = 3;
 
 		if (_difficultyItemIndex == 0) {
 

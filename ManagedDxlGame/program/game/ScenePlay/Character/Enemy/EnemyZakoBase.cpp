@@ -8,6 +8,7 @@
 #include "../game/ScenePlay/Bullet/Enemy/BulletFactory.h"
 #include "../game/ScenePlay/Collision/Collision.h"
 #include "../game/Utility/CustomException.h"
+#include "../game/ScenePlay/RandomValue/RandomValueGenerator.h"
 
 
 namespace inl {
@@ -37,24 +38,22 @@ namespace inl {
 
 		auto path = cus->TryLoadSound("sound/se/shot.wav", "inl::EnemyZakoBase::EnemyZakoBase()");
 
-		_shotSE_hdl = path;
+		_shotSE_hdl = path;                                           // SE
+		_id = data._id;												  // ID
+		_hp = data._hp;												  // HP
+		_MAX_HP = data._hp;											  // 最大HP
+		_name = data._name;											  // 名前
+		_scale = data._scale;										  // サイズ
+		_enemyMoveSpeed = data._enemyMoveSpeed;						  // 移動スピード
+		_maxBulletSpawnCount = data._maxBulletSpawnCount;			  // 弾の最大生成数
+		_maxTotalEnemy_spawnCount = data._maxTotalEnemy_spawnCount;	  // 敵の総数
+		_bulletMoveSpeed = data._bulletMoveSpeed;					  // 弾のスピード
+		_bulletFireInterval = data._bulletFireInterval;				  // 弾の撃つ間隔
+		_bulletReloadTimeInterval = data._bulletReloadTimeInterval;	  // 弾のリロード間隔
 
-		_id = data._id;
-		_name = data._name;
-		_scale = data._scale;
-		_hp = data._hp;
-		_MAX_HP = data._hp;
-		_enemyMoveSpeed = data._enemyMoveSpeed;
-
-		_maxBulletSpawnCount = data._maxBulletSpawnCount;
-		_maxTotalEnemy_spawnCount = data._maxTotalEnemy_spawnCount;
-		_bulletMoveSpeed = data._bulletMoveSpeed;
-		_bulletFireInterval = data._bulletFireInterval;
-		_bulletReloadTimeInterval = data._bulletReloadTimeInterval;
-
-		_player_ref = player;
-		_enemyCamera = camera;
-		_collision_ref = collision;
+		_player_ref = player;										  // プレイヤー
+		_enemyCamera = camera;										  // カメラ
+		_collision_ref = collision;									  // 当たり判定
 	}
 
 
@@ -70,12 +69,14 @@ namespace inl {
 
 		if (_hp <= 0) {
 
+			//　爆発エフェクト起動
 			dxe::DirectXRenderBegin();
 			_explode_particle->setPosition(_mesh->pos_);
 			_explode_particle->start();
 			_explode_particle->render(camera);
 			dxe::DirectXRenderEnd();
 
+			//　キルボーナス獲得
 			ScoreManager::GetInstance().AddKillBonus(1000);
 			_isDead = true;
 		}
@@ -83,7 +84,8 @@ namespace inl {
 	}
 
 	//　弾---------------------------------------------------------------------------------------------------------------------------
-	void EnemyZakoBase::ShotStraightBullet(const float deltaTime) {              // 直行弾
+	// 直行弾---------------------------------------------------------------------------------
+	void EnemyZakoBase::ShotStraightBullet(const float deltaTime) {
 
 		_straightBullet_count++;
 
@@ -105,11 +107,12 @@ namespace inl {
 		ReloadStraightBulletByTimer(deltaTime);           //　リロード
 	}
 
-
-	void EnemyZakoBase::ShotHomingBullet(const float deltaTime) {              // 追尾弾
+	// 追尾弾---------------------------------------------------------------------------------
+	void EnemyZakoBase::ShotHomingBullet(const float deltaTime) {
 
 		_homingBullet_count++;
 
+		//_homingBullet_count が　_bullet_fireIntervalの倍数になった時
 		if (_homingBullet_count % _bulletFireInterval == 0 && !_homingBullet_queue.empty()) {
 
 			Shared<HomingBullet> bullet = _homingBullet_queue.front();
@@ -127,9 +130,10 @@ namespace inl {
 		ReloadHomingBulletByTimer(deltaTime);
 	}
 
-	void EnemyZakoBase::ReloadStraightBulletByTimer(const float deltaTime)              // 直行弾
+	void EnemyZakoBase::ReloadStraightBulletByTimer(const float deltaTime)
 	{
-		if (!_straightBullet_queue.empty()) return;         // 弾がまだあればリターン
+		if (!_straightBullet_queue.empty()) 
+			return;         // 弾がまだあればリターン
 
 		_reloadStraightBullet_timeCounter += deltaTime;
 
@@ -139,7 +143,8 @@ namespace inl {
 
 		std::list<Shared<StraightBullet>> bullets =                 // 弾生成
 			_bulletFactory->CreateStraightBullet(
-				StraightBullet::USER::ZakoBox, _maxBulletSpawnCount
+				StraightBullet::USER::ZakoBox,
+				_maxBulletSpawnCount
 			);
 
 		for (const auto& bullet : bullets) {                        // 弾装填
@@ -153,7 +158,8 @@ namespace inl {
 
 	void EnemyZakoBase::ReloadHomingBulletByTimer(const float deltaTime) {              // 追尾弾
 
-		if (!_homingBullet_queue.empty()) return; // 弾がまだあればリターン
+		if (!_homingBullet_queue.empty())
+			return; // 弾がまだあればリターン
 
 		_reloadHomingBullet_timeCounter += deltaTime;
 
@@ -163,7 +169,8 @@ namespace inl {
 
 		std::list<Shared<HomingBullet>> bullets =                // 弾生成
 			_bulletFactory->CreateHomingBullet(
-				HomingBullet::USER::ZakoBox, _maxBulletSpawnCount
+				HomingBullet::USER::ZakoBox,
+				_maxBulletSpawnCount
 			);
 
 		for (const auto& bullet : bullets) {                     // 弾装填
@@ -186,6 +193,7 @@ namespace inl {
 				// 当たり判定　bool
 				if (_collision_ref->CheckCollision_EnemyStraightBulletAndPlayer((*it_blt), _player_ref)) {
 
+					//　攻撃力からプレイヤー防御力を引いた分 HPを削る
 					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
 
 						_player_ref->SetIsInvincible(true);   // 無敵時間
@@ -199,11 +207,11 @@ namespace inl {
 				// 弾の寿命を時間で管理
 				(*it_blt)->_timer += deltaTime;
 
-				tnl::Vector3 move_dir = tnl::Vector3::TransformCoord({ 0,0,1 }, _mesh->rot_);
-				move_dir.normalize();
+				tnl::Vector3 moveDir = tnl::Vector3::TransformCoord({ 0,0,1 }, _mesh->rot_);
+				moveDir.normalize();
 
 				//　更新
-				(*it_blt)->_mesh->pos_ += move_dir * _bulletMoveSpeed * deltaTime;
+				(*it_blt)->_mesh->pos_ += moveDir * _bulletMoveSpeed * deltaTime;
 
 
 				if ((*it_blt)->_timer > _STRAIGHTBULLET_LIFETIME_LIMIT) {
@@ -213,6 +221,7 @@ namespace inl {
 				}
 			}
 			else {
+				//　削除
 				it_blt = _straight_bullets.erase(it_blt);
 				continue;
 			}
@@ -233,6 +242,7 @@ namespace inl {
 				// 当たり判定　bool
 				if (_collision_ref->CheckCollision_EnemyHomingBulletAndPlayer((*it_blt), _player_ref)) {
 
+					//　攻撃力からプレイヤー防御力を引いた分 HPを削る
 					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
 
 						_player_ref->SetIsInvincible(true);
@@ -258,26 +268,26 @@ namespace inl {
 
 				// 線形補間で弾を旋回させる
 				(*it_blt)->_moveDirection = tnl::Vector3::UniformLerp(
-					(*it_blt)->_moveDirection,
-					targetDir * _bulletTurnDelayRate,
-					timeToReachPlayer,
-					(*it_blt)->_timer
+					(*it_blt)->_mesh->pos_,           // 現在位置
+					targetDir * _bulletTurnDelayRate, // 目標地点
+					timeToReachPlayer,                // 目標到達時間
+					(*it_blt)->_timer                 // 経過時間
 				);
 
 				// 更新
 				(*it_blt)->_mesh->pos_ +=
 					(*it_blt)->_moveDirection * deltaTime * _bulletMoveSpeed / 1.5f;
 
-
+				//　リセット
 				if ((*it_blt)->_timer > _HOMINGBULLET_LIFETIME_LIMIT) {
 
 					(*it_blt)->_isActive = false;
 					(*it_blt)->_timer = 0;
 				}
 			}
+			else {
 
-			else if (!(*it_blt)->_isActive) {
-
+				//　削除
 				it_blt = _homing_bullets.erase(it_blt);
 				continue;
 			}
@@ -313,33 +323,37 @@ namespace inl {
 		}
 		else {
 
-			static float state_timer = 0.0f;
+			static float stateTimer = 0.0f;
 
 			if (_behave == EnemyZakoBase::BEHAVE::Moving) {
+
 				//　時間制限付きでランダムに移動
 				//  ランダムな時間経過後停止(5秒以内)
-				_isReached_toInvestigatePos = false;
+				_isReachedToInvestigatePos = false;
 
-				if (!_isReached_toInvestigatePos) {
+				//　移動
+				if (!_isReachedToInvestigatePos) {
 					MoveToRandomInvestigatePos(deltaTime);
 				}
-
-				if (_isReached_toInvestigatePos) {
+				//　停止
+				if (_isReachedToInvestigatePos) {
 					_behave = EnemyZakoBase::BEHAVE::Stop;
 				}
+				//　移動
 				else {
-
-					_isReached_toInvestigatePos = false;
+					_isReachedToInvestigatePos = false;
 					_behave = EnemyZakoBase::BEHAVE::Moving;
 				}
 			}
 			else if (_behave == EnemyZakoBase::BEHAVE::Stop) {
 
 				//	時には同じ位置にとどまり左右の確認などを行う
-				state_timer += deltaTime;
+				stateTimer += deltaTime;
 
-				if (state_timer > _CHANGE_NEXT_BEHAVE_DURATION) {
+				//　次の挙動に移るまでの一定時間内であれば
+				if (stateTimer > _CHANGE_NEXT_BEHAVE_DURATION) {
 
+					//　３つの挙動から１つをランダムで選択
 					_behave = static_cast<EnemyZakoBase::BEHAVE>(rand() % 3);
 
 					if (_behave == EnemyZakoBase::BEHAVE::Turn) {
@@ -350,24 +364,23 @@ namespace inl {
 						_isTurning = false;
 					}
 
-					state_timer = 0.f;
+					stateTimer = 0.f;
 				}
 				else {
 					_behave = EnemyZakoBase::BEHAVE::Stop;
 				}
 			}
-
+			//　ターン
 			else if (_behave == EnemyZakoBase::BEHAVE::Turn) {
 
 				static float angle = 0;
 
 				if (_isTurning) {
 
-					std::mt19937 gen(mt());
-					std::uniform_real_distribution<float> rnd_rot(-_ROTATION_MAX_RANGE, _ROTATION_MAX_RANGE);
+					auto randomVector = RandomValueGenerator::Float(-_ROTATION_MAX_RANGE, _ROTATION_MAX_RANGE);
 
 					if (angle == 0) {
-						angle = rnd_rot(mt);
+						angle = randomVector;
 					}
 					else {
 						if (angle > 0) {
@@ -384,6 +397,7 @@ namespace inl {
 
 				if (angle != 0) {
 
+					//　ランダムで停止か移動を選択
 					int rnd = rand() % 2;
 
 					if (rnd == 0) {
@@ -405,20 +419,22 @@ namespace inl {
 
 	void EnemyZakoBase::MoveToRandomInvestigatePos(const float deltaTime)
 	{
-		std::mt19937 gen(mt());
-
 		if (_investigatePos.x == 0 && _investigatePos.y == 0 && _investigatePos.z == 0) {
 
-			std::uniform_real_distribution<float> rnd_x(-_randomInvestigateRange_x, _randomInvestigateRange_x);
-			std::uniform_real_distribution<float> rnd_y(-_randomInvestigateRange_y, _randomInvestigateRange_y);
-			std::uniform_real_distribution<float> rnd_z(-_randomInvestigateRange_z, _randomInvestigateRange_z);
-			_investigatePos.x = rnd_x(mt);
-			_investigatePos.y = rnd_y(mt);
-			_investigatePos.z = rnd_z(mt);
+			auto randomVector = RandomValueGenerator::Vector(
+				-_randomInvestigateRange_x, _randomInvestigateRange_x, 
+				-_randomInvestigateRange_y, _randomInvestigateRange_y,
+				-_randomInvestigateRange_z, _randomInvestigateRange_z
+			);
+
+			_investigatePos = randomVector;
 		}
 
+		//　移動方向取得
 		tnl::Vector3 direction = _investigatePos - _mesh->pos_;
 		direction.Normalize(direction);
+
+		//　移動
 		_mesh->pos_ += direction * deltaTime * _enemyMoveSpeed;
 
 		// 目的地に近づいたら停止する
@@ -426,7 +442,7 @@ namespace inl {
 
 			// 原点へ戻る
 			_investigatePos = { 0, 0, 0 };
-			_isReached_toInvestigatePos = true;
+			_isReachedToInvestigatePos = true;
 		}
 	}
 

@@ -47,10 +47,10 @@ namespace tnl {
 	}
 
 	// work... AABB ‚Æ AABB‚Ì”»’è
-	bool IsIntersectAABB(const tnl::Vector3& SummonBoss, const tnl::Vector3& a_size, const tnl::Vector3& b, const tnl::Vector3& b_size)
+	bool IsIntersectAABB(const tnl::Vector3& a, const tnl::Vector3& a_size, const tnl::Vector3& b, const tnl::Vector3& b_size)
 	{
-		tnl::Vector3 a_max = tnl::ToMaxAABB(SummonBoss, a_size);
-		tnl::Vector3 a_min = tnl::ToMinAABB(SummonBoss, a_size);
+		tnl::Vector3 a_max = tnl::ToMaxAABB(a, a_size);
+		tnl::Vector3 a_min = tnl::ToMinAABB(a, a_size);
 		tnl::Vector3 b_max = tnl::ToMaxAABB(b, b_size);
 		tnl::Vector3 b_min = tnl::ToMinAABB(b, b_size);
 		if (a_max.x < b_min.x || a_min.x > b_max.x) return false;
@@ -61,8 +61,8 @@ namespace tnl {
 
 
 	//----------------------------------------------------------------------------------------------
-	bool IsIntersectSphere(const tnl::Vector3& SummonBoss, float a_radius, const tnl::Vector3& b, float b_radius) {
-		float l = (SummonBoss - b).length();
+	bool IsIntersectSphere(const tnl::Vector3& a, float a_radius, const tnl::Vector3& b, float b_radius) {
+		float l = (a - b).length();
 		return l < (a_radius + b_radius) ? true : false;
 	}
 
@@ -133,12 +133,12 @@ namespace tnl {
 	//----------------------------------------------------------------------------------------------
 	bool IsIntersectTrianglePoint(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& p)
 	{
-		Vector3 SummonBoss = v1 - p;
+		Vector3 a = v1 - p;
 		Vector3 b = v2 - p;
 		Vector3 c = v3 - p;
 
-		float ab = Vector3::Dot(SummonBoss, b);
-		float ac = Vector3::Dot(SummonBoss, c);
+		float ab = Vector3::Dot(a, b);
+		float ac = Vector3::Dot(a, c);
 		float bc = Vector3::Dot(b, c);
 		float cc = Vector3::Dot(c, c);
 

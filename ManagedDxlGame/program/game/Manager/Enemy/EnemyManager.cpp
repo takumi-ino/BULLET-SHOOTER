@@ -43,10 +43,13 @@ namespace inl {
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 		_alertSE_hdl = cus->TryLoadSound("sound/se/bossAppears.mp3", "inl::EnemyManager::EnemyManager()");
 
+		//　CSVファイルから敵データを取ってくる
 		LoadEnemyDataFromCsv();
 
+		//　ザコ敵の１度に生成可能な最大数を難易度ごとに設定
 		SetMaxEnemySpawnCount();
 
+		//　敵データ取得
 		InitEnemyZakoInfo();
 		InitEnemyBossInfo();
 		SetSpawnEnemyBoss();
@@ -54,7 +57,7 @@ namespace inl {
 		_isInitializedBossInfo = false;
 
 		SoundManager::GetInstance().LoadStageBGM(ScenePlay::GetStageID());
-		SoundManager::GetInstance().PlayStageBGM(false);       // ボス(true)か雑魚(false)か
+		//SoundManager::GetInstance().PlayStageBGM(false);       // ボス(true)か雑魚(false)か
 
 		_itemManager = std::make_shared<ItemManager>(_player_ref, _collision_ref);
 		this->AttachItemManagerInstance(_itemManager);
@@ -74,7 +77,8 @@ namespace inl {
 	void EnemyManager::LoadEnemyDataFromCsv()
 	{
 		// CSVから敵データのロード
-		if (!_enemyZakoData_map.empty() && !_enemyBossData_map.empty()) return;
+		if (!_enemyZakoData_map.empty() && !_enemyBossData_map.empty())
+			return;
 
 		using namespace std;
 
@@ -83,7 +87,6 @@ namespace inl {
 		auto bossCsv = cus->TryLoadCsvFile("csv/EnemyBossInfos.csv", "inl::EnemyManager::LoadEnemyDataFromCsv()");
 
 		_csvLoader = make_shared<CsvLoader>();
-
 		_enemyZakoData_map = _csvLoader->LoadEnemyZakoInfos(zakoCsv);
 		_enemyBossData_map = _csvLoader->LoadEnemyBossInfos(bossCsv);
 	}
@@ -98,15 +101,24 @@ namespace inl {
 			switch ((*enemy).first) // id
 			{
 			case 0: // EnemyZakoBoxデータ取得
-				_sEnemy_zakoBox_info._enemyMoveSpeed = (*enemy).second._enemyMoveSpeed;
-				_sEnemy_zakoBox_info._maxTotalEnemy_spawnCount = (*enemy).second._maxTotalEnemy_spawnCount;
-				_sEnemy_zakoBox_info._name = (*enemy).second._name;
-				_sEnemy_zakoBox_info._scale = (*enemy).second._scale;
-				_sEnemy_zakoBox_info._stageID = (*enemy).second._stageID;
-				_sEnemy_zakoBox_info._bulletReloadTimeInterval = (*enemy).second._bulletReloadTimeInterval;
-				_sEnemy_zakoBox_info._bulletFireInterval = (*enemy).second._bulletFireInterval;
-				_sEnemy_zakoBox_info._bulletMoveSpeed = (*enemy).second._bulletMoveSpeed;
 
+				//　移動速度
+				_sEnemy_zakoBox_info._enemyMoveSpeed = (*enemy).second._enemyMoveSpeed;
+				//　全ての敵の数
+				_sEnemy_zakoBox_info._maxTotalEnemy_spawnCount = (*enemy).second._maxTotalEnemy_spawnCount;
+				//　名前
+				_sEnemy_zakoBox_info._name = (*enemy).second._name;
+				//　大きさ
+				_sEnemy_zakoBox_info._scale = (*enemy).second._scale;
+				//　ステージID
+				_sEnemy_zakoBox_info._stageID = (*enemy).second._stageID;
+				//　弾のリロード間隔時間
+				_sEnemy_zakoBox_info._bulletReloadTimeInterval = (*enemy).second._bulletReloadTimeInterval;
+				//　弾の撃つ間隔
+				_sEnemy_zakoBox_info._bulletFireInterval = (*enemy).second._bulletFireInterval;
+				//　弾の速さ
+				_sEnemy_zakoBox_info._bulletMoveSpeed = (*enemy).second._bulletMoveSpeed;
+				//　敵の残数
 				_remainingEnemyZako_spawnCount = _sEnemy_zakoBox_info._maxTotalEnemy_spawnCount;
 				break;
 			case 1: // EnemyZakoDomeデータ取得
@@ -145,9 +157,13 @@ namespace inl {
 			switch ((*boss).first) // id
 			{
 			case 0: // パチュリー データ取得
+				//　移動速度
 				_sBoss_PatchouliKnowledge_info._enemyMoveSpeed = (*boss).second._enemyMoveSpeed;
+				//　名前
 				_sBoss_PatchouliKnowledge_info._name = (*boss).second._name;
+				//　大きさ
 				_sBoss_PatchouliKnowledge_info._scale = (*boss).second._scale;
+				//　ステージID
 				_sBoss_PatchouliKnowledge_info._stageID = (*boss).second._stageID;
 				break;
 			case 1: // チルノ データ取得
@@ -172,14 +188,18 @@ namespace inl {
 		// ステージ１
 		if (ScenePlay::GetStageID() == _sBoss_PatchouliKnowledge_info._stageID) {
 
-			auto boss_patchouli =
+			auto boss_patchouli = // インスタンス生成
 				std::make_shared<EnemyBoss_PatchouliKnowledge>(
 					_enemyBossData_map[0], _player_ref, _mainCamera_ref, _collision_ref
 				);
 
+			//　死亡フラグ
 			boss_patchouli->_isDead = false;
+			//　移動速度　
 			boss_patchouli->_enemyMoveSpeed = _sBoss_PatchouliKnowledge_info._enemyMoveSpeed;
+			//　名前
 			boss_patchouli->_name = _sBoss_PatchouliKnowledge_info._name;
+			//　大きさ
 			boss_patchouli->_scale = _sBoss_PatchouliKnowledge_info._scale;
 
 			_enemyBossList.push_back(boss_patchouli);
@@ -352,12 +372,12 @@ namespace inl {
 
 					if (it->DecreaseHP(_player_ref->GetAT(), _mainCamera_ref)) {
 
-						ScoreManager::GetInstance().AddHitBulletScore(100);
-						EnemyZakoBase::_isNoticedPlayer = true;
+						ScoreManager::GetInstance().AddHitBulletScore(100);  // スコア加算
+						EnemyZakoBase::_isNoticedPlayer = true;              // プレイヤー発見
 
-						PlayerBullet::_bulletPowerRate += 0.01f;
+						PlayerBullet::_bulletPowerRate += 0.01f;             //　プレイヤーの弾の威力ポイント上昇
 
-						it->_timeCountFrom_noticedPlayer = 0.0f;
+						it->_timeCountFrom_noticedPlayer = 0.0f;             // プレイヤーに気付いてからの時間に初期値を設定
 					}
 					else {
 
@@ -369,7 +389,8 @@ namespace inl {
 			// Zakoエネミー同士の当たり判定
 			for (auto& it2 : _enemyZakoList) {
 
-				if (it == it2) continue;
+				if (it == it2) 
+					continue;
 
 				_collision_ref->CheckCollision_EnemyAndEnemy(it, it2, it->_mesh->pos_, it2->_mesh->pos_);
 			}
@@ -440,12 +461,14 @@ namespace inl {
 
 		_enemyPosList.clear();
 
-		for (auto& zako : _enemyZakoList) {
+		for (const auto& zako : _enemyZakoList) {
 
 			try {
 
+				// ザコの位置を取得
 				_enemyPosList.push_back(zako->_mesh->pos_);
 
+				//　取得した値が空だったら例外
 				if (_enemyPosList.empty()) {
 
 					throw CustomException("inl::EnemyManager::GetEnemyZakoPosition()");
@@ -462,13 +485,15 @@ namespace inl {
 
 	const tnl::Vector3& EnemyManager::GetEnemyBossPosition() {
 
-		for (auto& it_boss : _enemyBossList) {
+		for (const auto& it_boss : _enemyBossList) {
 
 			if (!it_boss->_mesh) {
 
 				try {
+					// ボスの位置を取得
 					_enemyBossPos = it_boss->_mesh->pos_;
 
+					//　取得した値が０だったら例外
 					if (_enemyBossPos.length() == 0) {
 
 						throw CustomException("inl::EnemyManager::GetEnemyBossPosition()");
@@ -505,13 +530,14 @@ namespace inl {
 	{
 		if (_isShowBossAppearanceText) {
 
-			_showBossAppearanceText_timer += deltaTime;
+			_bossAppearanceTextTimer += deltaTime;
 
 			ShowBossAppearanceText();
 
-			if (_showBossAppearanceText_timer > 3.f) {
+			//　時間経過でテキスト削除
+			if (_bossAppearanceTextTimer > 3.f) {
 
-				_showBossAppearanceText_timer = 0.0f;
+				_bossAppearanceTextTimer = 0.0f;
 				_isShowBossAppearanceText = false;
 			}
 		}
@@ -523,7 +549,11 @@ namespace inl {
 		std::string event = enemy_name + "を撃破 ";
 
 		Shared<inl::EventNoticeText> msg =
-			std::make_shared<inl::EventNoticeText>(event, GetColor(255, 0, 0), 16, 30
+			std::make_shared<inl::EventNoticeText>(
+				event,
+				GetColor(255, 0, 0),  // 色
+				16,					  // 文字の大きさ
+				30					  // 文字の間隔
 			);
 
 		inl::EventNoticeText::_messageQueue.push_back(msg);
@@ -534,7 +564,7 @@ namespace inl {
 	{
 		int index = 0;
 
-		for (auto msg : inl::EventNoticeText::_messageQueue) {
+		for (const auto msg : inl::EventNoticeText::_messageQueue) {
 			msg->Render(index);
 			index++;
 		}
@@ -544,7 +574,7 @@ namespace inl {
 	void EnemyManager::UpdateEventHitText(const float deltaTime)
 	{
 		// イベント通知
-		for (auto msg : inl::EventNoticeText::_messageQueue) {
+		for (const auto msg : inl::EventNoticeText::_messageQueue) {
 			msg->Update(deltaTime);
 		}
 
@@ -567,6 +597,7 @@ namespace inl {
 
 		SeqMoveToResult(deltaTime);
 
+		// ボスを倒したが、まだ全てのステージの敵を倒していなければ
 		if (IsKilledStageBoss() && !_isDefeatedAllStageEnemy) {
 
 			SetFontSize(80);
@@ -577,7 +608,7 @@ namespace inl {
 
 			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
-				SoundManager::GetInstance().DestroyStageBGM(false);
+				SoundManager::GetInstance().DestroyStageBGM(false);  // BGM削除
 
 				ScenePlay* sp = new ScenePlay();
 				sp->MoveToNextStage(ScenePlay::GetStageID(), ScenePlay::GetGameDifficulty());
@@ -593,6 +624,7 @@ namespace inl {
 
 	bool EnemyManager::SeqMoveToResult(const float deltaTime) {
 
+		// ボスを倒し、ステージ３をクリアしたら
 		if (IsKilledStageBoss() && ScenePlay::GetStageID() == 3) {
 
 			_isDefeatedAllStageEnemy = true;
@@ -609,7 +641,7 @@ namespace inl {
 
 				SoundManager::GetInstance().DestroyStageBGM(false); // BGM削除
 
-				ScenePlay::DestroyThirdStageBulletHellLists();
+				ScenePlay::DestroyThirdStageBulletHellLists();      // 第３ステージボスの弾幕を削除
 
 				MoveToResult();
 
@@ -649,7 +681,8 @@ namespace inl {
 		// ザコ
 		for (const auto& enemy : _enemyZakoList) {
 
-			if (enemy) enemy->Render(_mainCamera_ref);
+			if (enemy) 
+				enemy->Render(_mainCamera_ref);
 		}
 
 		// ボス
@@ -658,7 +691,8 @@ namespace inl {
 			if (_isSummonBoss) {
 
 				for (const auto& boss : _enemyBossList) {
-					if (boss) boss->Render(_mainCamera_ref);
+					if (boss) 
+						boss->Render(_mainCamera_ref);
 				}
 			}
 		}
@@ -667,18 +701,22 @@ namespace inl {
 	// 更新------------------------------------------------------------------------------------------------------------------------------------------
 	void EnemyManager::UpdateEnemyBossList(const float deltaTime)
 	{
-		if (!_enemyZakoList.empty() || _enemyBossList.empty()) return;
+		if (!_enemyZakoList.empty() || _enemyBossList.empty()) 
+			return;
 
-		if (!_isSummonBoss) return;
+		if (!_isSummonBoss)
+			return;
 
 		for (auto it_boss = _enemyBossList.begin(); it_boss != _enemyBossList.end();) {
 
 			if ((*it_boss)->Update(deltaTime) == false) {
 
+				//　削除
 				it_boss = _enemyBossList.erase(it_boss);
 				_isSummonBoss = false;
 			}
 			else {
+				//　更新
 				it_boss++;
 			}
 		}
@@ -687,7 +725,8 @@ namespace inl {
 
 	void EnemyManager::UpdateEnemyZakoList(const float deltaTime)
 	{
-		if (_enemyZakoList.empty()) return;
+		if (_enemyZakoList.empty()) 
+			return;
 
 		for (auto it_zako = _enemyZakoList.begin(); it_zako != _enemyZakoList.end();) {
 
@@ -696,18 +735,19 @@ namespace inl {
 				// 関数内でItemManagerクラスに通知
 				SendEnemyPosition((*it_zako)->_mesh->pos_, (*it_zako)->_isDead);
 
+				//　削除
 				it_zako = _enemyZakoList.erase(it_zako);
 			}
 			else {
 
+				//　更新
 				it_zako++;
 			}
 		}
 	}
 
 
-	float EnemyManager::_showBossAppearanceText_timer;
-
+	float EnemyManager::_bossAppearanceTextTimer;
 
 	void EnemyManager::Update(const float deltaTime) {
 
@@ -720,15 +760,18 @@ namespace inl {
 			CheckDoSpawnEnemy();
 		}
 
+		//　イベントテキスト
+		UpdateEventHitText(deltaTime);
+
+		//　ボス出現テキスト
+		UpdateBossAppearanceTextTimer(deltaTime);
+
+		// ザコ・ボス当たり判定
 		EnemyZakoCollisionPairLists();
 		EnemyBossCollisionPairLists();
 
-		UpdateEventHitText(deltaTime);
-
-		UpdateBossAppearanceTextTimer(deltaTime);
-
+		// ザコ・ボス更新
 		UpdateEnemyZakoList(deltaTime);
-
 		UpdateEnemyBossList(deltaTime);
 	}
 }

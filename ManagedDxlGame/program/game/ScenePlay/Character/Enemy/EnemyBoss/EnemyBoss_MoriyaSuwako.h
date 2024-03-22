@@ -42,13 +42,13 @@ namespace inl {
 	private:
 
 		// プレイヤーへ攻撃
-		void AttackPlayer(const float& deltaTime) override;
+		void AttackPlayer(const float deltaTime) override;
 
 		// 弾幕名表示
 		void RenderBossSpellCardName() override;
 
 		// プレイヤーを見る、攻撃する、追いかける、距離を取るなどをまとめた動き
-		void DoRoutineMoves(const float& deltaTime) override;
+		void DoRoutineMoves(const float deltaTime) override;
 
 	public:
 

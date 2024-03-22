@@ -36,7 +36,7 @@ namespace {
 		std::string sound = cus->TryLoadSoundPath("sound/bgm/title.mp3", "SceneTitle::SceneTitle()");
 
 		SoundManager::GetInstance().LoadBGM(sound);
-		SoundManager::GetInstance().PlayBGM();
+		//SoundManager::GetInstance().PlayBGM();
 	}
 
 

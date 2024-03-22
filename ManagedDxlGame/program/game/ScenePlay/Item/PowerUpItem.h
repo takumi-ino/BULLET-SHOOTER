@@ -3,6 +3,8 @@
 
 namespace inl {
 
+	class CustomException;
+
 	// プレイヤー強化アイテム
 	class PowerUpItem : public ItemBase
 	{
@@ -24,11 +26,21 @@ namespace inl {
 
 		~PowerUpItem() override {}
 
+
+		// 初期化------------------------------------------------------------
+		void InitPowerUpItem(
+			const Shared<inl::CustomException>& cus,
+			const float meshSize,
+			const std::string texturePath,
+			const std::string funcName,
+			PowerUpItem::TYPE type
+		);
+
 		// 更新------------------------------------------------------------
 		bool Update(Shared<PowerUpItem>& item);
 
 	public:
 
-		PowerUpItem::TYPE type = PowerUpItem::TYPE::Default;
+		PowerUpItem::TYPE _type = PowerUpItem::TYPE::Default;
 	};
 }

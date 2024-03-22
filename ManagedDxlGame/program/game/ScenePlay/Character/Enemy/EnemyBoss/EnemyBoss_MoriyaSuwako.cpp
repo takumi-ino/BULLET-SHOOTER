@@ -12,7 +12,10 @@ namespace inl {
 
 
 	EnemyBoss_MoriyaSuwako::EnemyBoss_MoriyaSuwako(
-		const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
+		const EnemyBossInfo& info, 
+		const Shared<Player>& player, 
+		const Shared<dxe::Camera>& camera,
+		const Shared<Collision>& collision)
 		: EnemyBossBase(info, player, camera, collision) {
 
 		_collideSize = { 50,50,50 };
@@ -26,7 +29,8 @@ namespace inl {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
-		auto texture = cus->TryLoadTexture("graphics/bossTexture/Suwako.jpg", "inl::EnemyBoss_Suwako::SetMeshInfo()");
+		auto texture = 
+			cus->TryLoadTexture("graphics/bossTexture/Suwako.jpg", "inl::EnemyBoss_Suwako::SetMeshInfo()");
 
 		_mesh = dxe::Mesh::CreateCubeMV(100);
 		_mesh->setTexture(texture);
@@ -43,14 +47,14 @@ namespace inl {
 
 
 
-	void EnemyBoss_MoriyaSuwako::AttackPlayer(const float& delta_time) {
+	void EnemyBoss_MoriyaSuwako::AttackPlayer(const float deltaTime) {
 
 		if (!_bulletHell) return;
 
 		if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
 			EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = true;
-			_bulletHell->ShotBulletHell_Normal_Suwako(delta_time);
+			_bulletHell->ShotBulletHell_Normal_Suwako(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_normal_suwako);
 		}
@@ -60,7 +64,7 @@ namespace inl {
 
 		if (3 == EnemyBossBase::_bossHp.size()) {
 			EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = true;
-			_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(delta_time);
+			_bulletHell->ShotBulletHell_IronRingOfMoriya_Suwako(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_ironRingOfMoriya_suwako);
 		}
@@ -70,7 +74,7 @@ namespace inl {
 
 		if (1 == EnemyBossBase::_bossHp.size()) {
 			EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = true;
-			_bulletHell->ShotBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako(delta_time);
+			_bulletHell->ShotBulletHell_KeroChanStandsFirmAgainstTheStorm_Suwako(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_keroChanStandsFirmAgainstTheStorm_suwako);
 		}
@@ -80,13 +84,15 @@ namespace inl {
 	}
 
 
-	void EnemyBoss_MoriyaSuwako::DoRoutineMoves(const float& delta_time) {
+	void EnemyBoss_MoriyaSuwako::DoRoutineMoves(const float deltaTime) {
 
 		LookAtPlayer();
 
-		ActKeepDistanceToPlayer(delta_time);
+		ActKeepDistanceToPlayer(deltaTime);
 
-		AttackPlayer(delta_time);
+		WarpToRandomPos(deltaTime);
+
+		AttackPlayer(deltaTime);
 	}
 
 
@@ -124,11 +130,11 @@ namespace inl {
 	}
 
 
-	bool EnemyBoss_MoriyaSuwako::Update(const float delta_time) {
+	bool EnemyBoss_MoriyaSuwako::Update(const float deltaTime) {
 
 		if (_isDead) return false;
 
-		DoRoutineMoves(delta_time);
+		DoRoutineMoves(deltaTime);
 		return true;
 	}
 }

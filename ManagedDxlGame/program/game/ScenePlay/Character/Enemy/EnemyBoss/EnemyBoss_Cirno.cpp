@@ -12,7 +12,10 @@ namespace inl {
 
 
 	EnemyBoss_Cirno::EnemyBoss_Cirno(
-		const EnemyBossInfo& info, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
+		const EnemyBossInfo& info, 
+		const Shared<Player>& player, 
+		const Shared<dxe::Camera>& camera, 
+		const Shared<Collision>& collision)
 		: EnemyBossBase(info, player, camera, collision) {
 
 		_collideSize = { 50,50,50 };
@@ -26,7 +29,8 @@ namespace inl {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
-		auto texture = cus->TryLoadTexture("graphics/bossTexture/Cirno.png", "inl::EnemyBoss_Cirno::SetMeshInfo()");
+		auto texture = 
+			cus->TryLoadTexture("graphics/bossTexture/Cirno.png", "inl::EnemyBoss_Cirno::SetMeshInfo()");
 
 		_mesh = dxe::Mesh::CreateCubeMV(100);
 		_mesh->setTexture(texture);
@@ -42,14 +46,14 @@ namespace inl {
 	}
 
 
-	void EnemyBoss_Cirno::AttackPlayer(const float& delta_time) {
+	void EnemyBoss_Cirno::AttackPlayer(const float deltaTime) {
 
 		if (!_bulletHell) return;
 
 		if (4 == EnemyBossBase::_bossHp.size() || 2 == EnemyBossBase::_bossHp.size()) {
 
 			_isUsingBullet_normal_cirno = true;
-			_bulletHell->ShotBulletHell_Normal_Cirno(delta_time);
+			_bulletHell->ShotBulletHell_Normal_Cirno(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_normal_cirno);
 		}
@@ -59,7 +63,7 @@ namespace inl {
 
 		if (3 == EnemyBossBase::_bossHp.size()) {
 			_isUsingBullet_icicleFall_cirno = true;
-			_bulletHell->ShotBulletHell_IcicleFall_Cirno(delta_time);
+			_bulletHell->ShotBulletHell_IcicleFall_Cirno(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_icicleFall_cirno);
 		}
@@ -69,7 +73,7 @@ namespace inl {
 
 		if (1 == EnemyBossBase::_bossHp.size()) {
 			_isUsingBullet_perfectFreeze_cirno = true;
-			_bulletHell->ShotBulletHell_PerfectFreeze_Cirno(delta_time);
+			_bulletHell->ShotBulletHell_PerfectFreeze_Cirno(deltaTime);
 
 			CheckCollision_BulletHellBulletsAndPlayer_DRY(_bullet_perfectFreeze_cirno);
 		}
@@ -80,13 +84,15 @@ namespace inl {
 
 
 
-	void EnemyBoss_Cirno::DoRoutineMoves(const float& delta_time) {
+	void EnemyBoss_Cirno::DoRoutineMoves(const float deltaTime) {
 
 		LookAtPlayer();
 
-		ActKeepDistanceToPlayer(delta_time);
+		ActKeepDistanceToPlayer(deltaTime);
 
-		AttackPlayer(delta_time);
+		WarpToRandomPos(deltaTime);
+
+		AttackPlayer(deltaTime);
 	}
 
 
@@ -124,11 +130,11 @@ namespace inl {
 	}
 
 
-	bool EnemyBoss_Cirno::Update(const float delta_time) {
+	bool EnemyBoss_Cirno::Update(const float deltaTime) {
 
 		if (_isDead) return false;
 
-		DoRoutineMoves(delta_time);
+		DoRoutineMoves(deltaTime);
 		return true;
 	}
 }

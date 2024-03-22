@@ -1,5 +1,4 @@
 #include "EnemyBossBase.h"
-#include <random>
 #include "../Player/Player.h"
 #include "../../../Loader/CsvLoader.h"
 #include "../../../Manager/Score/ScoreManager.h"
@@ -41,10 +40,10 @@ namespace inl {
 
 	// ボスエネミーデータ読み取り
 	EnemyBossBase::EnemyBossBase(
-		const EnemyBossInfo& data, 
-		const Shared<Player>& player, 
-		const Shared<dxe::Camera>& camera, 
-		const Shared<Collision>& collision) 
+		const EnemyBossInfo& data,
+		const Shared<Player>& player,
+		const Shared<dxe::Camera>& camera,
+		const Shared<Collision>& collision)
 	{
 
 		_bossHp.clear(); //　ボスHPをリセット
@@ -59,22 +58,20 @@ namespace inl {
 			_remainingLife_indicator.push(_bossHp);
 		}
 
-		_id = data._id;
-		_name = data._name;
-
-		_MAX_HP = data._hp;
-		_scale = data._scale;
-		_enemyMoveSpeed = data._enemyMoveSpeed;
-
-		_maxBulletSpawnCount = data._maxBulletSpawnCount;
-
-		_player_ref = player;
-		_enemyCamera = camera;
-		_collision_ref = collision;
+		_id = data._id;                                    // ID
+		_name = data._name;								   // 名前
+		_MAX_HP = data._hp;								   // 最大HP
+		_scale = data._scale;							   // サイズ
+		_enemyMoveSpeed = data._enemyMoveSpeed;			   // 移動スピード
+		_maxBulletSpawnCount = data._maxBulletSpawnCount;  // 弾の最大生成数
+														   
+		_player_ref = player;                              //　プレイヤー
+		_enemyCamera = camera;							   //　カメラ
+		_collision_ref = collision;						   //　当たり判定
 	}
 
 
-	void EnemyBossBase::ActKeepDistanceToPlayer(const float& delta_time) {
+	void EnemyBossBase::ActKeepDistanceToPlayer(const float deltaTime) {
 
 		// 敵とプレイヤーの距離
 		float distance_from_player = GetDistanceToPlayer();
@@ -83,11 +80,14 @@ namespace inl {
 
 		tnl::Vector3 moveDirection;
 
-		if (distance_from_player < _DISTANCE_THRESHOLD) { //　プレイヤーに近づく
+		//　基準距離よりも近い
+		if (distance_from_player < _DISTANCE_THRESHOLD) {
 
-			moveDirection.x = differenceVector.x * -1;
-			moveDirection.z = differenceVector.z * -1;
+			//　プレイヤーから離れる
+			moveDirection.x = differenceVector.x * -1.f;
+			moveDirection.z = differenceVector.z * -1.f;
 		}
+		//　基準距離よりも離れてる
 		else if (distance_from_player > _DISTANCE_THRESHOLD) {
 
 			moveDirection.x = differenceVector.x;
@@ -97,7 +97,21 @@ namespace inl {
 			moveDirection = tnl::Vector3::Cross(differenceVector, tnl::Vector3::up);
 		}
 
-		_warpToRandPosTimer += delta_time;
+		ClampMovableRange(moveDirection);
+
+		// Y座標はプレイヤーに合わせるように動く
+		float diffY = _player_ref->GetPos().y - _mesh->pos_.y;
+		moveDirection.y = diffY;
+
+		moveDirection.normalize();
+		_mesh->pos_ += moveDirection * _enemyMoveSpeed * deltaTime;
+	}
+
+
+
+	void EnemyBossBase::WarpToRandomPos(const float deltaTime)
+	{
+		_warpToRandPosTimer += deltaTime;
 
 		//　一定間隔でランダムな地点にワープ
 		if (_warpToRandPosTimer > _WARPING_DURATION) {
@@ -106,10 +120,13 @@ namespace inl {
 
 			_mesh->pos_ += (targetPos - _mesh->pos_);
 
-			_warpToRandPosTimer = 0;
+			_warpToRandPosTimer = 0.f;
 		}
+	}
 
 
+	void EnemyBossBase::ClampMovableRange(tnl::Vector3& moveDirection)
+	{
 		float distance_from_origin = (tnl::Vector3{ 0,0,0 } - _mesh->pos_).length();
 
 		// 原点から離れすぎてしまったらフィールド内に戻るようにする
@@ -120,14 +137,6 @@ namespace inl {
 
 			moveDirection = direction;
 		}
-
-
-		float diff_y = _player_ref->_mesh->pos_.y - _mesh->pos_.y;
-
-		moveDirection.y = diff_y;
-
-		moveDirection.normalize();
-		_mesh->pos_ += moveDirection * _enemyMoveSpeed * delta_time;
 	}
 
 
@@ -137,10 +146,11 @@ namespace inl {
 
 			if (_collision_ref->CheckCollision_BulletHellBulletsAndPlayer(blt, _player_ref)) {
 
+				// 敵の攻撃力からプレイヤーの防御力を引いた分 HPを削る
 				if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
 
-					_player_ref->SetIsInvincible(true);
-					_player_ref->PlayDamageHitSE();
+					_player_ref->SetIsInvincible(true);  // 無敵時間
+					_player_ref->PlayDamageHitSE();      // ダメージ音
 				}
 			}
 
@@ -171,40 +181,43 @@ namespace inl {
 
 	bool EnemyBossBase::ShowHpGage_EnemyBoss() {
 
-		if (!_bossHp.empty()) {
-
-			float BOSS_HP_GAGE_X2 = 860.0f;
-
-			float gage_width = abs(BOSS_HP_GAGE_X2 - _BOSS_HP_GAGE_X1);
-
-			float average = (_MAX_HP > 0) ? gage_width / _MAX_HP : 0;
-
-			BOSS_HP_GAGE_X2 = _BOSS_HP_GAGE_X1 + static_cast<int>(average * _bossHp.front());
-
-			DrawBoxAA(
-				_BOSS_HP_GAGE_X1,
-				_BOSS_HP_GAGE_Y1,
-				860,
-				_BOSS_HP_GAGE_Y2,
-				GetColor(255, 255, 255),
-				true
-			);
-
-			DrawBoxAA(
-				_BOSS_HP_GAGE_X1,
-				_BOSS_HP_GAGE_Y1,
-				BOSS_HP_GAGE_X2,
-				_BOSS_HP_GAGE_Y2,
-				GetColor(255, 0, 0),
-				true
-			);
-
-			RenderBossName();
-			RenderBossRemainLife();
-
-			return true;
+		if (_bossHp.empty()) {
+			return false;
 		}
-		return false;
+
+		float BOSS_HP_GAGE_X2 = 860.0f;
+
+		//　HPゲージの幅
+		float gageWidth = abs(BOSS_HP_GAGE_X2 - _BOSS_HP_GAGE_X1);  //　この値は変わらない
+
+		//　HPゲージの1ポイントあたりの幅
+		float average = (_MAX_HP > 0) ? gageWidth / _MAX_HP : 0;    //  この値は変わらない
+
+		//　平均と現在HPを掛けた値を Ｘ１に足す
+		BOSS_HP_GAGE_X2 = _BOSS_HP_GAGE_X1 + static_cast<int>(average * _bossHp.front());
+
+		DrawBoxAA(
+			_BOSS_HP_GAGE_X1,
+			_BOSS_HP_GAGE_Y1,
+			860,
+			_BOSS_HP_GAGE_Y2,
+			GetColor(255, 255, 255),
+			true
+		);
+
+		DrawBoxAA(
+			_BOSS_HP_GAGE_X1,
+			_BOSS_HP_GAGE_Y1,
+			BOSS_HP_GAGE_X2,
+			_BOSS_HP_GAGE_Y2,
+			GetColor(255, 0, 0),
+			true
+		);
+
+		RenderBossName();       // 名前
+		RenderBossRemainLife(); //　ＨＰコア
+
+		return true;
 	}
 
 

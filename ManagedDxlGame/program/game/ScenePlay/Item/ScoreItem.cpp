@@ -9,43 +9,26 @@ namespace inl {
 	ScoreItem::ScoreItem(const ScoreItem::TYPE itemType) {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
+		const std::string functionName = "inl::ScoreItem::ScoreItem()";
 
 		switch (itemType)
 		{
 		case ScoreItem::TYPE::Small:
 		{
-			float size_small = 10;
-			_mesh = dxe::Mesh::CreateSphereMV(size_small);
-
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/prism.jpg", "inl::ScoreItem::ScoreItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_small * 2.0f,size_small * 2.0f,size_small * 2.0f };
-			_sizeName = "small";
+			std::string texturePath = "graphics/itemTexture/prism.jpg";
+			InitScoreItem(cus, 10.f, texturePath, functionName, "small");
 			break;
 		}
 		case ScoreItem::TYPE::Medium:
 		{
-			float size_medium = 15;
-			_mesh = dxe::Mesh::CreateSphereMV(size_medium);
-
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/sapphire.jpg", "inl::ScoreItem::ScoreItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_medium * 2.0f,size_medium * 2.0f,size_medium * 2.0f };
-			_sizeName = "medium";
+			std::string texturePath = "graphics/itemTexture/sapphire.jpg";
+			InitScoreItem(cus, 15.f, texturePath, functionName, "medium");
 			break;
 		}
 		case ScoreItem::TYPE::Large:
 		{
-			float size_large = 20;
-			_mesh = dxe::Mesh::CreateSphereMV(size_large);
-
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/gold.jpg", "inl::ScoreItem::ScoreItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_large * 2.0f,size_large * 2.0f,size_large * 2.0f };
-			_sizeName = "large";
+			std::string texturePath = "graphics/itemTexture/gold.jpg";
+			InitScoreItem(cus, 20.f, texturePath, functionName, "large");
 			break;
 		}
 		}
@@ -54,17 +37,44 @@ namespace inl {
 	}
 
 
+	void ScoreItem::InitScoreItem(
+		const Shared<inl::CustomException>& cus,
+		const float meshSize, 
+		const std::string texturePath,
+		const std::string funcName,
+		const std::string size) 
+	{
+	
+		//　メッシュ生成
+		_mesh = dxe::Mesh::CreateSphereMV(meshSize);
+
+		//　テクスチャ取得
+		auto textureHandle = cus->TryLoadTexture(texturePath, funcName);
+		_mesh->setTexture(textureHandle);
+
+		//　当たり判定サイズ
+		_collisionSize = { meshSize * 2.0f,meshSize * 2.0f,meshSize * 2.0f };
+
+		//　名前
+		_sizeName = size;
+	}
+
+
 	bool ScoreItem::Update(Shared<ScoreItem>& item) {
 
 		if (item->_isActive) {
+			
+			// ライフタイマー計測
 			item->_lifeTimer += ScenePlay::GetDeltaTime();
 
+			//　重力を適用
 			_velocity += _gravity * ScenePlay::GetDeltaTime() * 2.0f;
 			item->_mesh->pos_ += _velocity * ScenePlay::GetDeltaTime();
-
-
+			
+			//　リセット
 			if (item->_lifeTimer > _lifeTime) {
-				item->_lifeTimer = 0;
+
+				item->_lifeTimer = 0.f;
 				item->_isActive = false;
 				return false;
 			}

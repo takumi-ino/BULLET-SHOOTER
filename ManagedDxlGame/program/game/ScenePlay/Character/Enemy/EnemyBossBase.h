@@ -47,7 +47,11 @@ namespace inl {
 		void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
 
 		// ACT------------------------------------------------------------
-		void ActKeepDistanceToPlayer(const float& deltaTime);
+		void ActKeepDistanceToPlayer(const float deltaTime);
+
+		void WarpToRandomPos(const float deltaTime);
+
+		void ClampMovableRange(tnl::Vector3& moveDirection);
 
 	public:
 

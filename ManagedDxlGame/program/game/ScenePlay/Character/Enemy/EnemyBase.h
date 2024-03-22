@@ -24,11 +24,11 @@ namespace inl {
 	protected:
 
 		// 待機、追跡、攻撃などのパターンを管理し実行
-		virtual void DoRoutineMoves(const float& deltaTime) {}
+		virtual void DoRoutineMoves(const float deltaTime) {}
 
 		virtual void ChasePlayer(const float deltaTime) {}
 
-		virtual void AttackPlayer(const float& deltaTime) {}
+		virtual void AttackPlayer(const float deltaTime) {}
 
 		void LookAtPlayer();
 
@@ -52,8 +52,8 @@ namespace inl {
 
 	private:
 
-		const float _RANDOM_SPAWN_RANGE_RANGE_X = 800.0f;
-		const float _RANDOM_SPAWN_RANGE_RANGE_Y = 100.0f;
-		const float _RANDOM_SPAWN_RANGE_RANGE_Z = 500.0f;
+		const float _RANDOM_SPAWN_RANGE_X = 800.0f;
+		const float _RANDOM_SPAWN_RANGE_Y = 100.0f;
+		const float _RANDOM_SPAWN_RANGE_Z = 500.0f;
 	};
 }

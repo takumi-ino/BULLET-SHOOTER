@@ -86,14 +86,15 @@ namespace inl {
 		//// <param name="enemyBullet"></param>
 		void InitAssist_MetalFatigue_Patchouli(
 			const int splitOneIntoEight_wave,
-			int id, Shared<EnemyBullet>& splitOneIntoEight_bullet,
+			int id,
+			Shared<EnemyBullet>& splitOneIntoEight_bullet,
 			std::vector<Shared<EnemyBullet>>& enemyBullet,
 			const EnemyBullet::SPECIFICTYPE wave
 		);
 
 		//// <summary>
 		//  ※ (パチュリー専用)　「サイレント・セレナ」
-		// 円形連続発射と、ランダムにゆっくり近づいてくる弾を組み合わせた弾幕
+		// 　円周上放射と、ランダムにゆっくり近づいてくる弾を組み合わせた弾幕
 		//// </summary>
 		std::vector<Shared<EnemyBullet>> CreateBulletHell_SilentSerena_Patchouli();
 

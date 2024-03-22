@@ -102,7 +102,7 @@ namespace inl {
 		static Shared<dxe::Particle> _explode_particle;
 
 		// ランダムに決定した調査地点に辿り着いたか---------------------------------------------
-		bool                         _isReached_toInvestigatePos{ false };
+		bool                         _isReachedToInvestigatePos{ false };
 
 		// プレイヤーに気付いた状態 ------------------------------------------------------------
 		static bool                  _isNoticedPlayer;
@@ -152,9 +152,6 @@ namespace inl {
 
 		// Enum変数----------------------------------------
 		BEHAVE _behave = EnemyZakoBase::BEHAVE::Moving;  //敵の挙動管理
-
-		// ランダムデバイス--------------------------------
-		std::random_device mt;
 
 		// リロード時間を追跡------------------------------
 		float       _reloadStraightBullet_timeCounter{};

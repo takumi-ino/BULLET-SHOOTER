@@ -144,7 +144,7 @@ namespace inl {
 		std::vector<tnl::Vector3>  _enemyPosList{};
 
 		//　ボス---------------------------------------------------------------------------------------------------
-		static float   _showBossAppearanceText_timer;       // ボス出現警告テキストのタイマー
+		static float   _bossAppearanceTextTimer;            // ボス出現警告テキストのタイマー
 		bool           _isShowBossAppearanceText{};         // ボス出現警告テキストのフラグ
 
 		bool           _isSummonBoss{ false };              // ボス生成フラグ

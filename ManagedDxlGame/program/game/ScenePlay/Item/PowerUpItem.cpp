@@ -9,67 +9,62 @@ namespace inl {
 	PowerUpItem::PowerUpItem(const PowerUpItem::TYPE itemType) {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
+		const std::string functionName = "inl::PowerUpItem::PowerUpItem()";
+
+		float meshSize = 0.f;
 
 		switch (itemType)
 		{
+		//　回復
 		case PowerUpItem::TYPE::Heal:
 		{
-			float size_small = 10;
-			_mesh = dxe::Mesh::CreateTorusMV(size_small, 1);
+			meshSize = 10.f;
+			
+			//　生成
+			_mesh = dxe::Mesh::CreateTorusMV(meshSize, 1.f);
 
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/prism.jpg", "inl::PowerUpItem::PowerUpItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_small * 2.0f,size_small * 2.0f,size_small * 2.0f };
-			type = PowerUpItem::TYPE::Heal;
+			std::string texturePath = "graphics/itemTexture/prism.jpg";
+			InitPowerUpItem(cus, 15.f, texturePath, functionName, PowerUpItem::TYPE::Heal);
 			break;
 		}
+		//　攻撃
 		case PowerUpItem::TYPE::Attack:
 		{
-			float size_medium = 15;
-			_mesh = dxe::Mesh::CreateBarrelMV(size_medium, 5, 3);
+			meshSize = 10.f;
+			_mesh = dxe::Mesh::CreateBarrelMV(meshSize, 5.f, 3.f);
 
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/sapphire.jpg", "inl::PowerUpItem::PowerUpItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_medium * 2.0f,size_medium * 2.0f,size_medium * 2.0f };
-			type = PowerUpItem::TYPE::Attack;
+			std::string texturePath = "graphics/itemTexture/sapphire.jpg";
+			InitPowerUpItem(cus, 15.f, texturePath, functionName, PowerUpItem::TYPE::Attack);
 			break;
 		}
+		//　防御
 		case PowerUpItem::TYPE::Defense:
 		{
-			float size_large = 20;
-			_mesh = dxe::Mesh::CreateConeMV(size_large, 10);
+			meshSize = 15.f;
+			_mesh = dxe::Mesh::CreateConeMV(meshSize, 10.f);
 
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/gold.jpg", "inl::PowerUpItem::PowerUpItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_large * 2.0f,size_large * 2.0f,size_large * 2.0f };
-			type = PowerUpItem::TYPE::Defense;
+			std::string texturePath = "graphics/itemTexture/gold.jpg";
+			InitPowerUpItem(cus, 15.f, texturePath, functionName, PowerUpItem::TYPE::Defense);
 			break;
 		}
+		//　スピード
 		case PowerUpItem::TYPE::Speed:
 		{
-			float size_large = 20;
-			_mesh = dxe::Mesh::CreateCubeMV(size_large);
+			meshSize = 15.f;
+			_mesh = dxe::Mesh::CreateCubeMV(meshSize);
 
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/gold.jpg", "inl::PowerUpItem::PowerUpItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_large * 2.0f,size_large * 2.0f,size_large * 2.0f };
-			type = PowerUpItem::TYPE::Speed;
+			std::string texturePath = "graphics/itemTexture/gold.jpg";
+			InitPowerUpItem(cus, 15.f, texturePath, functionName, PowerUpItem::TYPE::Speed);
 			break;
 		}
+		//　ボム
 		case PowerUpItem::TYPE::Bomb:
 		{
-			float size_large = 20;
-			_mesh = dxe::Mesh::CreateDiskMV(size_large);
+			meshSize = 15.f;
+			_mesh = dxe::Mesh::CreateDiskMV(meshSize);
 
-			auto textureHandle = cus->TryLoadTexture("graphics/itemTexture/gold.jpg", "inl::PowerUpItem::PowerUpItem()");
-			_mesh->setTexture(textureHandle);
-
-			_collisionSize = { size_large * 2.0f,size_large * 2.0f,size_large * 2.0f };
-			type = PowerUpItem::TYPE::Bomb;
+			std::string texturePath = "graphics/itemTexture/gold.jpg";
+			InitPowerUpItem(cus, 15.f, texturePath, functionName, PowerUpItem::TYPE::Bomb);
 			break;
 		}
 		}
@@ -78,17 +73,40 @@ namespace inl {
 	}
 
 
+	void PowerUpItem::InitPowerUpItem(
+		const Shared<inl::CustomException>& cus,
+		const float meshSize,
+		const std::string texturePath,
+		const std::string funcName,
+		PowerUpItem::TYPE type)
+	{
+		// テクスチャ取得
+		auto textureHandle = cus->TryLoadTexture(texturePath, funcName);
+		_mesh->setTexture(textureHandle);
+
+		//　当たり判定サイズ
+		_collisionSize = { meshSize * 2.0f,meshSize * 2.0f,meshSize * 2.0f };
+
+		//　アイテムタイプ
+		_type = type;
+	}
+
+
 	bool PowerUpItem::Update(Shared<PowerUpItem>& item) {
 
 		if (item->_isActive) {
+
+			// ライフタイマー計測
 			item->_lifeTimer += ScenePlay::GetDeltaTime();
 
+			//　重力を適用
 			_velocity += _gravity * ScenePlay::GetDeltaTime() * 2.0f;
 			item->_mesh->pos_ += _velocity * ScenePlay::GetDeltaTime();
 
-
+			//　リセット
 			if (item->_lifeTimer > _lifeTime) {
-				item->_lifeTimer = 0;
+
+				item->_lifeTimer = 0.f;
 				item->_isActive = false;
 				return false;
 			}

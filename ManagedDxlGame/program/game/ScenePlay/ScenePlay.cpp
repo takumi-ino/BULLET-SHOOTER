@@ -549,16 +549,16 @@ void ScenePlay::RenderEnemyRadarOnMiniMap() {
 
 		tnl::Vector3 screenPos = tnl::Vector3::ConvertToScreen(
 			{ (*enemyPos).x, (*enemyPos).y, (*enemyPos).z },
-			(float)_miniMap_centerPos.x,
-			(float)_miniMap_centerPos.y,
+			static_cast<float>(_miniMap_centerPos.x),
+			static_cast<float>(_miniMap_centerPos.y),
 			_mainCamera->view_,
 			_mainCamera->proj_
 		);
 
 		// 敵位置を緑の円で描画
 		DrawCircleAA(
-			(float)std::clamp((int)screenPos.x, _miniMap_centerPos.x, _miniMapRadar_clampX),
-			(float)std::clamp((int)screenPos.y, _miniMap_centerPos.y, _miniMapRadar_clampY),
+			static_cast<float>(std::clamp((int)screenPos.x, _miniMap_centerPos.x, _miniMapRadar_clampX)),
+			static_cast<float>(std::clamp((int)screenPos.y, _miniMap_centerPos.y, _miniMapRadar_clampY)),
 			2,
 			_miniMapRadar_edgeNum,
 			_radarColor
@@ -723,6 +723,9 @@ void ScenePlay::Update(const float deltaTime) {
 		UpdateThirdStageBulletHellLists();
 	}
 
+	// ゲーム開始時の「 Begin 」テキスト
 	UpdateShowBeginTextTimer(deltaTime);
+
+	//　プレイヤーの弾の威力最大値でキャップ
 	inl::PlayerBullet::ClampBulletPowerRate();
 }

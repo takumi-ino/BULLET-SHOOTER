@@ -1,4 +1,3 @@
-#include <random>
 #include "../../ScenePlay/Item/PowerUpItem.h"
 #include "../../Manager/Enemy/EnemyManager.h"
 #include "ItemManager.h"
@@ -6,6 +5,7 @@
 #include "../../ScenePlay/Collision/Collision.h"
 #include "../../ScenePlay/Character/Player/Player.h"
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
+#include "../../ScenePlay/RandomValue/RandomValueGenerator.h"
 
 
 // 得点アイテム--------------------------------------------------------------------------------------------------------------------------
@@ -13,16 +13,16 @@ std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_small;
 std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_medium;
 std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_large;
 
-void ItemManager::CreateScoreItemPool(const std::string difficulty, const int stage_id) {
+void ItemManager::CreateScoreItemPool(const std::string difficulty, const int stageId) {
 
 	struct ItemSize {
 		int s, m, l;
 	};
 
 	// Easyを基準とした各得点アイテムの総数
-	int small_cnt = 10;
-	int medium_cnt = 5;
-	int large_cnt = 1;
+	int smallCount = 10;
+	int mediumCount = 5;
+	int largeCount = 1;
 
 	std::map<std::string, std::vector<ItemSize>> itemCountSetting
 	{
@@ -30,81 +30,104 @@ void ItemManager::CreateScoreItemPool(const std::string difficulty, const int st
 
 		// 難易度　Easy
 		{"Easy",
-		{{small_cnt,    medium_cnt,     large_cnt},        //stage1 
-		{small_cnt,     medium_cnt,     large_cnt},        //stage2 
-		{small_cnt,     medium_cnt,     large_cnt},}},     //stage3
+		{{smallCount,    mediumCount,     largeCount},        //stage1 
+		{smallCount,     mediumCount,     largeCount},        //stage2 
+		{smallCount,     mediumCount,     largeCount},}},     //stage3
 		// 難易度　Normal
 		{"Normal",
-		{{small_cnt - 2,medium_cnt - 1, large_cnt * 2},    //stage1
-		{small_cnt - 2, medium_cnt,     large_cnt * 2},    //stage2
-		{small_cnt - 2, medium_cnt,     large_cnt * 2}}},  //stage3
+		{{smallCount - 2,mediumCount - 1, largeCount * 2},    //stage1
+		{smallCount - 2, mediumCount,     largeCount * 2},    //stage2
+		{smallCount - 2, mediumCount,     largeCount * 2}}},  //stage3
 		// 難易度　Hard
 		{"Hard",
-		{{small_cnt - 4,medium_cnt - 2, large_cnt * 3},    //stage1
-		{small_cnt - 4, medium_cnt - 2, large_cnt * 3},	   //stage2
-		{small_cnt - 4, medium_cnt - 2, large_cnt * 3}}},  //stage3
+		{{smallCount - 4,mediumCount - 2, largeCount * 3},    //stage1
+		{smallCount - 4, mediumCount - 2, largeCount * 3},	   //stage2
+		{smallCount - 4, mediumCount - 2, largeCount * 3}}},  //stage3
 		// 難易度　Lunatic
 		{"Lunatic",
-		{{small_cnt - 6,medium_cnt - 3, large_cnt * 4},    //stage1
-		{small_cnt - 6, medium_cnt - 3, large_cnt * 4},	   //stage2
-		{small_cnt - 6, medium_cnt - 3, large_cnt * 4}}}   //stage3
+		{{smallCount - 6,mediumCount - 3, largeCount * 4},    //stage1
+		{smallCount - 6, mediumCount - 3, largeCount * 4},	   //stage2
+		{smallCount - 6, mediumCount - 3, largeCount * 4}}}   //stage3
 	};
 
-	if (itemCountSetting.count(difficulty) > 0 && stage_id >= 1 && stage_id <= 3) {
+	// コンストラクタで受け取った難易度と一致するものがない場合
+	if (itemCountSetting.count(difficulty) <= 0) return;
 
-		ItemSize& size = itemCountSetting[difficulty][stage_id - 1];
+	//　1より小さい、もしくは３より大きい場合
+	if (stageId < 1 || stageId > 3) return;
 
-		for (int i = 0; i < size.s; i++) {
-			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Small);
-			_scoreItem_small.push_back(item);
-		}
 
-		for (int i = 0; i < size.m; i++) {
-			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Medium);
-			_scoreItem_medium.push_back(item);
-		}
+	ItemSize& size = itemCountSetting[difficulty][stageId - 1];
 
-		for (int i = 0; i < size.l; i++) {
-			Shared<inl::ScoreItem> item = std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Large);
-			_scoreItem_large.push_back(item);
-		}
+	// 小アイテム
+	for (int i = 0; i < size.s; i++) {
+
+		Shared<inl::ScoreItem> item =
+			std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Small);
+
+		_scoreItem_small.push_back(item);
+	}
+
+	// 中アイテム
+	for (int i = 0; i < size.m; i++) {
+
+		Shared<inl::ScoreItem> item =
+			std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Medium);
+
+		_scoreItem_medium.push_back(item);
+	}
+
+	// 大アイテム
+	for (int i = 0; i < size.l; i++) {
+
+		Shared<inl::ScoreItem> item =
+			std::make_shared<inl::ScoreItem>(inl::ScoreItem::TYPE::Large);
+
+		_scoreItem_large.push_back(item);
 	}
 }
 
 
 
-void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems, const inl::ScoreItem::TYPE type) {
+void ItemManager::EventHit_ScoreItemAndPlayer_DRY(
+	std::vector<Shared<inl::ScoreItem>>& scoreItems,
+	const inl::ScoreItem::TYPE type)
+{
+	for (decltype(auto)it : scoreItems) {
 
-	for (auto it : scoreItems) {
+		// メッシュがないまたは非アクティブ状態なら
+		if (!it->_mesh || !it->_isActive)
+			return;
 
-		if (it->_mesh != nullptr && it->_isActive) {
+		//　当たり判定
+		if (_collision_ref->CheckCollision_PlayerAndScoreItem(it, _player_ref)) {
 
-			if (_collision_ref->CheckCollision_PlayerAndScoreItem(it, _player_ref)) {
-
-				switch (type)
-				{
-				case inl::ScoreItem::TYPE::Small:
-				{
-					EventNotify_OnCaughtItem("得点アイテム小", "500ポイント加算。");
-					ScoreManager::GetInstance().AddScoreItemScore(500);
-					break;
-				}
-				case inl::ScoreItem::TYPE::Medium:
-				{
-					EventNotify_OnCaughtItem("得点アイテム中", "1000ポイント加算。");
-					ScoreManager::GetInstance().AddScoreItemScore(100);
-					break;
-				}
-				case inl::ScoreItem::TYPE::Large:
-				{
-					EventNotify_OnCaughtItem("得点アイテム大", "1500ポイント加算。");
-					ScoreManager::GetInstance().AddScoreItemScore(1500);
-					break;
-				}
-				}
-
-				it->_isActive = false;
+			switch (type)
+			{
+				//　得点アイテム小
+			case inl::ScoreItem::TYPE::Small:
+			{
+				EventNotify_OnCaughtItem("得点アイテム小", "500ポイント加算。");
+				ScoreManager::GetInstance().AddScoreItemScore(500);
+				break;
 			}
+			//　得点アイテム中
+			case inl::ScoreItem::TYPE::Medium:
+			{
+				EventNotify_OnCaughtItem("得点アイテム中", "1000ポイント加算。");
+				ScoreManager::GetInstance().AddScoreItemScore(100);
+				break;
+			}
+			//　得点アイテム大
+			case inl::ScoreItem::TYPE::Large:
+			{
+				EventNotify_OnCaughtItem("得点アイテム大", "1500ポイント加算。");
+				ScoreManager::GetInstance().AddScoreItemScore(1500);
+				break;
+			}
+			}
+
+			it->_isActive = false;
 		}
 	}
 }
@@ -112,22 +135,35 @@ void ItemManager::EventHit_ScoreItemAndPlayer_DRY(std::vector<Shared<inl::ScoreI
 
 void ItemManager::EventHit_ScoreItemAndPlayer()
 {
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_small, inl::ScoreItem::TYPE::Small);
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_medium, inl::ScoreItem::TYPE::Medium);
-	EventHit_ScoreItemAndPlayer_DRY(_scoreItem_large, inl::ScoreItem::TYPE::Large);
+	//　得点アイテム小
+	EventHit_ScoreItemAndPlayer_DRY
+	(_scoreItem_small, inl::ScoreItem::TYPE::Small);
+
+	//　得点アイテム中
+	EventHit_ScoreItemAndPlayer_DRY(
+		_scoreItem_medium, inl::ScoreItem::TYPE::Medium);
+
+	//　得点アイテム大
+	EventHit_ScoreItemAndPlayer_DRY(
+		_scoreItem_large, inl::ScoreItem::TYPE::Large);
 }
 
 
 void ItemManager::UpdateScoreItem_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems) {
 
-	if (!scoreItems.empty()) {
+	if (scoreItems.empty())
+		return;
 
-		for (auto it_scrItm = scoreItems.begin(); it_scrItm != scoreItems.end();) {
+	for (auto it_scrItm = scoreItems.begin(); it_scrItm != scoreItems.end();) {
 
-			if ((*it_scrItm)->Update((*it_scrItm)) == false)
-				it_scrItm = scoreItems.erase(it_scrItm);
-			else
-				it_scrItm++;
+		if (!(*it_scrItm)->Update((*it_scrItm))) {
+
+			// 非アクティブ化
+			it_scrItm = scoreItems.erase(it_scrItm);
+		}
+		else {
+			//　更新
+			it_scrItm++;
 		}
 	}
 }
@@ -147,7 +183,7 @@ std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_speed;
 std::vector<Shared<inl::PowerUpItem>> ItemManager::_powerUpItem_bomb;
 
 
-void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int stage_id) {
+void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int stageId) {
 
 	struct ItemType {
 		int heal, attack, defense, speed, bomb;
@@ -182,91 +218,130 @@ void ItemManager::CreatePowerUpItemPool(const std::string difficulty, const int 
 		{heal_cnt,  attack_cnt, defense_cnt, speed_cnt, bomb_cnt}, }},   //stage3
 	};
 
-	if (itemCountSetting.count(difficulty) > 0 && stage_id >= 1 && stage_id <= 3) {
 
-		ItemType& type = itemCountSetting[difficulty][stage_id - 1];
+	// コンストラクタで受け取った難易度と一致するものがない場合
+	if (itemCountSetting.count(difficulty) <= 0) return;
 
-		for (int i = 0; i < type.heal; i++) {
-			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Heal);
-			_powerUpItem_heal.push_back(item);
-		}
-		for (int i = 0; i < type.attack; i++) {
-			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Attack);
-			_powerUpItem_attack.push_back(item);
-		}
-		for (int i = 0; i < type.defense; i++) {
-			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Defense);
-			_powerUpItem_defense.push_back(item);
-		}
-		for (int i = 0; i < type.speed; i++) {
-			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Speed);
-			_powerUpItem_speed.push_back(item);
-		}
-		for (int i = 0; i < type.bomb; i++) {
-			Shared<inl::PowerUpItem> item = std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Bomb);
-			_powerUpItem_bomb.push_back(item);
-		}
+	//　1より小さい、もしくは３より大きい場合
+	if (stageId < 1 && stageId > 3) return;
+
+
+	ItemType& type = itemCountSetting[difficulty][stageId - 1];
+
+	// 回復アイテム
+	for (int i = 0; i < type.heal; i++) {
+
+		Shared<inl::PowerUpItem> item =
+			std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Heal);
+
+		_powerUpItem_heal.push_back(item);
+	}
+
+	//　ATアイテム
+	for (int i = 0; i < type.attack; i++) {
+
+		Shared<inl::PowerUpItem> item =
+			std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Attack);
+
+		_powerUpItem_attack.push_back(item);
+	}
+
+	//　DEFアイテム
+	for (int i = 0; i < type.defense; i++) {
+
+		Shared<inl::PowerUpItem> item =
+			std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Defense);
+
+		_powerUpItem_defense.push_back(item);
+	}
+
+	//　スピードアイテム
+	for (int i = 0; i < type.speed; i++) {
+
+		Shared<inl::PowerUpItem> item =
+			std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Speed);
+
+		_powerUpItem_speed.push_back(item);
+	}
+
+	//　ボムアイテム
+	for (int i = 0; i < type.bomb; i++) {
+
+		Shared<inl::PowerUpItem> item =
+			std::make_shared<inl::PowerUpItem>(inl::PowerUpItem::TYPE::Bomb);
+
+		_powerUpItem_bomb.push_back(item);
 	}
 }
 
 
 void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
-	for (auto it : powerUpItems) {
+	for (decltype(auto) it : powerUpItems) {
 
-		if (it->_mesh != nullptr && it->_isActive) {
+		// メッシュがないまたは非アクティブ状態なら
+		if (!it->_mesh || !it->_isActive)
+			return;
 
-			if (_collision_ref->CheckCollision_PlayerAndPowerUpItem(it, _player_ref)) {
+		// 当たり判定
+		if (_collision_ref->CheckCollision_PlayerAndPowerUpItem(it, _player_ref)) {
 
-				switch (it->type)
-				{
-				case inl::PowerUpItem::TYPE::Heal:
-				{
-					if (_player_ref->GetHP() < _player_ref->GetMaxHP()) {
-
-						EventNotify_OnCaughtItem("回復アイテム", "HPが上昇。");
-
-						_player_ref->HealHP(10);
-
-						if (_player_ref->GetHP() > _player_ref->GetMaxHP()) {
-
-							_player_ref->SetHP(_player_ref->GetMaxHP());
-						}
-						break;
-					}
+			switch (it->_type)
+			{
+				//　回復アイテム
+			case inl::PowerUpItem::TYPE::Heal:
+			{
+				//　HPが最大HPと同じかそれ以上なら処理を抜ける
+				if (_player_ref->GetHP() >= _player_ref->GetMaxHP()) {
 					break;
 				}
-				case inl::PowerUpItem::TYPE::Attack:
-				{
-					EventNotify_OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
 
-					_player_ref->AddAT(2);
-					break;
-				}
-				case inl::PowerUpItem::TYPE::Defense:
-				{
-					EventNotify_OnCaughtItem("防御強化アイテム", "防御力が上昇。");
+				EventNotify_OnCaughtItem("回復アイテム", "HPが上昇。");
 
-					_player_ref->AddDEF(2); // 防御力が敵の攻撃力を上回らないように
-					break;
-				}
-				case inl::PowerUpItem::TYPE::Speed:
-				{
-					EventNotify_OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
+				_player_ref->HealHP(10);
 
-					_player_ref->AddSpeed(0.1f);
-					break;
-				}
-				case inl::PowerUpItem::TYPE::Bomb:
-				{
-					EventNotify_OnCaughtItem("ボム", "");
+				//　HP上昇後、HPが最大HP以上になったらHPを最大値でキャップ
+				if (_player_ref->GetHP() > _player_ref->GetMaxHP()) {
 
-					_player_ref->AddBombStockCount();
-					break;
+					_player_ref->SetHP(_player_ref->GetMaxHP());
 				}
-				}
-				it->_isActive = false;
+				break;
 			}
+			//　攻撃アイテム
+			case inl::PowerUpItem::TYPE::Attack:
+			{
+				EventNotify_OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
+
+				_player_ref->AddAT(2);
+				break;
+			}
+			//　防御アイテム
+			case inl::PowerUpItem::TYPE::Defense:
+			{
+				EventNotify_OnCaughtItem("防御強化アイテム", "防御力が上昇。");
+
+				_player_ref->AddDEF(2);
+				break;
+			}
+			//　スピードアイテム
+			case inl::PowerUpItem::TYPE::Speed:
+			{
+				EventNotify_OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
+
+				_player_ref->AddSpeed(0.1f);
+				break;
+			}
+			//　ボムアイテム
+			case inl::PowerUpItem::TYPE::Bomb:
+			{
+				EventNotify_OnCaughtItem("ボム", "");
+
+				_player_ref->AddBombStockCount();
+				break;
+			}
+			}
+
+			it->_isActive = false;
 		}
 	}
 }
@@ -293,14 +368,16 @@ void ItemManager::DestroyAllItems() noexcept {
 }
 
 // イベント通知----------------------------------------------------------------------------------------------------------------------------------
-void ItemManager::EventNotify_OnCaughtItem(const std::string item_name, const std::string effect) {
+void ItemManager::EventNotify_OnCaughtItem(const std::string itemName, const std::string effect) {
 
-	std::string msg = item_name + "を獲得。 \n" + effect;
+	//　取得したアイテムを文字列で取得
+	std::string msgStr = itemName + "を獲得。 \n" + effect;
 
-	Shared<inl::EventNoticeText> event_msg = 
-		std::make_shared<inl::EventNoticeText>(msg, GetColor(0, 255, 0), 16, 35);
+	Shared<inl::EventNoticeText> event =
+		std::make_shared<inl::EventNoticeText>(msgStr, GetColor(0, 255, 0), 16, 35);
 
-	inl::EventNoticeText::_messageQueue.push_back(event_msg);
+	//　通知
+	inl::EventNoticeText::_messageQueue.push_back(event);
 }
 
 
@@ -316,36 +393,48 @@ void ItemManager::RenderEventHitText() const {
 
 void ItemManager::UpdateEventHitText(const float deltaTime) {
 
-	for (auto msg : inl::EventNoticeText::_messageQueue) {
+	for (const auto& msg : inl::EventNoticeText::_messageQueue) {
 		msg->Update(deltaTime);
 	}
 
 	auto it = inl::EventNoticeText::_messageQueue.begin();
+
 	while (it != inl::EventNoticeText::_messageQueue.end()) {
 
+		// 時間切れでメッセージ削除
 		if ((*it)->IsExpired()) {
 			it = inl::EventNoticeText::_messageQueue.erase(it);
 		}
 		else {
+			// 表示
 			++it;
 		}
 	}
 }
 
+
 // 当たり判定-----------------------------------------------------------------------------------------------------------------------------------
 void ItemManager::AvoidOverlap_ScoreItemAndScoreItem_DRY(
-	std::vector<Shared<inl::ScoreItem>>& scoreItems_1, 
+	std::vector<Shared<inl::ScoreItem>>& scoreItems_1,
 	std::vector<Shared<inl::ScoreItem>>& scoreItems_2) {
 
-	for (auto it : scoreItems_1) {
-		for (auto& it2 : scoreItems_2) {
-			_collision_ref->CheckCollision_ScoreItemAndScoreItem(it, it2, it->_mesh->pos_, it2->_mesh->pos_);
+	for (decltype(auto) it : scoreItems_1) {
+		for (decltype(auto) it2 : scoreItems_2) {
+
+			_collision_ref->CheckCollision_ScoreItemAndScoreItem(
+				it,                // アイテム１
+				it2,			   // アイテム２
+				it->_mesh->pos_,   // アイテム１位置
+				it2->_mesh->pos_   // アイテム２位置
+			);
 		}
 	}
 }
 
 void ItemManager::AvoidOverlap_ScoreItemAndScoreItem()
 {
+	//　スコアアイテムとスコアアイテムの当たり判定補正
+
 	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_small);    // 小と小
 	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_medium);   // 小と中
 	AvoidOverlap_ScoreItemAndScoreItem_DRY(_scoreItem_small, _scoreItem_large);    // 小と大
@@ -356,17 +445,26 @@ void ItemManager::AvoidOverlap_ScoreItemAndScoreItem()
 
 
 void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
-	std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1, 
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1,
 	std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2) {
 
-	for (auto it : powerUpItems_1) {
-		for (auto& it2 : powerUpItems_2) {
-			_collision_ref->CheckCollision_PowerUpItemAndPowerUpItem(it, it2, it->_mesh->pos_, it2->_mesh->pos_);
+	for (decltype(auto) it : powerUpItems_1) {
+		for (decltype(auto) it2 : powerUpItems_2) {
+
+			_collision_ref->CheckCollision_PowerUpItemAndPowerUpItem(
+				it,                // アイテム１
+				it2,			   // アイテム２
+				it->_mesh->pos_,   // アイテム１位置
+				it2->_mesh->pos_   // アイテム２位置
+			);
 		}
 	}
 }
 
 void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem() {
+
+	//　プレイヤー強化アイテムとプレイヤー強化アイテムの当たり判定補正
+
 	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_heal);    // 回復と回復
 	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_attack);  // 回復と攻撃
 	AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(_powerUpItem_heal, _powerUpItem_defense); // 回復と防御
@@ -390,18 +488,27 @@ void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem() {
 
 
 void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
-	std::vector<Shared<inl::ScoreItem>>& scoreItems, 
+	std::vector<Shared<inl::ScoreItem>>& scoreItems,
 	std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
-	for (auto it : scoreItems) {
-		for (auto& it2 : powerUpItems) {
-			_collision_ref->CheckCollision_ScoreItemAndPowerUpItem(it, it2, it->_mesh->pos_, it2->_mesh->pos_);
+	for (decltype(auto) it : scoreItems) {
+		for (decltype(auto) it2 : powerUpItems) {
+
+			_collision_ref->CheckCollision_ScoreItemAndPowerUpItem(
+				it,                // アイテム１
+				it2,			   // アイテム２
+				it->_mesh->pos_,   // アイテム１位置
+				it2->_mesh->pos_   // アイテム２位置
+			);
 		}
 	}
 }
 
 
 void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem() {
+
+	//　スコアアイテムとプレイヤー強化アイテムの当たり判定補正
+
 	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_heal);    // 小アイテムと回復
 	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_attack);  // 小アイテムと攻撃
 	AvoidOverlap_ScoreItemAndPowerUpItem_DRY(_scoreItem_small, _powerUpItem_defense); // 小アイテムと防御
@@ -424,37 +531,46 @@ void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem() {
 
 // 描画-----------------------------------------------------------------------------------------------------------------------------------
 void ItemManager::RenderPowerUpItems(
-	std::vector<Shared<inl::PowerUpItem>>& powerUpItems, 
+	std::vector<Shared<inl::PowerUpItem>>& powerUpItems,
 	const Shared<dxe::Camera>& camera) {
 
-	if (!powerUpItems.empty()) {
-		for (auto it_scrItm_large : powerUpItems) {
-			if (it_scrItm_large->_isActive)
-				it_scrItm_large->_mesh->render(camera);
-		}
+	if (powerUpItems.empty())
+		return;
+
+	for (const auto it_scrItm_large : powerUpItems) {
+
+		if (it_scrItm_large->_isActive)
+			it_scrItm_large->_mesh->render(camera);
 	}
 }
+
 
 void ItemManager::RenderScoreItems(
-	std::vector<Shared<inl::ScoreItem>>& scoreItems, 
+	std::vector<Shared<inl::ScoreItem>>& scoreItems,
 	const Shared<dxe::Camera>& camera) {
 
-	if (!scoreItems.empty()) {
-		for (auto it_scrItm_small : scoreItems) {
-			if (it_scrItm_small->_isActive)
-				it_scrItm_small->_mesh->render(camera);
-		}
+	if (scoreItems.empty())
+		return;
+
+	for (auto it_scrItm_small : scoreItems) {
+
+		if (it_scrItm_small->_isActive)
+			it_scrItm_small->_mesh->render(camera);
 	}
 }
+
 
 void ItemManager::Render(const Shared<dxe::Camera>& camera) {
 
+	// イベント情報描画
 	RenderEventHitText();
 
+	//　スコアアイテム描画
 	RenderScoreItems(_scoreItem_small, camera);
 	RenderScoreItems(_scoreItem_medium, camera);
 	RenderScoreItems(_scoreItem_large, camera);
 
+	//　プレイヤー強化アイテム描画
 	RenderPowerUpItems(_powerUpItem_heal, camera);
 	RenderPowerUpItems(_powerUpItem_attack, camera);
 	RenderPowerUpItems(_powerUpItem_defense, camera);
@@ -467,18 +583,27 @@ void ItemManager::Render(const Shared<dxe::Camera>& camera) {
 void ItemManager::UpdatePowerUpItem_DRY(
 	std::vector<Shared<inl::PowerUpItem>>& powerUpItems) {
 
-	if (!powerUpItems.empty()) {
-		for (auto it_powItm = powerUpItems.begin(); it_powItm != powerUpItems.end();) {
-			if ((*it_powItm)->Update((*it_powItm)) == false)
-				it_powItm = powerUpItems.erase(it_powItm);
-			else
-				it_powItm++;
+	if (powerUpItems.empty())
+		return;
+
+	for (auto it_powItm = powerUpItems.begin(); it_powItm != powerUpItems.end();) {
+
+		// アイテム消去
+		if (!(*it_powItm)->Update((*it_powItm))) {
+
+			it_powItm = powerUpItems.erase(it_powItm);
+		}
+		else {
+			it_powItm++;
 		}
 	}
 }
 
 
 void ItemManager::UpdatePowerUpItem() {
+
+	// プレイヤー強化アイテム更新
+
 	UpdatePowerUpItem_DRY(_powerUpItem_heal);
 	UpdatePowerUpItem_DRY(_powerUpItem_attack);
 	UpdatePowerUpItem_DRY(_powerUpItem_defense);
@@ -489,49 +614,38 @@ void ItemManager::UpdatePowerUpItem() {
 
 void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const bool isEnemyDead) {
 
-	std::random_device rd;
-	std::mt19937 mt(rd());
-
-	// 得点アイテムに番号を割り振り、ランダムで選択
-	std::uniform_int_distribution<int> rnd_scoreItem_num(1, 3);
-	// プレイヤー強化アイテムに番号を割り振り、ランダムで選択
-	std::uniform_int_distribution<int> rnd_powerUpItem_num(1, 5);
-
-
-	std::uniform_real_distribution<float> rnd_valX(-100, 100);
-	std::uniform_real_distribution<float> rnd_valY(-10, 10);
-	std::uniform_real_distribution<float> rnd_valZ(-100, 100);
-
 	// 1体撃破でスポーンするアイテムの数を指定（↓処理のループ回数）
-	std::uniform_int_distribution<int> rnd_loop_count(0, 4);
-	int loop_count = rnd_loop_count(mt);
+	int loopCount = inl::RandomValueGenerator::Int(0,4);
 
-
-	for (int i = 0; i < loop_count; ++i) {
-
-		tnl::Vector3 rnd_offset;
-		rnd_offset.x = (float)rnd_valX(mt);
-		rnd_offset.y = (float)rnd_valY(mt);
-		rnd_offset.z = (float)rnd_valZ(mt);
+	for (int i = 0; i < loopCount; ++i) {
 
 		std::vector<Shared<inl::ScoreItem>>* scoreItems = nullptr;
 
-		int chooseScoreItem = rnd_scoreItem_num(mt);
+		// 得点アイテムに番号を割り振り、ランダムで1つ選択
+		int chooseScoreItem = inl::RandomValueGenerator::Int(1, 3);
 
 		switch (chooseScoreItem)
 		{
-		case 1:
+		case 1:  //　得点アイテム小
 			scoreItems = &_scoreItem_small;	 break;
-		case 2:
+		case 2:  //　得点アイテム中
 			scoreItems = &_scoreItem_medium; break;
-		case 3:
+		case 3:  //　得点アイテム大
 			scoreItems = &_scoreItem_large;  break;
 		}
 
-		if (scoreItems && !scoreItems->empty()) {
-			for (auto& item : *scoreItems) {
+
+		if (!scoreItems->empty()) {
+
+			for (auto item : *scoreItems) {
+
+				// 敵を倒し、アイテムがまだ生成されていなければ
 				if (isEnemyDead && !item->_hasSpawned) {
-					item->_mesh->pos_ = enemyPos + rnd_offset;
+
+					auto randomVector = 
+						inl::RandomValueGenerator::Vector(-100, 100, -10, 10, -100, 100);
+
+					item->_mesh->pos_ = enemyPos + randomVector;
 					item->_hasSpawned = true;
 					item->_isActive = true;
 					break;
@@ -541,26 +655,34 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 
 		std::vector<Shared<inl::PowerUpItem>>* powerUpItems = nullptr;
 
-		int choosePowerUpItem = rnd_powerUpItem_num(mt);
+		// プレイヤー強化アイテムに番号を割り振り、ランダムで選択
+		int choosePowerUpItem = inl::RandomValueGenerator::Int(1, 5);
 
 		switch (choosePowerUpItem)
 		{
-		case 1:
+		case 1:  //　回復アイテム
 			powerUpItems = &_powerUpItem_heal;	  break;
-		case 2:
+		case 2:  //　攻撃アイテム
 			powerUpItems = &_powerUpItem_attack;  break;
-		case 3:
+		case 3:  //　防御アイテム
 			powerUpItems = &_powerUpItem_defense; break;
-		case 4:
-			powerUpItems = &_powerUpItem_speed;  break;
-		case 5:
-			powerUpItems = &_powerUpItem_bomb;   break;
+		case 4:  //　スピードアイテム
+			powerUpItems = &_powerUpItem_speed;   break;
+		case 5:  //　ボムアイテム
+			powerUpItems = &_powerUpItem_bomb;    break;
 		}
 
-		if (powerUpItems && !powerUpItems->empty()) {
-			for (auto& item : *powerUpItems) {
+		if (!powerUpItems->empty()) {
+
+			for (auto item : *powerUpItems) {
+
+				// 敵を倒し、アイテムがまだ生成されていなければ
 				if (isEnemyDead && !item->_hasSpawned) {
-					item->_mesh->pos_ = enemyPos + rnd_offset;
+
+					auto randomVector = 
+						inl::RandomValueGenerator::Vector(-100, 100, -10, 10, -100, 100);
+
+					item->_mesh->pos_ = enemyPos + randomVector;
 					item->_hasSpawned = true;
 					item->_isActive = true;
 					break;
@@ -569,18 +691,23 @@ void ItemManager::SpawnItemsOnEnemyDeath(const tnl::Vector3& enemyPos, const boo
 		}
 	}
 
+	// 生成後、くっつかないように補正
 	AvoidOverlap_ScoreItemAndScoreItem();
 	AvoidOverlap_PowerUpItemAndPowerUpItem();
 	AvoidOverlap_ScoreItemAndPowerUpItem();
 }
 
+
 void ItemManager::Update(const float deltaTime) {
 
+	//　スコアアイテム
 	UpdateScoreItem();
-	UpdatePowerUpItem();
-
-	UpdateEventHitText(deltaTime);
-
 	EventHit_ScoreItemAndPlayer();
+
+	//　プレイヤー強化アイテム
+	UpdatePowerUpItem();
 	EventHit_PowerUpItemAndPlayer();
+
+	//　イベントテキスト
+	UpdateEventHitText(deltaTime);
 }
