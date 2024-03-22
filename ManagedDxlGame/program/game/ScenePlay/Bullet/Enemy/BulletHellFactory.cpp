@@ -4,6 +4,20 @@
 #include "../game/Utility/CustomException.h"
 
 
+/*　　　　　　　　　　　
+		 　　  関数内の主な処理
+
+		   １.　インスタンス生成
+		   ２.　角度設定
+		   ３.　弾ID設定
+		   ４.　速度設定
+		   ５.　アクティブ状態設定
+		   ６.　弾のタイプ設定（形、動き方、色）
+		   ７.　vectorコンテナに追加
+*/
+
+
+
 namespace inl {
 
 
@@ -24,21 +38,30 @@ namespace inl {
 
 			switch ((*it_bltData).first) // id
 			{
-			case 1:
+			case 1: 
+			{
+				// 名前
 				_sBltHell_patchouli_info._typeName = (*it_bltData).second._typeName;
+				// 弾の最大数
 				_sBltHell_patchouli_info._maxBulletSpawnCount = (*it_bltData).second._maxBulletSpawnCount;
+				// 弾の生成頻度
 				_sBltHell_patchouli_info._bulletSpawnRate = (*it_bltData).second._bulletSpawnRate;
 				break;
+			}
 			case 2:
+			{
 				_sBltHell_cirno_info._typeName = (*it_bltData).second._typeName;
 				_sBltHell_cirno_info._maxBulletSpawnCount = (*it_bltData).second._maxBulletSpawnCount;
 				_sBltHell_cirno_info._bulletSpawnRate = (*it_bltData).second._bulletSpawnRate;
 				break;
+			}
 			case 3:
+			{
 				_sBltHell_suwako_info._typeName = (*it_bltData).second._typeName;
 				_sBltHell_suwako_info._maxBulletSpawnCount = (*it_bltData).second._maxBulletSpawnCount;
 				_sBltHell_suwako_info._bulletSpawnRate = (*it_bltData).second._bulletSpawnRate;
 				break;
+			}
 			}
 		}
 	}
@@ -117,6 +140,7 @@ namespace inl {
 		std::vector<Shared<EnemyBullet>> enemyBullet;
 		int id = 0;
 
+		// 全方向連射弾----------------------------------------------------------------------------------------------------
 		for (int i = 0; i < EVERYDIRECTION_BULLETCOUNT_T_METALFATIGUE_PATCHOULI; i++) {
 
 			Shared<EnemyBullet> every_direction_bullet =
@@ -137,19 +161,22 @@ namespace inl {
 			id,
 			split_one_into_eight_bullet_wave1,
 			enemyBullet,
-			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow
+		);
 
 		InitAssist_MetalFatigue_Patchouli(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 			id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 			split_one_into_eight_bullet_wave2,
 			enemyBullet,
-			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow
+		);
 
 		InitAssist_MetalFatigue_Patchouli(SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI,
 			id + SPLITONE_INTOEIGHT_BULLETCOUNT_T_METALFATIGUE_PATCHOULI * 2,
 			split_one_into_eight_bullet_wave3,
 			enemyBullet,
-			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow);
+			EnemyBullet::SPECIFICTYPE::Sphere_Round_Yellow
+		);
 
 		return enemyBullet;
 	}
@@ -164,14 +191,19 @@ namespace inl {
 	{
 		for (int i = 0; i < splitOneIntoEight_wave; i++) {
 
-			splitOneIntoEight_bullet = std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 12.0f);
+			splitOneIntoEight_bullet =
+				std::make_shared<EnemyBullet>(EnemyBullet::SHAPE::Sphere, EnemyBullet::COLOR::Yellow, 12.0f);
 
 			splitOneIntoEight_bullet->_radius = 65.0f;
 			splitOneIntoEight_bullet->_angle = (2.0f * tnl::PI / 8) * i;
 
-			splitOneIntoEight_bullet->_mesh->pos_.x = splitOneIntoEight_bullet->_radius * cos(splitOneIntoEight_bullet->_angle);
-			splitOneIntoEight_bullet->_mesh->pos_.y = splitOneIntoEight_bullet->_mesh->pos_.y;;
-			splitOneIntoEight_bullet->_mesh->pos_.z = splitOneIntoEight_bullet->_radius * sin(splitOneIntoEight_bullet->_angle);
+			splitOneIntoEight_bullet->_mesh->pos_.x =
+				splitOneIntoEight_bullet->_radius * cos(splitOneIntoEight_bullet->_angle);
+
+			splitOneIntoEight_bullet->_mesh->pos_.y = splitOneIntoEight_bullet->_mesh->pos_.y;
+
+			splitOneIntoEight_bullet->_mesh->pos_.z = 
+				splitOneIntoEight_bullet->_radius * sin(splitOneIntoEight_bullet->_angle);
 
 			splitOneIntoEight_bullet->_id = id++;
 			splitOneIntoEight_bullet->_isActive = true;
@@ -223,6 +255,8 @@ namespace inl {
 		int straight_id = 0;
 		int every_direction_id = 0;
 
+
+		// 直行弾--------------------------------------------------------------------------------------------------------------------------
 		for (int i = 0; i < STRAIGHTAPPROACH_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
 
 			Shared<EnemyBullet> straight_approach_bullet =
@@ -235,6 +269,7 @@ namespace inl {
 			enemyBullet.push_back(straight_approach_bullet);
 		}
 
+		// 全方向連射弾--------------------------------------------------------------------------------------------------------------------------
 		for (int i = 0; i < EVERYDIRECTION_BULLETCOUNT_T_NORMAL_CIRNO; i++) {
 
 			Shared<EnemyBullet> every_direction_bullet =
@@ -257,6 +292,7 @@ namespace inl {
 		int shotOuter_moveInner_id = 0;
 		int lineUp_straight_id = 0;
 
+		// 外側へ撃ち、内側へ移動させる弾----------------------------------------------------------------------------
 		for (int i = 0; i < SHOTOUTERMOVEINNER_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
 
 			Shared<EnemyBullet> shotOuter_moveInner_bullet =
@@ -269,6 +305,7 @@ namespace inl {
 			enemyBullet.push_back(shotOuter_moveInner_bullet);
 		}
 
+		// １行５列の弾（３セット）-----------------------------------------------------------------------------
 		for (int i = 0; i < LINEUPSTRAIGHTSHOT_BULLETCOUNT_T_ICICLEFALL_CIRNO; i++) {
 
 			Shared<EnemyBullet> lineUp_straight_bullet =
@@ -417,7 +454,7 @@ namespace inl {
 
 		switch (type)
 		{
-			// パチュリー
+			// パチュリー（ステージ１ボス）
 		case BulletHell::TYPE::Normal_Patchouli:
 			return CreateBulletHell_Normal_Patchouli();
 			break;
@@ -427,7 +464,8 @@ namespace inl {
 		case BulletHell::TYPE::SilentSerena_Patchouli:
 			return CreateBulletHell_SilentSerena_Patchouli();
 			break;
-			// チルノ
+
+			// チルノ（ステージ２ボス）
 		case BulletHell::TYPE::Normal_Cirno:
 			return CreateBulletHell_Normal_Cirno();
 			break;
@@ -437,7 +475,8 @@ namespace inl {
 		case BulletHell::TYPE::Perfect_Freeze_Cirno:
 			return CreateBulletHell_PerfectFreeze_Cirno();
 			break;
-			// 諏訪子
+
+			// 諏訪子（ステージ３ボス）
 		case BulletHell::TYPE::Normal_Suwako:
 			return CreateBulletHell_Normal_Suwako();
 			break;

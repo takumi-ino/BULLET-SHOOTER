@@ -1,6 +1,6 @@
 #pragma once
-#include <random>
 #include "EnemyBullet.h"
+
 
 class ScenePlay;
 class Player;
@@ -9,16 +9,23 @@ class Player;
  　　 　弾の生成、更新、削除などを行うクラス (EnemyBoss限定)
 　　　ボスは通常攻撃、特殊攻撃１、特殊攻撃２、の計３種類の弾幕を放つ
 
+    ※　関数の定義は1箇所にまとめると長くなってしまうため、各ボスごとの cpp に分けています。
+
+		　1. AllBulletHell_PatchouliKnowledge.cpp　 （ステージ１ボス）
+		　2. AllBulletHell_Cirno.cpp				（ステージ２ボス）
+		　3. AllBulletHell_MoriyaSuwako.cpp		  　（ステージ３ボス）
+
 
 　　※    弾幕の名称・実装は
         「東方プロジェクト」という弾幕シューティングゲームを中心としたコンテンツから直接引用しています。
-	    固有名詞が非常に多く分かりづらくなっているかと存じますが、何卒ご理解いただけますと幸いです。　　
+	    固有名詞が非常に多く分かりづらくなっているかと存じますが、何卒ご理解いただけますと幸いです。
 */
+
 
 namespace inl {
 
 	class BulletHellFactory;
-
+	class RandomValueGenerator;
 
 	class BulletHell : public EnemyBullet
 	{
@@ -118,9 +125,7 @@ namespace inl {
 		);
 
 		void InitAssist_IcicleFall_StraightYellow_Cirno(
-			Shared<EnemyBullet>& bullet,
-			const int bullets_perRow,
-			const float bulletSpace
+			Shared<EnemyBullet>& bullet
 		);
 
 		void UpdateAssist_IcicleFall_StraightYellow_Cirno(
@@ -130,7 +135,7 @@ namespace inl {
 		);
 
 		// ステージ3ボス（諏訪子）-----------------------------------------------------------------------
-		void UpdateAssist_Normal_Suwako(
+		void ResetAssist_Normal_Suwako(
 			Shared<EnemyBullet>& bullet,
 			const float timeLimit
 		);
@@ -145,8 +150,10 @@ namespace inl {
 		);
 
 		void InitAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(
-			tnl::Vector3& upwardVelocity,
-			Shared<EnemyBullet>& bullet
+			const float deltaTime,
+			const float upwardPower,
+			Shared<EnemyBullet>& bullet,
+			const bool isOscillate
 		);
 
 		void UpdateAssist_KeroChanStandsFirmAgainstTheStorm_Suwako(
@@ -154,33 +161,8 @@ namespace inl {
 			const float deltaTime
 		);
 
-		// 共通機能-----------------------------------------------------------------------------
-		tnl::Vector3 GenerateRandomVector(  // ランダムベクター生成
-			std::mt19937& mt,
-			const int minX,
-			const int maxX,
-			const int minY,
-			const int maxY,
-			const int minZ,
-			const int maxZ)
-		{
-			std::uniform_int_distribution<int> rnd_valX(minX, maxX);
-			std::uniform_int_distribution<int> rnd_valY(minY, maxY);
-			std::uniform_int_distribution<int> rnd_valZ(minZ, maxZ);
-
-			return tnl::Vector3{
-				static_cast<float>(rnd_valX(mt)),
-				static_cast<float>(rnd_valY(mt)),
-				static_cast<float>(rnd_valZ(mt))
-			};
-		}
-
 	private:
 
 		const Shared<dxe::Mesh> _bossMesh_ref = nullptr;
-
-	private:
-
-		std::random_device rd;
 	};
 }
