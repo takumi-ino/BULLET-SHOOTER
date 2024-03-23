@@ -2,17 +2,29 @@
 #include "../../../Loader/CsvLoader.h"
 #include "BulletHellsBulletNumInfo.h"
 
-class EnemyManager;
 
 
 /*
  　　 　 各弾幕パターンを初期化 (EnemyBoss限定)
+	   
+
+
+	※　関数の定義は1箇所にまとめると長くなってしまうため、各ボスごとの cpp に分けています。
+
+		　1. AllBulletHellFactory_PatchouliKnowledge.cpp　 （ステージ１ボス）
+		　2. AllBulletHellFactory_Cirno.cpp				   （ステージ２ボス）
+		　3. AllBulletHellFactory_MoriyaSuwako.cpp		   （ステージ３ボス）
+
 
 
 　　※    弾幕の名称・実装は
 		「東方プロジェクト」という弾幕シューティングゲームを中心としたコンテンツから直接引用しています。
 		固有名詞が非常に多く分かりづらくなっているかと存じますが、何卒ご理解いただけますと幸いです。　　
 */
+
+
+class EnemyManager;
+
 
 namespace inl {
 
