@@ -8,7 +8,7 @@
 
 ■ 製作期間 
 
-　2024年1月上旬～3月中旬（約2か月半）
+　2024年1月3日～3月24日（約2か月半）
 
 
 ■ 言語
@@ -137,12 +137,11 @@
 
 ■ 開発の参考にしたゲーム
 
-　　https://store.steampowered.com/app/1299420/Touhou__Shooting_Star/?l=japanese
-
+　　　https://store.steampowered.com/app/1299420/Touhou__Shooting_Star/?l=japanese
 
  
 ■ 使用音源をお借りしたサイト
 
-サイト名：ユーフルカ
+　　サイト名：ユーフルカ
 
-https://youfulca.com/
+　　　https://youfulca.com/
