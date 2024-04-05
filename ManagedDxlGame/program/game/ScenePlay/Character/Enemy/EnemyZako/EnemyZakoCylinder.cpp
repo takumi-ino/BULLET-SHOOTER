@@ -37,7 +37,7 @@ namespace inl {
 
 		_mesh = dxe::Mesh::CreateCylinderMV(20, 20);
 		_mesh->setTexture(dxe::Texture::CreateFromFile("graphics/box.bmp"));
-		_mesh->pos_ = GetRandomPosition_Mt19337();
+		_mesh->pos_ = GetRandomPosition();
 		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
 	}
 

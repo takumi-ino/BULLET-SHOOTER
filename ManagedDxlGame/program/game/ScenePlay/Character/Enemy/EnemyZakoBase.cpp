@@ -268,7 +268,7 @@ namespace inl {
 
 				// 線形補間で弾を旋回させる
 				(*it_blt)->_moveDirection = tnl::Vector3::UniformLerp(
-					(*it_blt)->_mesh->pos_,           // 現在位置
+					(*it_blt)->_moveDirection,        // 方向
 					targetDir * _bulletTurnDelayRate, // 目標地点
 					timeToReachPlayer,                // 目標到達時間
 					(*it_blt)->_timer                 // 経過時間
@@ -310,6 +310,7 @@ namespace inl {
 
 	void EnemyZakoBase::SearchPlayerMovementState(const float deltaTime)
 	{
+		//　プレイヤーに気付いている
 		if (_isNoticedPlayer) {
 
 			_timeCountFrom_noticedPlayer += deltaTime;
@@ -321,10 +322,12 @@ namespace inl {
 				_timeCountFrom_noticedPlayer = 0.0f;
 			}
 		}
+		//　プレイヤーに気付いていない
 		else {
 
 			static float stateTimer = 0.0f;
 
+			//　移動
 			if (_behave == EnemyZakoBase::BEHAVE::Moving) {
 
 				//　時間制限付きでランダムに移動
@@ -345,6 +348,7 @@ namespace inl {
 					_behave = EnemyZakoBase::BEHAVE::Moving;
 				}
 			}
+			//　待機
 			else if (_behave == EnemyZakoBase::BEHAVE::Stop) {
 
 				//	時には同じ位置にとどまり左右の確認などを行う

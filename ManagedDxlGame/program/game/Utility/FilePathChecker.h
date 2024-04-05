@@ -32,9 +32,9 @@ namespace inl {
 
 		static const bool GRAPH(const std::string path) {
 
-			auto sound = LoadGraph(path.c_str());
+			auto graph = LoadGraph(path.c_str());
 
-			if (sound == -1)
+			if (graph == -1)
 				return false;
 			
 			return true;

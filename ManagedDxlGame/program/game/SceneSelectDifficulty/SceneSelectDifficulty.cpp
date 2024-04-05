@@ -60,13 +60,23 @@ void SceneSelectDifficulty::UpdateSelectDifficultyCursor_ByInput() noexcept {
 void SceneSelectDifficulty::RenderDifficultiesAndAnnotation() noexcept {
 
 	int colors[] = { 1,1,1,1 };
+
+	// 選択中のもののみ白色に変更
 	colors[_difficultyItemIndex] = -1;
 
-	const char* difficulties[] =
-	{ "Easy", "Normal", "Hard", "Lunatic" };
+	const char* difficulties[] = {
+		"Easy",
+		"Normal",
+		"Hard",
+		"Lunatic" 
+	};
 
-	const char* annotations[] =
-	{ "もっとも易しい難易度です", "もっとも標準の難易度です", "ちょっと高めの難易度です", "奇特な難易度です" };
+	const char* annotations[] = {
+		"もっとも易しい難易度です",
+		"もっとも標準の難易度です", 
+		"ちょっと高めの難易度です",
+		"奇特な難易度です" 
+	};
 
 	for (int i = 0; i < _DIFFICULTY_COUNT; i++) {
 
@@ -98,7 +108,7 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		ScoreManager::GetInstance().InitScoreInstance();
 
-		int startStage = 3;
+		int startStage = 1;
 
 		if (_difficultyItemIndex == 0) {
 

@@ -32,7 +32,7 @@
 namespace inl {
 
 
-	// 初期化処理-------------------------------------------------------------------------------------------------------------------------
+	// 初期化処理-----------------------------------------------------------------------------------------------
 	EnemyManager::EnemyManager(
 		const Shared<Player>& player,
 		const Shared<dxe::Camera>& camera,
@@ -57,7 +57,7 @@ namespace inl {
 		_isInitializedBossInfo = false;
 
 		SoundManager::GetInstance().LoadStageBGM(ScenePlay::GetStageID());
-		//SoundManager::GetInstance().PlayStageBGM(false);       // ボス(true)か雑魚(false)か
+		SoundManager::GetInstance().PlayStageBGM(false);       // ボス(true)か雑魚(false)か
 
 		_itemManager = std::make_shared<ItemManager>(_player_ref, _collision_ref);
 		this->AttachItemManagerInstance(_itemManager);
@@ -237,7 +237,7 @@ namespace inl {
 	}
 
 
-	// -------------------------------------------------------------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------------------------------
 	void EnemyManager::CheckDoSpawnEnemy() {
 
 		switch (ScenePlay::GetStageID())
@@ -253,7 +253,10 @@ namespace inl {
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
 					auto enemy_box = std::make_shared<EnemyZakoBox>(
-						_enemyZakoData_map[0], _player_ref, _mainCamera_ref, _collision_ref
+						_enemyZakoData_map[0], 
+						_player_ref,
+						_mainCamera_ref,
+						_collision_ref
 					);
 
 					enemy_box->_isDead = false;
@@ -281,7 +284,10 @@ namespace inl {
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
 					auto enemy_dome = std::make_shared<EnemyZakoDome>(
-						_enemyZakoData_map[1], _player_ref, _mainCamera_ref, _collision_ref
+						_enemyZakoData_map[1],
+						_player_ref,
+						_mainCamera_ref,
+						_collision_ref
 					);
 
 					enemy_dome->_isDead = false;
@@ -307,7 +313,10 @@ namespace inl {
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
 					auto enemy_cylinder = std::make_shared<EnemyZakoCylinder>(
-						_enemyZakoData_map[2], _player_ref, _mainCamera_ref, _collision_ref
+						_enemyZakoData_map[2], 
+						_player_ref,
+						_mainCamera_ref,
+						_collision_ref
 					);
 
 					enemy_cylinder->_isDead = false;
@@ -351,7 +360,7 @@ namespace inl {
 	}
 
 
-	//当たり判定---------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//当たり判定----------------------------------------------------------------------------------------------------------
 	void EnemyManager::EnemyZakoCollisionPairLists()
 	{
 		for (auto& it : _enemyZakoList) {
@@ -372,12 +381,14 @@ namespace inl {
 
 					if (it->DecreaseHP(_player_ref->GetAT(), _mainCamera_ref)) {
 
-						ScoreManager::GetInstance().AddHitBulletScore(100);  // スコア加算
-						EnemyZakoBase::_isNoticedPlayer = true;              // プレイヤー発見
-
-						PlayerBullet::_bulletPowerRate += 0.01f;             //　プレイヤーの弾の威力ポイント上昇
-
-						it->_timeCountFrom_noticedPlayer = 0.0f;             // プレイヤーに気付いてからの時間に初期値を設定
+						// スコア加算
+						ScoreManager::GetInstance().AddHitBulletScore(100);
+						// プレイヤー発見
+						EnemyZakoBase::_isNoticedPlayer = true;
+						//　プレイヤーの弾の威力ポイント上昇
+						PlayerBullet::_bulletPowerRate += 0.01f;
+						// プレイヤーに気付いてからの時間に初期値を設定
+						it->_timeCountFrom_noticedPlayer = 0.0f;
 					}
 					else {
 
@@ -392,7 +403,12 @@ namespace inl {
 				if (it == it2) 
 					continue;
 
-				_collision_ref->CheckCollision_EnemyAndEnemy(it, it2, it->_mesh->pos_, it2->_mesh->pos_);
+				_collision_ref->CheckCollision_EnemyAndEnemy(
+					it,
+					it2,
+					it->_mesh->pos_,
+					it2->_mesh->pos_
+				);
 			}
 		}
 	}
@@ -406,7 +422,10 @@ namespace inl {
 
 				// プレイヤーとBossエネミー各種
 				_collision_ref->CheckCollision_PlayerAndEnemyBoss(
-					_player_ref, it, _player_ref->GetPos(), it->_mesh->pos_
+					_player_ref,
+					it, 
+					_player_ref->GetPos(),
+					it->_mesh->pos_
 				);
 			}
 
@@ -434,7 +453,7 @@ namespace inl {
 		}
 	}
 
-	//　ボスの位置座標の通知-------------------------------------------------------------------------------------------------------------------
+	//　ボスの位置座標の通知------------------------------------------------------------------------------------------
 	void EnemyManager::AttachItemManagerInstance(const Shared<ItemManager>& observer) {
 		_observerItems.push_back(observer);
 	}
@@ -543,7 +562,7 @@ namespace inl {
 		}
 	}
 
-	// 敵殺傷イベント通知------------------------------------------------------------------------------------------------------------------------------------------
+	// 敵殺傷イベント通知--------------------------------------------------------------------------------------------
 	void EnemyManager::EventNotify_OnEnemyKilled(const std::string enemy_name) {
 
 		std::string event = enemy_name + "を撃破 ";
@@ -584,6 +603,7 @@ namespace inl {
 		while (it != inl::EventNoticeText::_messageQueue.end()) {
 
 			if ((*it)->IsExpired()) {
+
 				it = inl::EventNoticeText::_messageQueue.erase(it);
 			}
 			else {
@@ -592,7 +612,7 @@ namespace inl {
 		}
 	}
 
-	// ステージ移動------------------------------------------------------------------------------------------------------------------------------------------
+	// ステージ移動-------------------------------------------------------------------------------------------------
 	bool EnemyManager::SeqMoveToNextStage(const float deltaTime) {
 
 		SeqMoveToResult(deltaTime);
@@ -671,7 +691,7 @@ namespace inl {
 			mgr->ChangeScene(new SceneResult("Lunatic", total));
 	}
 
-	// 描画------------------------------------------------------------------------------------------------------------------------------------------
+	// 描画-----------------------------------------------------------------------------------------------------------
 	void EnemyManager::Render(const Shared<dxe::Camera>& camera) const {
 
 		_itemManager->Render(camera);
@@ -698,7 +718,7 @@ namespace inl {
 		}
 	}
 
-	// 更新------------------------------------------------------------------------------------------------------------------------------------------
+	// 更新---------------------------------------------------------------------------------------------------------
 	void EnemyManager::UpdateEnemyBossList(const float deltaTime)
 	{
 		if (!_enemyZakoList.empty() || _enemyBossList.empty()) 

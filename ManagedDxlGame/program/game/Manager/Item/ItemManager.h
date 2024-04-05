@@ -57,57 +57,64 @@ private:
 	　   末尾に　DRY　がついている関数は同じ処理を異なるオブジェクトへまとめて適用しています
 	*/
 
-	// 得点アイテム-------------------------------------------------------------------------------------------------------------------
+	// 得点アイテム-------------------------------------------------------------------------------------------------------
 
-	// 描画------------------------------------------------------------------------------
+	// 描画
 	void RenderScoreItems(
-		std::vector<Shared<inl::ScoreItem>>& scoreItems, const Shared<dxe::Camera>& camera);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems, 
+		const Shared<dxe::Camera>& camera
+	);
 
-	// 更新------------------------------------------------------------------------------
+	// 更新
 	void UpdateScoreItem_DRY(std::vector<Shared<inl::ScoreItem>>& scoreItems);
 
-	// 当たり判定------------------------------------------------------------------------
+	// 当たり判定
 	void EventHit_ScoreItemAndPlayer_DRY(
-		std::vector<Shared<inl::ScoreItem>>& scoreItems, const inl::ScoreItem::TYPE type);
+		std::vector<Shared<inl::ScoreItem>>& scoreItems,
+		const inl::ScoreItem::TYPE type
+	);
 
-	void AvoidOverlap_ScoreItemAndScoreItem();       // アイテムどうしが重ならないように補正
+	// 補正
+	void AvoidOverlap_ScoreItemAndScoreItem();
 
 	void AvoidOverlap_ScoreItemAndScoreItem_DRY(
 		std::vector<Shared<inl::ScoreItem>>& scoreItems_1,
 		std::vector<Shared<inl::ScoreItem>>& scoreItems_2
 	);
 
-	// プレイヤー強化アイテム----------------------------------------------------------------------------------------------------------
+	// プレイヤー強化アイテム--------------------------------------------------------------------------------------------
 
-	// 描画------------------------------------------------------------------------------
+	// 描画
 	void RenderPowerUpItems(
 		std::vector<Shared<inl::PowerUpItem>>& powerUpItems,
 		const Shared<dxe::Camera>& camera
 	);
 
-	// 更新------------------------------------------------------------------------------
+	// 更新
 	void UpdatePowerUpItem_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
-	// 当たり判定------------------------------------------------------------------------
+	// 当たり判定
 	void EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::PowerUpItem>>& powerUpItems);
 
-	void AvoidOverlap_PowerUpItemAndPowerUpItem();   // アイテムどうしが重ならないように補正
+	//　補正
+	void AvoidOverlap_PowerUpItemAndPowerUpItem();
 
 	void AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
 		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_1,
 		std::vector<Shared<inl::PowerUpItem>>& powerUpItems_2
 	);
 
-	// 得点アイテム＆プレイヤー強化アイテム-------------------------------------------------------------------------------------------
+	// 得点アイテム＆プレイヤー強化アイテム------------------------------------------------------------------------------
 
-	void AvoidOverlap_ScoreItemAndPowerUpItem();     // アイテムどうしが重ならないように補正
+	// 補正
+	void AvoidOverlap_ScoreItemAndPowerUpItem();
 
 	void AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
 		std::vector<Shared<inl::ScoreItem>>& scoreItems,
 		std::vector<Shared<inl::PowerUpItem>>& powerUpItems
 	);
 
-	// イベント通知（プレイヤーがアイテムを取得したときに表示するメッセージを通達）---------------------------------------------------
+	// イベント通知（プレイヤーがアイテムを取得したときに表示するメッセージを通達）-------------------------------------
 	void RenderEventHitText() const;
 	void UpdateEventHitText(const float deltaTime);
 	void EventNotify_OnCaughtItem(const std::string itemName, const std::string effect);

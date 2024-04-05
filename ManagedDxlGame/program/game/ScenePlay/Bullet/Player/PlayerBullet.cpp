@@ -17,8 +17,11 @@ namespace inl {
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
 		//　ロードに失敗したら例外発生----------------------------------------------------
-		auto redGraphHandle = cus->TryLoadTexture("graphics/colorTexture/red.bmp", "inl::PlayerBullet::PlayerBullet()");
-		auto whiteGraphHandle = cus->TryLoadTexture("graphics/colorTexture/white.bmp", "inl::PlayerBullet::PlayerBullet()");
+		auto redGraphHandle =
+			cus->TryLoadTexture("graphics/colorTexture/red.bmp", "inl::PlayerBullet::PlayerBullet()");
+
+		auto whiteGraphHandle = 
+			cus->TryLoadTexture("graphics/colorTexture/white.bmp", "inl::PlayerBullet::PlayerBullet()");
 
 		_mesh = dxe::Mesh::CreateSphereMV(size);
 
@@ -53,6 +56,7 @@ namespace inl {
 
 		float current_distance = sqrt(dx * dx + dy * dy + dz * dz);
 
-		if (abs(current_distance) > 1200) _isActive = false;
+		if (abs(current_distance) > 1200)
+			_isActive = false;
 	}
 }

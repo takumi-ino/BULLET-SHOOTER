@@ -23,13 +23,13 @@ namespace inl {
 
 	private:
 
-		int          _color{};
-		int          _fontSize{};
-		int          _margin{};
-		int          _startTextPos_X{};
-		int          _startTextPos_Y{};
+		int          _color{};               // 色
+		int          _fontSize{};		     // フォントサイズ
+		int          _margin{};			     // 行間
+		int          _startTextPos_X{};	     // X座標
+		int          _startTextPos_Y{};	     // Y座標
 
-		float        _duration{};
+		float        _duration{};		     // 表示時間
 
 		std::string  _messageText{};
 	};

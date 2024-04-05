@@ -47,14 +47,32 @@ SceneResult::SceneResult(const std::string difficulty, const int totalScore)
 
 void SceneResult::RenderLiteralResult() noexcept
 {
+	//　Result　という文字列
 	SetFontSize(70);
-	DrawString(_resultText_posX, _resultText_posY, "Result", GetColor(0, 200, 100));
+	DrawString(
+		_resultText_posX, 
+		_resultText_posY, 
+		"Result",
+		GetColor(0, 200, 100)
+	);
 
+	//　選択した難易度の文字列
 	SetFontSize(40);
-	DrawFormatString(_difficultyText_posX, _difficultyText_posY, GetColor(0, 200, 100), "%s", _DIFFICULTY.c_str());
+	DrawFormatString(
+		_difficultyText_posX,
+		_difficultyText_posY,
+		GetColor(0, 200, 100),
+		"%s", _DIFFICULTY.c_str()
+	);
 
+	//　トータルスコア
 	SetFontSize(30);
-	DrawFormatString(_totalScoreText_posX, _totalScoreText_posY, GetColor(0, 200, 100), "TotalScore  %d", _TOTAL_SCORE);
+	DrawFormatString(
+		_totalScoreText_posX,
+		_totalScoreText_posY,
+		GetColor(0, 200, 100),
+		"TotalScore  %d", _TOTAL_SCORE
+	);
 }
 
 
@@ -62,7 +80,14 @@ void SceneResult::RenderBackGround() noexcept
 {
 	// 背景画像
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _backGround_baseAlpha);
-	DrawRotaGraph(_backGround_posX, _backGround_posY, _backGround_extendRate, 0, _backGround_hdl, true);
+	DrawRotaGraph(
+		_backGround_posX,
+		_backGround_posY, 
+		_backGround_extendRate,
+		0, 
+		_backGround_hdl,
+		true
+	);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 

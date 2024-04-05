@@ -10,7 +10,7 @@ public:
 		return instance;
 	}
 
-	// ScenePlay専用（ザコ戦とボス戦で流すBGMを使い分ける目的があるため）----------------------------
+	// ScenePlay専用（通常エネミー戦とボス戦で流すBGMを使い分ける目的があるため）----------------------------
 	void LoadStageBGM(const int stageId);
 	void PlayStageBGM(const bool isBossBattle) noexcept;
 	void DestroyStageBGM(const bool isBossBattle) noexcept;

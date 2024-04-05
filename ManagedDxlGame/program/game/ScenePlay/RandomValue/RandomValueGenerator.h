@@ -2,15 +2,15 @@
 #include <random>
 #include "../../DxLibEngine.h"
 
-// BulletHellクラスのみで使用する機能クラス
 
 namespace inl {
 
+	// ランダムな値を生成するクラス
 	class RandomValueGenerator 
 	{
 	public:
 
-		// ランダムベクター生成
+		// ランダムベクター
 		static const tnl::Vector3 Vector(
 			const int minX,
 			const int maxX,
@@ -33,7 +33,7 @@ namespace inl {
 			};
 		}
 
-		// ランダム整数生成
+		// ランダム整数
 		static const int Int(const int min, const int max) noexcept {
 
 			std::random_device rd;
@@ -44,7 +44,7 @@ namespace inl {
 			return static_cast<int>(randomInt(mt));
 		}
 
-		// ランダム浮動小数生成
+		// ランダム浮動小数
 		static const float Float(const float min, const float max) noexcept {
 
 			std::random_device rd;

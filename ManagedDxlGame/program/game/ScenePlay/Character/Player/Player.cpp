@@ -18,7 +18,6 @@ namespace inl {
 
 	Shared<dxe::Particle> Player::_bombParticle;
 
-
 	namespace {
 
 		// プレイヤーステータス -------------------------------------------------
@@ -101,7 +100,7 @@ namespace inl {
 		_collideSize = { 20, 20, 20 };
 	}
 
-	// 機能－-----------------------－-----------------------－-----------------------－-----------------------－---------------------
+	// 機能－-----------------------－-----------------------－-----------------------－--------------------------
 	bool Player::DecreaseHP(int damage) {
 
 		if (_hp > 0) {
@@ -147,11 +146,13 @@ namespace inl {
 
 	bool Player::IsEnemyInCapturableRange() {
 
-		if (!_enemyManager_ref) return false;
+		if (!_enemyManager_ref)
+			return false;
 
 		tnl::Vector3 enemyPos;
 		AssignEnemyPosition(enemyPos);
 
+		//　プレイヤーと敵の距離
 		float dis_playerAndEnemy = (enemyPos - _mesh->pos_).length();
 
 		if (dis_playerAndEnemy < _CAPTURABLE_RANGE_ENEMY) {
@@ -162,7 +163,7 @@ namespace inl {
 	}
 
 
-	void Player::AssignEnemyPosition(tnl::Vector3& enemy_pos) {
+	void Player::AssignEnemyPosition(tnl::Vector3& enemyPos) {
 
 		int enemyZakoLeftCount = _enemyManager_ref->GetRemainingEnemyCount();
 		auto zakoList = _enemyManager_ref->_enemyZakoList;
@@ -171,6 +172,7 @@ namespace inl {
 		auto bossList = _enemyManager_ref->_enemyBossList;
 		auto it_boss = _enemyManager_ref->_itBoss;
 
+		//　通常エネミーが全滅していれば
 		if (_enemyManager_ref->_enemyZakoList.empty()) {
 			enemyZakoLeftCount = 0;
 		}
@@ -178,31 +180,35 @@ namespace inl {
 		if (!bossList.empty()) {
 
 			for (auto& boss : bossList) {
+
+				//　ボスが撃破されていれば
 				if (boss->_isDead)
 					enemyZakoLeftCount = 0;
 			}
 		}
 
+		//　ザコ敵が全滅していなければ
 		if (enemyZakoLeftCount != 0 && !zakoList.empty()) {
 
 			// インデックスが置かれている敵のみイテレーターで取得
 			if (_enemyIndex < zakoList.size()) {
 
 				it_zako = std::next(zakoList.begin(), _enemyIndex);
-				enemy_pos = (*it_zako)->_mesh->pos_;
+				enemyPos = (*it_zako)->_mesh->pos_;
 			}
 			else {
 				_enemyIndex = 0;
 				it_zako = zakoList.begin();
-				enemy_pos = (*it_zako)->_mesh->pos_;
+				enemyPos = (*it_zako)->_mesh->pos_;
 			}
 		}
+		//　ザコ敵が全滅しており、ボスがまだ生きていれば
 		else if (enemyZakoLeftCount == 0 && zakoList.empty() && !bossList.empty()) {
 
 			it_boss = bossList.begin();
 
 			if ((*it_boss)->_mesh != nullptr) {
-				enemy_pos = (*it_boss)->_mesh->pos_;
+				enemyPos = (*it_boss)->_mesh->pos_;
 			}
 		}
 	}
@@ -225,34 +231,42 @@ namespace inl {
 		return moveDir;
 	}
 
-	// 操作－-----------------------－-----------------------－-------------------------------------------------------------------
+	// 操作－-----------------------－-----------------------－----------------------------------------------------
 	void Player::ShotPlayerBullet() {
 
-		if (IsShooting()) {
+		if (!IsShooting()) return;
 
-			tnl::Vector3 spawnPos = _mesh->pos_;
-			tnl::Vector3 moveDir = GetBulletMoveDirection();
+		tnl::Vector3 spawnPos = _mesh->pos_;
+		tnl::Vector3 moveDir = GetBulletMoveDirection();
 
-			_straightBullets_player.emplace_back(
-				std::make_shared<inl::PlayerBullet>(spawnPos, moveDir, inl::PlayerBullet::COLOR::Red, 10.0f));
-		}
+		_straightBullets_player.emplace_back(
+			std::make_shared<inl::PlayerBullet>(
+				spawnPos,                        //　位置
+				moveDir,						 //　方向
+				inl::PlayerBullet::COLOR::Red, 	 //　色
+				10.0f)							 //　サイズ
+		);
 	}
 
 
 	void Player::ShotGunportBullet() {
 
-		if (IsShooting()) {
+		if (!IsShooting()) return;
 
-			tnl::Vector3 moveDir = GetBulletMoveDirection();
+		tnl::Vector3 moveDir = GetBulletMoveDirection();
 
-			for (const auto& blt : _gunportVec) {
+		for (const auto& blt : _gunportVec) {
 
-				if (blt) {
+			if (!blt) return;
 
-					_straightBullets_player.emplace_back(
-						std::make_shared<inl::PlayerBullet>(blt->_mesh->pos_, moveDir, inl::PlayerBullet::COLOR::White, 7.0f));
-				}
-			}
+			_straightBullets_player.emplace_back(
+				std::make_shared<inl::PlayerBullet>(
+					blt->_mesh->pos_,                   //　位置
+					moveDir,							//　方向
+					inl::PlayerBullet::COLOR::White,	//　色
+					7.0f                                //　サイズ
+				)
+			);
 		}
 	}
 
@@ -262,26 +276,33 @@ namespace inl {
 		float speed = 4.f;
 
 		// 減速  ゲームパッドの場合は△かＹ
-		if (tnl::Input::IsKeyDown(eKeys::KB_LSHIFT) || tnl::Input::IsPadDown(ePad::KEY_3)) {
+		if (tnl::Input::IsKeyDown(eKeys::KB_LSHIFT) ||
+			tnl::Input::IsPadDown(ePad::KEY_3))
+		{
 			speed = 2.5f;
 		}
 
 		// 左方向
-		if (InputFuncTable::IsButtonDown_LEFT() && !_playerCamera->follow) {
+		if (InputFuncTable::IsButtonDown_LEFT() && 
+			!_playerCamera->follow) 
+		{
 
 			_moveVelocity -= tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
 			NormalizeCameraSpeed(speed);
 		}
 
 		// 右方向
-		if (InputFuncTable::IsButtonDown_RIGHT() && !_playerCamera->follow) {
+		if (InputFuncTable::IsButtonDown_RIGHT() && 
+			!_playerCamera->follow)
+		{
 
 			_moveVelocity += tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
 			NormalizeCameraSpeed(speed);
 		}
 
 		// 上方向　　//　このゲームパッドを有効にすると座標が上に飛んで行くバグがある
-		if (tnl::Input::IsKeyDown(eKeys::KB_W) /*|| tnl::Input::IsPadDown(ePad::KEY_UP)*/) {
+		if (tnl::Input::IsKeyDown(eKeys::KB_W) /*|| tnl::Input::IsPadDown(ePad::KEY_UP)*/) 
+		{
 
 			_moveVelocity += tnl::Vector3::TransformCoord({ 0, 1.0f, 0.1f }, _rotY);
 			_mesh->pos_.z += _playerMoveSpeed;
@@ -290,7 +311,8 @@ namespace inl {
 		}
 
 		// 下方向
-		if (InputFuncTable::IsButtonDown_DOWN()) {
+		if (InputFuncTable::IsButtonDown_DOWN()) 
+		{
 
 			_moveVelocity -= tnl::Vector3::TransformCoord({ 0, 1.0f, 0.1f }, _rotY);
 			_mesh->pos_.z -= _playerMoveSpeed;
@@ -299,9 +321,12 @@ namespace inl {
 		}
 
 		// 前方向　ゲームパッドの場合はL1
-		if (tnl::Input::IsKeyDown(eKeys::KB_SPACE) || tnl::Input::IsPadDown(ePad::KEY_4)) {
+		if (tnl::Input::IsKeyDown(eKeys::KB_SPACE) ||
+			tnl::Input::IsPadDown(ePad::KEY_4))
+		{
 
-			_mesh->pos_ += tnl::Vector3::TransformCoord({ 0,0,2 }, _mesh->rot_) * _forwardVelocity * deltaTime;
+			_mesh->pos_ +=
+				tnl::Vector3::TransformCoord({ 0,0,2 }, _mesh->rot_) * _forwardVelocity * deltaTime;
 		}
 	}
 
@@ -313,13 +338,17 @@ namespace inl {
 
 		// マウスホイールの入力に応じて敵のインデックスを増減
 		if (wheel > 0) {
+
 			_enemyIndex++;
+
 			if (_enemyIndex >= zakoList.size()) {
 				_enemyIndex = 0;
 			}
 		}
 		else if (wheel < 0) {
+
 			_enemyIndex--;
+
 			if (_enemyIndex < 0) {
 				_enemyIndex = static_cast<int>(zakoList.size() - 1);
 			}
@@ -337,10 +366,14 @@ namespace inl {
 			// 左右視点
 			_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x));
 
-			// 上下視点
+			// プレイヤーの前方
 			tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
+
+			// 上下視点
 			_rotX *= tnl::Quaternion::RotationAxis(
-				tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V));
+				tnl::Vector3::Cross({ 0, 1, 0 }, forward),     // 外積
+				tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V)  // 回転（ラジアン）
+			);
 		}
 
 		// マウス
@@ -354,10 +387,14 @@ namespace inl {
 			// 左右視点
 			_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x * _VIEWPOINT_LERP_RATE_H));
 
-			// 上下視点
+			// プレイヤーの前方
 			tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
+
+			// 上下視点
 			_rotX *= tnl::Quaternion::RotationAxis(
-				tnl::Vector3::Cross({ 0, 1, 0 }, forward), tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V));
+				tnl::Vector3::Cross({ 0, 1, 0 }, forward),     // 外積
+				tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V)  // 回転（ラジアン）
+			);
 		}
 	}
 
@@ -365,33 +402,47 @@ namespace inl {
 	void Player::AdjustPlayerVelocity() {
 
 		// Time.deltaTimeのようなもの。これがないとプレイヤーが吹っ飛ぶ
-		tnl::EasyAdjustObjectVelocity(_CENTROID_RADIUS, _MASS, _FRICTION, _past_moveVelocity, _moveVelocity, _centerOfGravity);
-
-		_mesh->pos_ += _moveVelocity;
+		tnl::EasyAdjustObjectVelocity(
+			_CENTROID_RADIUS,    //　重心
+			_MASS,               //　質量
+			_FRICTION,           //　摩擦
+			_past_moveVelocity,  //　前回の移動ベクトル
+			_moveVelocity,       //　現在の移動ベクトル
+			_centerOfGravity     //　重心座標
+		);
 
 		if (_centerOfGravity.length() > FLT_EPSILON) {
+
 			// 重心位置を利用して傾いてほしいアッパーベクトルを作成
-			tnl::Vector3 upper = tnl::Vector3::Normalize({ _centerOfGravity.x, _CENTROID_RADIUS, _centerOfGravity.z });
+			tnl::Vector3 upper =
+				tnl::Vector3::Normalize({ _centerOfGravity.x, _CENTROID_RADIUS, _centerOfGravity.z });
+
 			// 傾きの角度を計算
 			float angle = upper.angle({ 0, 1, 0 });
+
 			// 傾きベクトルと真上ベクトルの外積から回転軸を計算し、傾き角度を調整して回転クォータニオンを作成
 			_rotXZ = tnl::Quaternion::RotationAxis(tnl::Vector3::Cross(upper, { 0, 1, 0 }), -(angle * 0.2f));
 		}
 
-		//// 最終的な姿勢
+		//　位置
+		_mesh->pos_ += _moveVelocity;
+
 		//_mesh->rot_ = rot_y_ * rot_xz_;
 		// ControlRotationByMouse で上下視点も使用する場合は↓を使う
+		//　回転（　最終的な姿勢　）
 		_mesh->rot_ = _rotY * _rotX * _rotXZ;
 	}
 
-	// カメラ－-----------------------－-----------------------－-----------------------－-----------------------－---------------------
+	// カメラ－-----------------------－-----------------------－-----------------------－-------------------------
 	void Player::ActivateDarkSoulsCamera() {
 
 		tnl::Vector3 playerPos = _mesh->pos_;
 		tnl::Vector3 targetEnemyPos;
 
+		//　敵座標取得
 		AssignEnemyPosition(targetEnemyPos);
 
+		//　敵とのユークリッド距離
 		float dis_player_enemy = (targetEnemyPos - playerPos).length();
 
 		if (_playerCamera->follow) {
@@ -419,6 +470,7 @@ namespace inl {
 		// カメラの動きの遅延処理
 		tnl::Vector3 fixPos =
 			playerPos + tnl::Vector3::TransformCoord(_DEFAULT_CAMERA_POSITION, _mesh->rot_);
+
 		_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * _CAMERAMOVE_DELAY_RATE;
 
 		// 追従ポインターOFF
@@ -459,10 +511,10 @@ namespace inl {
 
 	void Player::ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y)
 	{
-		//左方向
+		//　左方向
 		if (InputFuncTable::IsButtonDown_LEFT()) {
 
-			tnl::Vector3 newPos =
+			tnl::Vector3 newPos =   //　カメラ焦点座標　+　指定の座標
 				_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
@@ -472,10 +524,10 @@ namespace inl {
 			_playerCamera->axis_y_angle_ += tnl::ToRadian(2);
 		}
 
-		// 右方向
+		//　右方向
 		if (InputFuncTable::IsButtonDown_RIGHT()) {
 
-			tnl::Vector3 newPos =
+			tnl::Vector3 newPos =  //　カメラ焦点座標　+　指定の座標
 				_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
@@ -486,7 +538,7 @@ namespace inl {
 		}
 	}
 
-	// ボム－-----------------------－-----------------------－-----------------------－-----------------------－-----------------------
+	// ボム－-----------------------－-----------------------－-----------------------－-----------------------
 	void Player::ValidateBombEffect() {
 
 		float adaptRange = 200.f;
@@ -514,10 +566,12 @@ namespace inl {
 	void Player::InvalidateBombEffect(const float deltaTime) {
 
 		if (_isTriggered_playersBombEffect) {
+
 			_bombTimer += deltaTime;
 			ValidateBombEffect();
 
 			if (_bombTimer > _BOMBEFFECT_TIME_LIMIT) {
+
 				_bombTimer = 0.0f;
 				ScenePlay::DeactivateAllEnemyBullets();
 				_isTriggered_playersBombEffect = false;
@@ -526,7 +580,7 @@ namespace inl {
 	}
 
 
-	// 描画－-----------------------－-----------------------－-----------------------－-----------------------－-----------------------
+	// 描画－-----------------------－-----------------------－-----------------------－-----------------------------
 	void Player::RenderFollowPointer() {
 
 		tnl::Vector3 enemyPos;
@@ -590,8 +644,22 @@ namespace inl {
 
 		x2 = _HP_POS_X + static_cast<int>(average * _hp);
 
-		DrawBoxAA(_HP_POS_X, _HP_POS_Y, 210, 65, GetColor(150, 150, 150), true);
-		DrawBoxAA(_HP_POS_X, _HP_POS_Y, x2, 65, GetColor(0, 255, 0), true);
+		// HPゲージの枠
+		DrawBoxAA(_HP_POS_X,
+			_HP_POS_Y,
+			210,
+			65,
+			GetColor(150, 150, 150),
+			true
+		);
+		// HPゲージ本体
+		DrawBoxAA(_HP_POS_X,
+			_HP_POS_Y,
+			x2,
+			65,
+			GetColor(0, 255, 0),
+			true
+		);
 
 		SetFontSize(16);
 		DrawString(30, 50, "HP:", -1);
@@ -636,7 +704,7 @@ namespace inl {
 	}
 
 
-	// 更新－-----------------------－-----------------------－-----------------------－-----------------------－-----------------------
+	// 更新－-----------------------－-----------------------－-----------------------－-----------------------－-----
 	void Player::UpdateStraightBullet(const float deltaTime)
 	{
 		auto it_blt = _straightBullets_player.begin();
@@ -646,6 +714,7 @@ namespace inl {
 			(*it_blt)->Update(deltaTime);
 
 			if (!(*it_blt)->_isActive) {
+
 				it_blt = _straightBullets_player.erase(it_blt);
 				continue;
 			}
@@ -657,6 +726,7 @@ namespace inl {
 	void Player::WatchInvincibleTimer(const float deltaTime) noexcept {
 
 		if (_isInvincible) {
+
 			_invincibleTimer += deltaTime;
 
 			if (_invincibleTimer >= _INVINCIBLE_TIME_LIMIT) {
@@ -670,7 +740,9 @@ namespace inl {
 
 	void Player::UpdateGunport_DRY(Shared<inl::Gunport>& gunportVec, const tnl::Vector3 coords) {
 
+		//　位置
 		gunportVec->_mesh->pos_ = GetPos() + tnl::Vector3::TransformCoord({ coords }, _mesh->rot_);
+		//　回転
 		gunportVec->_mesh->rot_ = _mesh->rot_;
 	}
 
@@ -679,6 +751,7 @@ namespace inl {
 
 		if (_gunportVec.empty()) return;
 
+		//　各連装砲の配置座標（ 最大５ ）
 		const tnl::Vector3 coords[] = {
 		{  0, -25, -20},
 		{-25,   0, -20},
@@ -731,29 +804,36 @@ namespace inl {
 
 	void Player::Update(const float deltaTime) {
 
-		ActivateDarkSoulsCamera();
-
-		ControlPlayerMoveByInput(deltaTime);
-		AdjustPlayerVelocity();
+		//　「 Begin 」テキスト
 		WatchInvincibleTimer(deltaTime);
 
 		// カメラを敵に固定するフラグを反転
 		// マウス右　ゲームパッドの場合はR1（RB)
-		if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) || tnl::Input::IsPadDownTrigger(ePad::KEY_5)) {
-
+		if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) ||
+			tnl::Input::IsPadDownTrigger(ePad::KEY_5))
+		{
 			if (IsEnemyInCapturableRange() || _playerCamera->follow)
 				_playerCamera->follow = !_playerCamera->follow;
 		}
 
+		//　カメラ
+		ActivateDarkSoulsCamera();
 		_playerCamera->Update(deltaTime);
 
+		//　プレイヤー操作
+		ControlPlayerMoveByInput(deltaTime);
+		AdjustPlayerVelocity();
+
+		//　弾発射
 		ShotPlayerBullet();
 		ShotGunportBullet();
 		UpdateStraightBullet(deltaTime);
 
+		//　ガンポート
 		_playerGunport->ManageGunportCount(_gunportVec);
 		UpdateGunport();
 
+		//　ボム
 		UseBomb();
 		InvalidateBombEffect(deltaTime);
 	}

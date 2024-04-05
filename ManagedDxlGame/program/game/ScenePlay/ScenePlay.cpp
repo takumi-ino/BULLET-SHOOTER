@@ -1,10 +1,5 @@
 #include "../DxLibEngine.h"
 #include "ScenePlay.h"
-#include "../SceneResult/SceneResult.h"
-#include "../Manager/Item/ItemManager.h"
-#include "../Manager/Scene/SceneManager.h"
-#include "../Manager/Enemy/EnemyManager.h"
-#include "../Manager/Score/ScoreManager.h"
 #include "Sky/SkyBox.h"
 #include "Pause/PauseMenu.h"
 #include "Star/ShiningStar.h"
@@ -17,6 +12,11 @@
 #include "../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../ScenePlay/Bullet/Enemy/HomingBullet.h"
+#include "../SceneResult/SceneResult.h"
+#include "../Manager/Item/ItemManager.h"
+#include "../Manager/Scene/SceneManager.h"
+#include "../Manager/Enemy/EnemyManager.h"
+#include "../Manager/Score/ScoreManager.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_PatchouliKnowledge.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_Cirno.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
@@ -54,14 +54,17 @@ namespace {
 ScenePlay::ScenePlay(const std::string selectedDifficulty, const int stage)
 {
 	Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
-	int graph = cus->TryLoadGraph("graphics/miniMap/radar.jpg", "ScenePlay::ScenePlay()");
+	int graph = 
+		cus->TryLoadGraph("graphics/miniMap/radar.jpg", "ScenePlay::ScenePlay()");
 
-	_miniMap_hdl = graph; // ミニマップ画像ロード
+	// ミニマップ画像ロード
+	_miniMap_hdl = graph;
 
 	_GAME_DIFFICULTY = selectedDifficulty;
 	_STAGE_ID = stage;
 
-	InitWeatherParticle(cus); // 雪や雨などのパーティクル
+	// 雪や雨などのパーティクル
+	InitWeatherParticle(cus);
 
 	_isShowGameBeginText = true;
 	inl::PauseMenu::_isShowPauseOption = false;
@@ -83,19 +86,25 @@ ScenePlay::ScenePlay(const std::string selectedDifficulty, const int stage)
 	// 敵に関するあらゆる処理を管理
 	_enemyManager = std::make_shared<inl::EnemyManager>(_player, _mainCamera, _collision);
 
-	// 弾幕工場
+	//　弾幕消去（初期化）
+	DestroyFirstStageBulletHellLists();
+	DestroySecondStageBulletHellLists();
+	DestroyThirdStageBulletHellLists();
+
+	// 弾幕生成工場
 	_bltHellFactory = std::make_shared<inl::BulletHellFactory>();
 
 	// 生成する弾幕を最初に選び、初期化
-	CheckDoInit_FirstStageBulletHellLists();
-	CheckDoInit_SecondStageBulletHellLists();
-	CheckDoInit_ThirdStageBulletHellLists();
+	InitFirstStageBulletHellLists();
+	InitSecondStageBulletHellLists();
+	InitThirdStageBulletHellLists();
 
 	// 弾幕のアクティブフラグを全てリセット
-	TurnOff_FirstStageBulletHellLists();
-	TurnOff_SecondStageBulletHellLists();
-	TurnOff_ThirdStageBulletHellLists();
+	TurnOffFirstStageBulletHellLists();
+	TurnOffSecondStageBulletHellLists();
+	TurnOffThirdStageBulletHellLists();
 
+	// プレイヤークラスへ敵の参照を渡す
 	_player->SetEnemyManagerRef(_enemyManager);
 
 	// アイテム-----------------------------------------
@@ -103,8 +112,10 @@ ScenePlay::ScenePlay(const std::string selectedDifficulty, const int stage)
 	ItemManager::GetInstance().CreateScoreItemPool(selectedDifficulty, _STAGE_ID);   // 生成
 	ItemManager::GetInstance().CreatePowerUpItemPool(selectedDifficulty, _STAGE_ID); // 生成
 
+	//　スクリーンエフェクト
 	_screenEffect = std::make_shared<dxe::ScreenEffect>(DXE_WINDOW_WIDTH, DXE_WINDOW_HEIGHT);
 
+	//　ポーズメニュー
 	_pauseMenu = std::make_shared<inl::PauseMenu>(_player);
 }
 
@@ -113,57 +124,62 @@ void ScenePlay::InitWeatherParticle(const Shared<inl::CustomException>& cus)
 {
 	if (_STAGE_ID == 1) {
 
-		auto particle = cus->TryLoadParticleBinaryFile("particle/preset/snow.bin", "ScenePlay::InitWeatherParticle()");
+		auto particle = 
+			cus->TryLoadParticleBinaryFile("particle/preset/snow.bin", "ScenePlay::InitWeatherParticle()");
 		_weatherParticle = particle;
 	}
 	else if (_STAGE_ID == 2) {
 
-		auto particle = cus->TryLoadParticleBinaryFile("particle/preset/customRain.bin", "ScenePlay::InitWeatherParticle()");
+		auto particle = 
+			cus->TryLoadParticleBinaryFile("particle/preset/customRain.bin", "ScenePlay::InitWeatherParticle()");
 		_weatherParticle = particle;
 	}
 }
 
 
-// プレイヤーボム効果-------------------------------------------------------------------------------------------------------------------------
+// プレイヤーボム--------------------------------------------------------------------------------------------------------
 void ScenePlay::ReactivateEnemyBullets() {
 
 	switch (_STAGE_ID)
 	{
+		//　ステージ１の敵の弾幕を有効化
 	case 1:
 	{
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			b->_isActive = true;
 		}
 		break;
 	}
+	//　ステージ２の敵の弾幕を有効化
 	case 2:
 	{
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
 			b->_isActive = true;
 		}
 		break;
 	}
+	//　ステージ３の敵の弾幕を有効化
 	case 3:
 	{
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
 			b->_isActive = true;
 		}
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			b->_isActive = true;
 		}
 		break;
@@ -176,41 +192,44 @@ void ScenePlay::DeactivateAllEnemyBullets() {
 
 	switch (_STAGE_ID)
 	{
+	//　ステージ１の敵の弾幕を無効化
 	case 1:
 	{
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+		for (auto& b : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
 			b->_isActive = false;
 		}
 		break;
 	}
+	//　ステージ２の敵の弾幕を無効化
 	case 2:
 	{
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+		for (auto& b : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
 			b->_isActive = false;
 		}
 		break;
 	}
+	//　ステージ３の敵の弾幕を無効化
 	case 3:
 	{
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
 			b->_isActive = false;
 		}
-		for (auto b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+		for (auto& b : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 			b->_isActive = false;
 		}
 		break;
@@ -229,7 +248,7 @@ void ScenePlay::InitPlayersBombCount(const std::string selectedDifficulty) noexc
 
 
 // 弾幕（ボスの弾）-----------------------------------------------------------------------------------------------------------------------------
-void ScenePlay::CheckDoInit_FirstStageBulletHellLists()
+void ScenePlay::InitFirstStageBulletHellLists()
 {
 	if (_STAGE_ID != 1) return;
 
@@ -244,7 +263,7 @@ void ScenePlay::CheckDoInit_FirstStageBulletHellLists()
 }
 
 
-void ScenePlay::TurnOff_FirstStageBulletHellLists() {
+void ScenePlay::TurnOffFirstStageBulletHellLists() {
 
 	inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli = false;
 	inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli = false;
@@ -263,33 +282,43 @@ void ScenePlay::DestroyFirstStageBulletHellLists() {
 void ScenePlay::RenderFirstStageBulletHellLists()
 {
 	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_normal_patchouli) {
-		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
-			if (blt->_isActive)	blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_normal_patchouli) {
+			
+			if (blt->_isActive)	
+				blt->Render(_mainCamera);
 		}
 
-		//std::string s = std::to_string(_bullet_normal_patchouli.size());　　		// 弾が何個生成されているかを表示するデバッグ用
+		// 弾が何個生成されているかを表示するデバッグ用
+		//std::string s = std::to_string(_bullet_normal_patchouli.size());
 		//DrawFormatString(1000, 50, -1, "%s個 normal", s.c_str());
 	}
 
 	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_metalFatigue_patchouli) {
 
-		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_metalFatigue_patchouli) {
+			
+			if (blt->_isActive)  
+				blt->Render(_mainCamera);
 		}
-		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());　 // 弾が何個生成されているかを表示するデバッグ用
+
+		// 弾が何個生成されているかを表示するデバッグ用
+		//std::string s = std::to_string(_bullet_metalFatigue_patchouli.size());
 		//DrawFormatString(1000, 50, -1, "%s個 metalFatigue", s.c_str());
 	}
 
 	if (inl::EnemyBoss_PatchouliKnowledge::_isUsingBullet_silentSerena_patchouli) {
 
-		for (auto blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_PatchouliKnowledge::_bullet_silentSerena_patchouli) {
+			
+			if (blt->_isActive)  
+				blt->Render(_mainCamera);
 		}
-		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());　　// 弾が何個生成されているかを表示するデバッグ用
+
+		// 弾が何個生成されているかを表示するデバッグ用
+		//std::string s = std::to_string(_bullet_silentSerena_patchouli.size());
 		//DrawFormatString(1000, 50, -1, "%s個 silentSerena", s.c_str());
 	}
 }
-
 
 
 void ScenePlay::UpdateFirstStageBulletHellLists()
@@ -330,7 +359,7 @@ void ScenePlay::UpdateFirstStageBulletHellLists()
 }
 
 
-void ScenePlay::CheckDoInit_SecondStageBulletHellLists()
+void ScenePlay::InitSecondStageBulletHellLists()
 {
 	if (_STAGE_ID != 2) return;
 
@@ -345,7 +374,7 @@ void ScenePlay::CheckDoInit_SecondStageBulletHellLists()
 }
 
 
-void ScenePlay::TurnOff_SecondStageBulletHellLists() 
+void ScenePlay::TurnOffSecondStageBulletHellLists() 
 {
 	inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno = false;
 	inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno = false;
@@ -365,8 +394,10 @@ void ScenePlay::DestroySecondStageBulletHellLists()
 void ScenePlay::RenderSecondStageBulletHellLists()
 {
 	if (inl::EnemyBoss_Cirno::_isUsingBullet_normal_cirno) {
-		for (auto blt : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
-			if (blt->_isActive)	blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_Cirno::_bullet_normal_cirno) {
+
+			if (blt->_isActive)	
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_normal_cirno.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -374,8 +405,10 @@ void ScenePlay::RenderSecondStageBulletHellLists()
 
 	if (inl::EnemyBoss_Cirno::_isUsingBullet_icicleFall_cirno) {
 
-		for (auto blt : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_Cirno::_bullet_icicleFall_cirno) {
+
+			if (blt->_isActive)  
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_icicleFall_cirno.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -383,8 +416,10 @@ void ScenePlay::RenderSecondStageBulletHellLists()
 
 	if (inl::EnemyBoss_Cirno::_isUsingBullet_perfectFreeze_cirno) {
 
-		for (auto blt : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_Cirno::_bullet_perfectFreeze_cirno) {
+
+			if (blt->_isActive)  
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_perfectFreeze_cirno.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -433,7 +468,7 @@ void ScenePlay::UpdateSecondStageBulletHellLists()
 }
 
 
-void ScenePlay::CheckDoInit_ThirdStageBulletHellLists() {
+void ScenePlay::InitThirdStageBulletHellLists() {
 
 	if (_STAGE_ID != 3) return;
 
@@ -448,7 +483,8 @@ void ScenePlay::CheckDoInit_ThirdStageBulletHellLists() {
 }
 
 
-void ScenePlay::TurnOff_ThirdStageBulletHellLists() {
+void ScenePlay::TurnOffThirdStageBulletHellLists() {
+
 	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako = false;
 	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako = false;
 	inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako = false;
@@ -456,6 +492,7 @@ void ScenePlay::TurnOff_ThirdStageBulletHellLists() {
 
 
 void ScenePlay::DestroyThirdStageBulletHellLists() {
+
 	inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako.clear();
 	inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako.clear();
 	inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako.clear();
@@ -465,8 +502,10 @@ void ScenePlay::DestroyThirdStageBulletHellLists() {
 void ScenePlay::RenderThirdStageBulletHellLists() {
 
 	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_normal_suwako) {
-		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
-			if (blt->_isActive)	blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_MoriyaSuwako::_bullet_normal_suwako) {
+
+			if (blt->_isActive)	
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_normal_suwako.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -474,8 +513,10 @@ void ScenePlay::RenderThirdStageBulletHellLists() {
 
 	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_ironRingOfMoriya_suwako) {
 
-		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_MoriyaSuwako::_bullet_ironRingOfMoriya_suwako) {
+
+			if (blt->_isActive) 
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_ironRingOfMoriya_suwako.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -483,8 +524,10 @@ void ScenePlay::RenderThirdStageBulletHellLists() {
 
 	if (inl::EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako) {
 
-		for (auto blt : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
-			if (blt->_isActive)  blt->Render(_mainCamera);
+		for (auto& blt : inl::EnemyBoss_MoriyaSuwako::_bullet_keroChanStandsFirmAgainstTheStorm_suwako) {
+
+			if (blt->_isActive)  
+				blt->Render(_mainCamera);
 		}
 		//std::string s = std::to_string(_bullet_keroChanStandsFirmAgainstTheStorm_suwako.size());
 		//DrawFormatString(1000, 50, -1, "%s個", s.c_str());
@@ -591,12 +634,11 @@ void ScenePlay::Render() {
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _bgAlpha_whenCall_pauseMenu);
 
-	_screenEffect->renderBegin();
+	_screenEffect->renderBegin();         // スクリーンエフェクト
 
-	_skyBox->Render(_mainCamera);
-	_player->Render(_mainCamera);
-	_enemyManager->Render(_mainCamera);
-
+	_skyBox->Render(_mainCamera);         // スカイボックス
+	_player->Render(_mainCamera);		  // プレイヤー
+	_enemyManager->Render(_mainCamera);	  // エネミーマネージャー
 
 	//　天候パーティクル----------------------------------------------------------------------
 	if (_STAGE_ID == 1 || _STAGE_ID == 2) {
@@ -609,7 +651,6 @@ void ScenePlay::Render() {
 		// お星さま描画
 		inl::ShiningStar s;	s.Render();
 	}
-
 
 	//　ボムパーティクル----------------------------------------------------------------------
 	if (_player->GetIsTriggeredBombEffect()) {
@@ -719,8 +760,8 @@ void ScenePlay::Update(const float deltaTime) {
 		_player->Update(deltaTime);		        //　プレイヤー
 
 		UpdateFirstStageBulletHellLists();      //　弾幕
-		UpdateSecondStageBulletHellLists();
-		UpdateThirdStageBulletHellLists();
+		UpdateSecondStageBulletHellLists();		//　弾幕
+		UpdateThirdStageBulletHellLists();		//　弾幕
 	}
 
 	// ゲーム開始時の「 Begin 」テキスト

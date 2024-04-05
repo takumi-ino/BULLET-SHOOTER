@@ -44,7 +44,7 @@ namespace inl {
 			dxe::Texture::CreateFromFile("graphics/boxTexture/box_back.bmp"),
 			dxe::Texture::CreateFromFile("graphics/boxTexture/box_forward.bmp"));
 
-		_mesh->pos_ = GetRandomPosition_Mt19337();
+		_mesh->pos_ = GetRandomPosition();
 		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
 	}
 

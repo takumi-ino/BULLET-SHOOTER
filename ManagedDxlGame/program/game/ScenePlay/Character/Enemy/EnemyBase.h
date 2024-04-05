@@ -25,14 +25,14 @@ namespace inl {
 
 		// 待機、追跡、攻撃などのパターンを管理し実行
 		virtual void DoRoutineMoves(const float deltaTime) {}
-
+		//　プレイヤー追跡
 		virtual void ChasePlayer(const float deltaTime) {}
-
+		//　プレイヤーを攻撃
 		virtual void AttackPlayer(const float deltaTime) {}
-
+		//　プレイヤーを見る
 		void LookAtPlayer();
-
-		tnl::Vector3 GetRandomPosition_Mt19337() const;
+		//　
+		tnl::Vector3 GetRandomPosition() const;
 
 	protected:
 

@@ -20,18 +20,27 @@ namespace inl {
 
 		_skybox = dxe::Mesh::CreateCubeMV(50000, 20, 20);
 
+		SetSkyBoxTexture_CurrentStage(cus);
+	}
+
+
+
+	void SkyBox::SetSkyBoxTexture_CurrentStage(Shared<inl::CustomException>& cus)
+	{
 		switch (ScenePlay::GetStageID())
 		{
-		case 1: 
+		case 1:
 		{
-			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_c.png", "inl::Player::Player()");
+			auto textureHandle =
+				cus->TryLoadTexture("graphics/skybox/_skybox_c.png", "inl::Player::Player()");
 
 			_skybox->setTexture(textureHandle);
 			break;
 		}
 		case 2:
 		{
-			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_b.png", "inl::Player::Player()");
+			auto textureHandle =
+				cus->TryLoadTexture("graphics/skybox/_skybox_b.png", "inl::Player::Player()");
 
 			_skybox->setTexture(textureHandle);
 			break;
@@ -39,7 +48,8 @@ namespace inl {
 		}
 		case 3:
 		{
-			auto textureHandle = cus->TryLoadTexture("graphics/skybox/_skybox_a.png", "inl::Player::Player()");
+			auto textureHandle =
+				cus->TryLoadTexture("graphics/skybox/_skybox_a.png", "inl::Player::Player()");
 
 			_skybox->setTexture(textureHandle);
 			break;

@@ -116,7 +116,7 @@ namespace inl {
 		//　一定間隔でランダムな地点にワープ
 		if (_warpToRandPosTimer > _WARPING_DURATION) {
 
-			tnl::Vector3 targetPos = _mesh->pos_ + GetRandomPosition_Mt19337();
+			tnl::Vector3 targetPos = _mesh->pos_ + GetRandomPosition();
 
 			_mesh->pos_ += (targetPos - _mesh->pos_);
 

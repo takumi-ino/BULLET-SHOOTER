@@ -4,6 +4,7 @@
 namespace inl {
 
 	class FreeLookCamera;
+	class CustomException;
 
 	// ステージのテクスチャ　空模様
 
@@ -15,6 +16,10 @@ namespace inl {
 
 		void Update();
 		void Render(const Shared<inl::FreeLookCamera>& camera);
+
+	private:
+
+		void SetSkyBoxTexture_CurrentStage(Shared<inl::CustomException>& cus);
 
 	public:
 

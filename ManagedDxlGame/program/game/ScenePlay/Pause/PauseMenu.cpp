@@ -10,7 +10,6 @@
 
 namespace inl {
 
-
 	bool PauseMenu::_isShowPauseOption = false;
 
 
@@ -26,12 +25,16 @@ namespace inl {
 		if (InputFuncTable::IsButtonDownTrigger_UP())
 		{
 			_menuIndex--;
-			if (_menuIndex < 0) _menuIndex = _MENU_INDEX_COUNT - 1;
+
+			if (_menuIndex < 0) 
+				_menuIndex = _MENU_INDEX_COUNT - 1;
 		}
 		if (InputFuncTable::IsButtonDownTrigger_DOWN())
 		{
 			_menuIndex++;
-			if (_menuIndex >= _MENU_INDEX_COUNT) _menuIndex = 0;
+
+			if (_menuIndex >= _MENU_INDEX_COUNT)
+				_menuIndex = 0;
 		}
 	}
 
@@ -39,6 +42,7 @@ namespace inl {
 	void PauseMenu::PickPauseMenuItemByInput() {
 
 		if (_MENU_INDEX_COUNT == 4) {
+
 			// ƒQ[ƒ€ÄŠJ
 			if (_menuIndex == 0) {
 
@@ -115,6 +119,14 @@ namespace inl {
 
 	void PauseMenu::ResetGame()
 	{
+		_scenePlay->TurnOffFirstStageBulletHellLists();
+		_scenePlay->TurnOffSecondStageBulletHellLists();
+		_scenePlay->TurnOffThirdStageBulletHellLists();
+
+		ScenePlay::DestroyFirstStageBulletHellLists();
+		ScenePlay::DestroySecondStageBulletHellLists();
+		ScenePlay::DestroyThirdStageBulletHellLists();
+
 		SoundManager::GetInstance().DestroyStageBGM(false);
 
 		_player_ref->SetHP(_player_ref->GetMaxHP());

@@ -1,19 +1,17 @@
 #include "EnemyBase.h"
-#include <random>
 #include "../Player/Player.h"
+#include "../game/ScenePlay/RandomValue/RandomValueGenerator.h"
 
 namespace inl {
 
-	tnl::Vector3 EnemyBase::GetRandomPosition_Mt19337() const {
+	tnl::Vector3 EnemyBase::GetRandomPosition() const {
 
-		std::random_device rd;
-		std::mt19937 gen(rd());
-
-		std::uniform_real_distribution<float> distX(-_RANDOM_SPAWN_RANGE_X, _RANDOM_SPAWN_RANGE_X);
-		std::uniform_real_distribution<float> distY(-_RANDOM_SPAWN_RANGE_Y, _RANDOM_SPAWN_RANGE_Y);
-		std::uniform_real_distribution<float> distZ(-_RANDOM_SPAWN_RANGE_Z, _RANDOM_SPAWN_RANGE_Z);
-
-		return tnl::Vector3(distX(gen), distY(gen), distZ(gen));
+		return 
+			RandomValueGenerator::Vector(
+			-_RANDOM_SPAWN_RANGE_X, _RANDOM_SPAWN_RANGE_X,
+			- _RANDOM_SPAWN_RANGE_Y, _RANDOM_SPAWN_RANGE_Y,
+			- _RANDOM_SPAWN_RANGE_Z, _RANDOM_SPAWN_RANGE_Z
+		);
 	}
 
 

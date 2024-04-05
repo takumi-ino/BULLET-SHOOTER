@@ -93,7 +93,7 @@ namespace inl {
 
 		// 似た処理が多い場合、効率化のため補助関数を使用（ InitAssist, WaveAssist, UpdateAssist）など
 
-		// ステージ1ボス（パチュリー）---------------------------------------------------------------
+		// ステージ1ボス（パチュリー）-----------------------------------------------------------
 		void WaveAssist_MetalFatigue_Patchouli(
 			Shared<EnemyBullet>& bullet,
 			const float deltaTime,

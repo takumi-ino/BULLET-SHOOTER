@@ -36,7 +36,7 @@ namespace {
 		std::string sound = cus->TryLoadSoundPath("sound/bgm/title.mp3", "SceneTitle::SceneTitle()");
 
 		SoundManager::GetInstance().LoadBGM(sound);
-		//SoundManager::GetInstance().PlayBGM();
+		SoundManager::GetInstance().PlayBGM();
 	}
 
 
@@ -66,7 +66,13 @@ namespace {
 		_transTime_logoLights += deltaTime;
 		
 		// tnl::SingleOscillationy ŠÖ”“à‚ÅU“®ŠJŽnˆÊ’u‚É + 1.5f‚Ì•ÏX‚ð‰Á‚¦‚Ä‚¢‚é
-		float bloom = tnl::SingleOscillationy(tnl::eOscStart::STOK, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_logoLights);
+		float bloom = 
+			tnl::SingleOscillationy(
+				tnl::eOscStart::STOK,
+				0,
+				_EFFECT_TRANS_OSCILLATE_RATE, 
+				_transTime_logoLights
+			);
 
 		_screenEffect->setBloomThreshold(bloom * _TITLELOGO_EFFECT_OSCILLATE_SPEED);
 	}
@@ -77,8 +83,23 @@ namespace {
 		_transTime_cb += deltaTime;
 		_transTime_cr -= deltaTime;
 
-		float cb = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_cb);
-		float cr = tnl::SingleOscillationy(tnl::eOscStart::CENTER, 0, _EFFECT_TRANS_OSCILLATE_RATE, _transTime_cr);
+		// ÂŒn“
+		float cb = 
+			tnl::SingleOscillationy(
+				tnl::eOscStart::CENTER,
+				0,
+				_EFFECT_TRANS_OSCILLATE_RATE,
+				_transTime_cb
+			);
+
+		// ÔŒn“
+		float cr = 
+			tnl::SingleOscillationy(
+				tnl::eOscStart::CENTER, 
+				0,
+				_EFFECT_TRANS_OSCILLATE_RATE,
+				_transTime_cr
+			);
 
 		_screenEffect->setMonoCb(cb * _BACKGROUND_EFFECT_OSCILLATE_SPEED);
 		_screenEffect->setMonoCr(cr * _BACKGROUND_EFFECT_OSCILLATE_SPEED);

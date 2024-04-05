@@ -4,8 +4,11 @@
 
 namespace inl {
 
-
-	int CustomException::TryLoadGraph(const std::string filePath, const std::string relevantFunction) {
+	//　画像----------------------------------------------------------------------------------
+	int CustomException::TryLoadGraph(
+		const std::string filePath, 
+		const std::string relevantFunction)
+	{
 
 		try {
 			bool graph = FilePathChecker::GRAPH(filePath);        // 最初にファイルパスが正しいか確認
@@ -31,7 +34,11 @@ namespace inl {
 	}
 
 
-	int CustomException::TryLoadSound(const std::string filePath, const std::string relevantFunction) {
+	//　サウンド----------------------------------------------------------------------------------
+	int CustomException::TryLoadSound(
+		const std::string filePath, 
+		const std::string relevantFunction) 
+	{
 
 		try {
 			bool sound = FilePathChecker::SOUND(filePath);
@@ -57,7 +64,11 @@ namespace inl {
 	}
 
 
-	Shared<dxe::Texture> CustomException::TryLoadTexture(const std::string filePath, const std::string relevantFunction) {
+	//　テクスチャ----------------------------------------------------------------------------------
+	Shared<dxe::Texture> CustomException::TryLoadTexture(
+		const std::string filePath,
+		const std::string relevantFunction)
+	{
 
 		try {
 			bool graph = FilePathChecker::GRAPH(filePath);
@@ -83,7 +94,11 @@ namespace inl {
 	}
 
 
-	std::string CustomException::TryLoadSoundPath(const std::string filePath, const std::string relevantFunction) {
+	//　サウンドパス----------------------------------------------------------------------------------
+	std::string CustomException::TryLoadSoundPath(
+		const std::string filePath,
+		const std::string relevantFunction)
+	{
 
 		try {
 			bool graph = FilePathChecker::SOUND(filePath);
@@ -101,7 +116,11 @@ namespace inl {
 	}
 
 
-	std::string CustomException::TryLoadBinaryPath(const std::string filePath, const std::string relevantFunction) {
+	//　バイナリファイルパス--------------------------------------------------------------------------
+	std::string CustomException::TryLoadBinaryPath(
+		const std::string filePath, 
+		const std::string relevantFunction)
+	{
 
 		try {
 			bool graph = FilePathChecker::BINARY(filePath);
@@ -119,7 +138,11 @@ namespace inl {
 	}
 
 
-	Shared<dxe::Particle> CustomException::TryLoadParticleBinaryFile(const std::string filePath, const std::string relevantFunction) {
+	//　パーティクルのバイナリファイル-----------------------------------------------------------------
+	Shared<dxe::Particle> CustomException::TryLoadParticleBinaryFile(
+		const std::string filePath, 
+		const std::string relevantFunction) 
+	{
 
 		try {
 			bool graph = FilePathChecker::BINARY(filePath);
@@ -147,7 +170,11 @@ namespace inl {
 	}
 
 
-	std::vector<std::vector<tnl::CsvCell>> CustomException::TryLoadCsvFile(const std::string filePath, const std::string relevantFunction) {
+	//　CSVファイル----------------------------------------------------------------------------------
+	std::vector<std::vector<tnl::CsvCell>> CustomException::TryLoadCsvFile(
+		const std::string filePath,
+		const std::string relevantFunction) 
+	{
 
 		try {
 			bool graph = FilePathChecker::CSV(filePath);

@@ -27,10 +27,10 @@ namespace inl {
 			const Shared<Collision>& collision
 		);
 
-		// INIT----------------------------------------------------------
+		// 初期化----------------------------------------------------------
 		virtual void InitBulletHellInstance() {}
 
-		// DAMAGE--------------------------------------------------------
+		// ダメージ--------------------------------------------------------
 		void DecreaseBossHP(int damage);
 
 	protected:
@@ -39,19 +39,21 @@ namespace inl {
 		bool ShowHpGage_EnemyBoss();
 		void RenderBossRemainLife();
 
-		// NAME-----------------------------------------------------------
+		// 名前-----------------------------------------------------------
 		void RenderBossName();
 		virtual void RenderBossSpellCardName() {}
 
-		// HIT------------------------------------------------------------
-		void CheckCollision_BulletHellBulletsAndPlayer_DRY(std::vector<Shared<EnemyBullet>>& bulletVector);
+		// 当たり判定-----------------------------------------------------
+		void CheckCollision_BulletHellBulletsAndPlayer_DRY(
+			std::vector<Shared<EnemyBullet>>& bulletVector
+		);
 
-		// ACT------------------------------------------------------------
-		void ActKeepDistanceToPlayer(const float deltaTime);
+		// 挙動------------------------------------------------------------
+		void ActKeepDistanceToPlayer(const float deltaTime);        // プレイヤーと一定距離を保つ
 
-		void WarpToRandomPos(const float deltaTime);
+		void WarpToRandomPos(const float deltaTime);				// 一定時間でランダムワープ
 
-		void ClampMovableRange(tnl::Vector3& moveDirection);
+		void ClampMovableRange(tnl::Vector3& moveDirection);		// 移動範囲制限
 
 	public:
 
@@ -69,10 +71,10 @@ namespace inl {
 
 	private:
 
-		// ボス残りHP。4つの赤い ダイヤの形をしたもの-------------------------
+		// ボス残りHP。4つの赤い ダイヤの形をしたもの
 		std::stack<std::deque<int>> _remainingLife_indicator;
 
-		// ワープするタイミングをタイマーで制御-------------------------------
+		// ワープするタイミングをタイマーで制御
 		float _warpToRandPosTimer{};
 	};
 }

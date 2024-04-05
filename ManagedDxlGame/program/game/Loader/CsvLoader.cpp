@@ -2,7 +2,10 @@
 #include "CsvLoader.h"
 
 
-std::unordered_map<int, inl::EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(std::vector<std::vector<tnl::CsvCell>> csv) {
+//　通常エネミー
+std::unordered_map<int, inl::EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(
+	std::vector<std::vector<tnl::CsvCell>> csv)
+{
 
 	std::unordered_map<int, inl::EnemyZakoInfo> infos;
 
@@ -59,8 +62,10 @@ std::unordered_map<int, inl::EnemyZakoInfo> CsvLoader::LoadEnemyZakoInfos(std::v
 }
 
 
-
-std::unordered_map<int, inl::EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(std::vector<std::vector<tnl::CsvCell>> csv) {
+//　ボスエネミー
+std::unordered_map<int, inl::EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(
+	std::vector<std::vector<tnl::CsvCell>> csv)
+{
 
 	std::unordered_map<int, inl::EnemyBossInfo> infos;
 
@@ -102,10 +107,12 @@ std::unordered_map<int, inl::EnemyBossInfo> CsvLoader::LoadEnemyBossInfos(std::v
 
 
 
-std::unordered_map<int, inl::BulletHellType_Info> CsvLoader::LoadBulletHellTypeInfos(std::vector<std::vector<tnl::CsvCell>> csv) {
+//　弾幕
+std::unordered_map<int, inl::BulletHellType_Info> CsvLoader::LoadBulletHellTypeInfos(
+	std::vector<std::vector<tnl::CsvCell>> csv) 
+{
 
 	std::unordered_map<int, inl::BulletHellType_Info> info;
-
 
 	for (int i = 1; i < csv.size(); i++) {
 
@@ -139,7 +146,10 @@ std::unordered_map<int, inl::BulletHellType_Info> CsvLoader::LoadBulletHellTypeI
 
 
 
-inl::PlayerStatus& CsvLoader::LoadPlayerStatus(std::vector<std::vector<tnl::CsvCell>> csv) {
+//　プレイヤーステータス
+inl::PlayerStatus& CsvLoader::LoadPlayerStatus(
+	std::vector<std::vector<tnl::CsvCell>> csv) 
+{
 
 	inl::PlayerStatus data;
 

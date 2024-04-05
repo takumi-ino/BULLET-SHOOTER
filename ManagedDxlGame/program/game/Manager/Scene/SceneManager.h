@@ -2,6 +2,7 @@
 #include "SceneBase.h"
 
 
+//　講師配布の雛形クラス　シーンの移動を行う
 class SceneManager : public SceneBase
 {
 public:

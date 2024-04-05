@@ -27,9 +27,16 @@ namespace inl {
 		~PlayerBullet() override {}
 
 		//　弾の威力設定-----------------------------------------------------------
-		static void ClampBulletPowerRate() noexcept { if (_bulletPowerRate >= 5.0f) _bulletPowerRate = 5.0f; }
+		static void ClampBulletPowerRate() noexcept                        // 弾の威力制限
+		{ 
+			if (_bulletPowerRate >= 5.0f) 
+				_bulletPowerRate = 5.0f; 
+		}
 
-		static void ResetBulletPowerRate() noexcept { _bulletPowerRate = 0.f; }
+		static void ResetBulletPowerRate() noexcept                        // 弾の威力リセット
+		{ 
+			_bulletPowerRate = 0.f; 
+		}
 
 		//　描画・更新---------------------------------------------------------------
 		void Render(const Shared<dxe::Camera> mainCamera) override;
@@ -37,15 +44,15 @@ namespace inl {
 
 	public:
 
-		static float _bulletPowerRate;
+		static float _bulletPowerRate;            // 弾の威力
 
-		bool         _isActive{ true };
+		bool         _isActive{ true };           // アクティブ状態
 
 		tnl::Vector3 _moveDirection{};            // 進む方向
 		tnl::Vector3 _collisionSize{ 10,10,10 };  // 当たり判定サイズ
 
 	private:
 
-		float        _speed{};
+		float        _speed{};                    // スピード
 	};
 }

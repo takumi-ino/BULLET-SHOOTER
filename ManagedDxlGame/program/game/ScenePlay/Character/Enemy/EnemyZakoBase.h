@@ -38,27 +38,27 @@ namespace inl {
 			const Shared<Collision>& collision
 		);
 
-		// 初期化 ------------------------------------------------------------------
-		virtual void InitBulletFactoryInstance() {}
+		// 初期化 --------------------------------------------------------------
+		virtual void InitBulletFactoryInstance() {}                                  //　弾幕生成
 
 		// HP ------------------------------------------------------------------
-		bool DecreaseHP(int damage, Shared<dxe::Camera> camera);
+		bool DecreaseHP(int damage, Shared<dxe::Camera> camera);                     //　HP減少
 
-		// 描画・更新 ------------------------------------------------------------
+		// 描画・更新 ----------------------------------------------------------
 		void Render(Shared<dxe::Camera> camera) override;
 		bool Update(const float deltaTime) override;
 
 	protected:
 
 		// 直行弾 ------------------------------------------------------------
-		void ShotStraightBullet(const float deltaTime);           // 発射
-		void ReloadStraightBulletByTimer(const float deltaTime);  // リロード
-		void UpdateStraightBullet(const float deltaTime);         // 更新
+		void ShotStraightBullet(const float deltaTime);                              // 発射
+		void ReloadStraightBulletByTimer(const float deltaTime);                     // リロード
+		void UpdateStraightBullet(const float deltaTime);                            // 更新
 
 		// 追尾弾 ------------------------------------------------------------
-		void ShotHomingBullet(const float deltaTime);             // 発射
-		void ReloadHomingBulletByTimer(const float deltaTime);	  // リロード
-		void UpdateHomingBullet(const float deltaTime);			  // 更新
+		void ShotHomingBullet(const float deltaTime);                                // 発射
+		void ReloadHomingBulletByTimer(const float deltaTime);	                     // リロード
+		void UpdateHomingBullet(const float deltaTime);			                     // 更新
 
 		// プレイヤーへ攻撃 -------------------------------------------------------------------
 		void AttackPlayer(const float deltaTime);
@@ -81,19 +81,19 @@ namespace inl {
 
 		bool ShowHpGage_EnemyZako();
 
-		const float GetIdleDistance() const noexcept { return _IDLE_DISTANCE; }
-		const float GetAttackDistance() const noexcept { return _ATTACK_DISTANCE; }
+		const float GetIdleDistance() const noexcept { return _IDLE_DISTANCE; }       //　待機距離
+		const float GetAttackDistance() const noexcept { return _ATTACK_DISTANCE; }   //　攻撃範囲距離
 
 	protected:
 
-		Shared<Collision>                      _collision_ref = nullptr;
+		Shared<Collision>                      _collision_ref = nullptr;              // 当たり判定
 
-		Shared<BulletFactory>                  _bulletFactory = nullptr;
+		Shared<BulletFactory>                  _bulletFactory = nullptr;              // 弾幕
 
-		std::list<Shared<StraightBullet>>      _straight_bullets{};
+		std::list<Shared<StraightBullet>>      _straight_bullets{};                   // 直行弾
 		std::deque<Shared<StraightBullet>>     _straightBullet_queue{};
 
-		std::list<Shared<HomingBullet>>        _homing_bullets{};
+		std::list<Shared<HomingBullet>>        _homing_bullets{};					  // 追尾弾
 		std::deque<Shared<HomingBullet>>       _homingBullet_queue{};
 
 	public:
@@ -111,9 +111,9 @@ namespace inl {
 		// CSVからロード-----------------------
 		int         _hp{};                         // HP
 		int         _maxTotalEnemy_spawnCount{};   // 敵の総数
-		int         _bulletFireInterval{};        // 弾の発射間隔
-		float       _bulletMoveSpeed{};           // 弾の移動スピード
-		float       _bulletReloadTimeInterval{};  // リロード間隔
+		int         _bulletFireInterval{};         // 弾の発射間隔
+		float       _bulletMoveSpeed{};            // 弾の移動スピード
+		float       _bulletReloadTimeInterval{};   // リロード間隔
 
 	protected:
 

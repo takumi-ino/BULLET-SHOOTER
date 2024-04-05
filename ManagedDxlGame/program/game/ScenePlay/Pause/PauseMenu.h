@@ -41,13 +41,13 @@ namespace inl {
 
 	public:
 
-		static bool      _isShowPauseOption;
+		static bool      _isShowPauseOption;         // 表示のオンオフ
 
 	private:
 
-		int              _MENU_INDEX_COUNT{ 4 };
-		int              _menuIndex{};
+		int              _MENU_INDEX_COUNT{ 4 };     // メニューの項目数
+		int              _menuIndex{};               // メニュー選択インデックス
 
-		bool             _isShowConfigInfo{ false };
+		bool             _isShowConfigInfo{ false }; // コンフィグ
 	};
 }
