@@ -1,17 +1,20 @@
 #include "Player.h"
-#include "../../Bullet/Player/PlayerBullet.h"
 #include "../../Sky/SkyBox.h"
 #include "../../ScenePlay.h"
 #include "../../Camera/FreeLookCamera.h"
-#include "../../Character/Enemy/EnemyZakoBase.h"
-#include "../../Character/Enemy/EnemyBossBase.h"
-#include "../game/Manager/Enemy/EnemyManager.h"
 #include "../../Pause/PauseMenu.h"
-#include "../game/ScenePlay/Bullet/Player/Gunport.h"
 #include "../game/Loader/CsvLoader.h"
+// 弾----------------------------------------------------------
+#include "../../Bullet/Player/PlayerBullet.h"
+#include "../game/ScenePlay/Bullet/Player/Gunport.h"
+// 機能----------------------------------------------------------
 #include "../../../Utility/InputFuncTable.h"
 #include "../game/Utility/CustomException.h"
 #include "../game/Utility/FilePathChecker.h"
+// 敵-------------------------------------------------------------
+#include "../../Character/Enemy/EnemyZakoBase.h"
+#include "../../Character/Enemy/EnemyBossBase.h"
+#include "../game/Manager/Enemy/EnemyManager.h"
 
 
 namespace inl {
@@ -62,15 +65,16 @@ namespace inl {
 		//　ロードに失敗したら例外発生----------------------------------------------------
 		auto textureHandle = cus->TryLoadTexture("graphics/prismatic-star.png", "inl::Player::Player()");
 		auto soundHandle = cus->TryLoadSound("sound/se/getHit.mp3", "inl::Player::Player()");
-		auto particleBinary = cus->TryLoadParticleBinaryFile("particle/preset/bombEffect.bin", "inl::Player::Player()");
-		auto csvData = cus->TryLoadCsvFile("csv/PlayerStatus.csv", "inl::Player::Player()");
+		auto bombParticleBinary = cus->TryLoadParticleBinaryFile("particle/preset/bombEffect.bin", "inl::Player::Player()");
+		auto playerParticleBinary = cus->TryLoadParticleBinaryFile("particle/preset/playerParticle.bin", "inl::Player::Player()");
+		auto csvPlayerStatus = cus->TryLoadCsvFile("csv/PlayerStatus.csv", "inl::Player::Player()");
 
 		//--------------------------------------------------------------------------------
 
-		InitPlayerStatus(csvData);
+		InitPlayerStatus(csvPlayerStatus);
 
 		// プレイヤー生成
-		_mesh = dxe::Mesh::CreateSphereMV(20, 10, 10, false);
+		_mesh = dxe::Mesh::CreateCubeMV(20, 20, 20, false);
 		_mesh->setTexture(textureHandle);
 		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
 		_mesh->pos_ = _START_POSITION;
@@ -79,7 +83,10 @@ namespace inl {
 		_getDamageSE_hdl = soundHandle;
 
 		// 爆発エフェクト
-		_bombParticle = particleBinary;
+		_bombParticle = bombParticleBinary;
+
+		//プレイヤー前方エフェクト
+		_playerParticle = playerParticleBinary;
 
 		// 連装砲
 		_playerGunport = std::make_shared<inl::Gunport>();
@@ -243,7 +250,7 @@ namespace inl {
 			std::make_shared<inl::PlayerBullet>(
 				spawnPos,                        //　位置
 				moveDir,						 //　方向
-				inl::PlayerBullet::COLOR::Red, 	 //　色
+				inl::PlayerBullet::COLOR::Gray,  //　色
 				10.0f)							 //　サイズ
 		);
 	}
@@ -283,8 +290,8 @@ namespace inl {
 		}
 
 		// 左方向
-		if (InputFuncTable::IsButtonDown_LEFT() && 
-			!_playerCamera->follow) 
+		if (InputFuncTable::IsButtonDown_LEFT() &&
+			!_playerCamera->follow)
 		{
 
 			_moveVelocity -= tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
@@ -292,7 +299,7 @@ namespace inl {
 		}
 
 		// 右方向
-		if (InputFuncTable::IsButtonDown_RIGHT() && 
+		if (InputFuncTable::IsButtonDown_RIGHT() &&
 			!_playerCamera->follow)
 		{
 
@@ -300,23 +307,18 @@ namespace inl {
 			NormalizeCameraSpeed(speed);
 		}
 
-		// 上方向　　//　このゲームパッドを有効にすると座標が上に飛んで行くバグがある
-		if (tnl::Input::IsKeyDown(eKeys::KB_W) /*|| tnl::Input::IsPadDown(ePad::KEY_UP)*/) 
+		if (tnl::Input::IsKeyDown(eKeys::KB_W) || tnl::Input::IsPadDown(ePad::KEY_UP))
 		{
 
 			_moveVelocity += tnl::Vector3::TransformCoord({ 0, 1.0f, 0.1f }, _rotY);
-			_mesh->pos_.z += _playerMoveSpeed;
-
 			NormalizeCameraSpeed(speed);
 		}
 
 		// 下方向
-		if (InputFuncTable::IsButtonDown_DOWN()) 
+		if (InputFuncTable::IsButtonDown_DOWN())
 		{
 
 			_moveVelocity -= tnl::Vector3::TransformCoord({ 0, 1.0f, 0.1f }, _rotY);
-			_mesh->pos_.z -= _playerMoveSpeed;
-
 			NormalizeCameraSpeed(speed);
 		}
 
@@ -333,11 +335,13 @@ namespace inl {
 
 	void Player::ChangeTarget_ByMouseWheel() {
 
+		tnl::Vector3 vel = tnl::Input::GetRightStick();
+
 		int wheel = tnl::Input::GetMouseWheel();
 		auto zakoList = _enemyManager_ref->_enemyZakoList;
 
 		// マウスホイールの入力に応じて敵のインデックスを増減
-		if (wheel > 0) {
+		if (wheel > 0 || tnl::Input::IsPadDownTrigger(ePad::KEY_9)) {
 
 			_enemyIndex++;
 
@@ -345,7 +349,7 @@ namespace inl {
 				_enemyIndex = 0;
 			}
 		}
-		else if (wheel < 0) {
+		else if (wheel < 0 || 0) {
 
 			_enemyIndex--;
 
@@ -361,26 +365,32 @@ namespace inl {
 		// ゲームパッド
 		if (!_playerCamera->follow) {
 
-			tnl::Vector3 vel = tnl::Input::GetLeftStick();
+			tnl::Vector3 vel = tnl::Input::GetRightStick();
 
-			// 左右視点
-			_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x));
+			if (vel.x > 0.2f || vel.x < -0.2f) {
 
-			// プレイヤーの前方
-			tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
+				// 左右視点
+				_rotY *= tnl::Quaternion::RotationAxis({ 0, 1, 0 }, tnl::ToRadian(vel.x * 1.2f));
+			}
 
-			// 上下視点
-			_rotX *= tnl::Quaternion::RotationAxis(
-				tnl::Vector3::Cross({ 0, 1, 0 }, forward),     // 外積
-				tnl::ToRadian(vel.y * _VIEWPOINT_LERP_RATE_V)  // 回転（ラジアン）
-			);
+			if (vel.y > 0.2f || vel.y < -0.2f) {
+
+				// プレイヤーの前方
+				tnl::Vector3 forward = tnl::Vector3::TransformCoord({ 0, 0, 1 }, _rotY);
+
+				// 上下視点
+				_rotX *= tnl::Quaternion::RotationAxis(
+					tnl::Vector3::Cross({ 0, 1, 0 }, forward),  // 外積
+					tnl::ToRadian(vel.y * 2.f)					// 回転（ラジアン）
+				);
+			}
 		}
 
 		// マウス
 		if (!_playerCamera->follow
-			&& tnl::Input::GetLeftStick().x == 0
-			&& tnl::Input::GetLeftStick().y == 0
-			&& tnl::Input::GetLeftStick().z == 0) {
+			&& tnl::Input::GetRightStick().x == 0
+			&& tnl::Input::GetRightStick().y == 0
+			&& tnl::Input::GetRightStick().z == 0) {
 
 			tnl::Vector3 vel = tnl::Input::GetMouseVelocity();
 
@@ -515,7 +525,8 @@ namespace inl {
 		if (InputFuncTable::IsButtonDown_LEFT()) {
 
 			tnl::Vector3 newPos =   //　カメラ焦点座標　+　指定の座標
-				_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
+				_playerCamera->target_ +
+				tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
 
@@ -528,7 +539,8 @@ namespace inl {
 		if (InputFuncTable::IsButtonDown_RIGHT()) {
 
 			tnl::Vector3 newPos =  //　カメラ焦点座標　+　指定の座標
-				_playerCamera->target_ + tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
+				_playerCamera->target_ +
+				tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
 
@@ -615,24 +627,34 @@ namespace inl {
 	}
 
 
-	void Player::RenderBulletPowerRate() {
+	void Player::RenderBulletPowerRate(const int color) {
 
 		std::ostringstream stream;
 		stream << std::fixed << std::setprecision(2) << inl::PlayerBullet::_bulletPowerRate;
 
 		std::string s = stream.str();
-		DrawFormatString(1000, 140, -1, "Power:%s / 5.00", s.c_str());
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		DrawBox(995, 135, 1150, 160, 1, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		DrawFormatString(1000, 140, color, "Power:%s / 5.00", s.c_str());
 	}
 
 
-	void Player::RenderBombRemainCount() noexcept {
+	void Player::RenderBombRemainCount(const int color) noexcept {
 
 		std::string s = std::to_string(_currentBomb_stockCount);
-		DrawFormatString(30, 80, -1, "Bomb:%s", s.c_str());
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		DrawBox(25, 77, 100, 100, 1, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		DrawFormatString(30, 80, color, "Bomb:%s", s.c_str());
 	}
 
 
-	void Player::RenderPlayerHp() {
+	void Player::RenderPlayerHp(const int color) {
 
 		if (_hp <= 0) return;
 
@@ -662,27 +684,64 @@ namespace inl {
 		);
 
 		SetFontSize(16);
-		DrawString(30, 50, "HP:", -1);
+		DrawString(30, 50, "HP:", color);
 	}
 
 
 	void Player::Render(const Shared<inl::FreeLookCamera> camera) {
 
+		RenderPlayerParticle(camera);
+
 		TriggerInvincible(camera);
 
-		RenderBulletPowerRate();
-		RenderPlayerHp();
 		RenderGunport(camera);
 
-		// ボムの残数
-		SetFontSize(DEFAULT_FONT_SIZE);
-		RenderBombRemainCount();
+		int color = -1;
 
+		switch (ScenePlay::GetStageID())
+		{
+		case 1:	color = 1;	break;
+		case 2:	color = GetColor(0, 220, 0); break;
+		}
+		
+		
+		RenderPlayerHp(color);
+
+		// ボムの残数
+		SetFontSize(18);
+		RenderBombRemainCount(color);
+
+		RenderBulletPowerRate(color);
+		
 		for (auto& blt : _straightBullets_player) {
 			blt->Render(camera);
 		}
+
+		if (_playerCamera->follow) {
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+			DrawBox(20, 430, 410, 460, 1, true);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+			DrawStringEx(25, 435, color, "ターゲット変更：マウスホイール or 右スティック押下");
+		}
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		DrawBox(20, 475, 280, 505, 1, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		DrawStringEx(25, 480, color, "姿勢を戻す: Key C or Pad X (□)");
 	}
 
+
+	void Player::RenderPlayerParticle(const Shared<inl::FreeLookCamera>& camera)
+	{
+		dxe::DirectXRenderBegin();
+		inl::Player::_playerParticle->setPosition(_mesh->pos_);
+		inl::Player::_playerParticle->start();
+		inl::Player::_playerParticle->render(camera);
+		dxe::DirectXRenderEnd();
+	}
 
 
 	void Player::TriggerInvincible(const Shared<inl::FreeLookCamera>& camera)
@@ -836,5 +895,11 @@ namespace inl {
 		//　ボム
 		UseBomb();
 		InvalidateBombEffect(deltaTime);
+
+		// 姿勢制御
+		if (tnl::Input::IsKeyDownTrigger(eKeys::KB_C) || tnl::Input::IsPadDownTrigger(ePad::KEY_2)) {
+
+			_rotY = tnl::Quaternion(0, 0, 0, 1);
+		}
 	}
 }

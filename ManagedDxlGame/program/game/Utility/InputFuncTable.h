@@ -79,7 +79,7 @@ namespace inl {
 		// BackKey or Pad A or Pad X
 		static const bool IsButtonTrigger_CANCEL() {       // キャンセル（単発）
 
-			if (tnl::Input::IsPadDownTrigger(ePad::KEY_2) || tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK))
+			if (tnl::Input::IsPadDownTrigger(ePad::KEY_0) || tnl::Input::IsKeyDownTrigger(eKeys::KB_BACK))
 				return true;
 			else
 				return false;

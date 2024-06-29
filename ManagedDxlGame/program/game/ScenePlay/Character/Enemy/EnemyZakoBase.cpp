@@ -1,11 +1,14 @@
 #include "EnemyZakoBase.h"
 #include "../Player/Player.h"
+// マネージャー-----------------------------------------
 #include "../../../Manager/Score/ScoreManager.h"
 #include "../../../Manager/Enemy/EnemyManager.h"
+// 弾---------------------------------------------------
 #include "../game/ScenePlay/Bullet/Enemy/EnemyBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletFactory.h"
+// ---------------------------------------------------
 #include "../game/ScenePlay/Collision/Collision.h"
 #include "../game/Utility/CustomException.h"
 #include "../game/ScenePlay/RandomValue/RandomValueGenerator.h"

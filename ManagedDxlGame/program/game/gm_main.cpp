@@ -58,7 +58,8 @@ void gameMain(float delta_time) {
 
     SceneManager::GetInstance()->Update(delta_time);
 
-    if (tnl::Input::IsKeyDownTrigger(eKeys::KB_ESCAPE)) exit(1);
+    // ÉQÅ[ÉÄã≠êßèIóπÅ@
+    if (tnl::Input::IsKeyDownTrigger(eKeys::KB_ESCAPE) || tnl::Input::IsPadDownTrigger(ePad::KEY_8)) exit(1);
 
     //DrawFpsIndicator({ 10, DXE_WINDOW_HEIGHT - 10, 0 }, delta_time);
 }

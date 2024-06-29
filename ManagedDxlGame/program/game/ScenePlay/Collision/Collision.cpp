@@ -1,13 +1,16 @@
 #include "../../DxLibEngine.h"
 #include "Collision.h"
 #include "../../ScenePlay/Character/Player/Player.h"
+// “G---------------------------------------------------
 #include "../../ScenePlay/Character/Enemy/EnemyBase.h"
+#include "../Character/Enemy/EnemyZakoBase.h"
+#include "../Character/Enemy/EnemyBossBase.h"
+// ’e---------------------------------------------------
 #include "../Bullet/Player/PlayerBullet.h"
 #include "../Bullet/Enemy/StraightBullet.h"
 #include "../Bullet/Enemy/HomingBullet.h"
 #include "../Bullet/Enemy/EnemyBullet.h"
-#include "../Character/Enemy/EnemyZakoBase.h"
-#include "../Character/Enemy/EnemyBossBase.h"
+// ƒAƒCƒeƒ€---------------------------------------------
 #include "../Item/ScoreItem.h"
 #include "../Item/PowerUpItem.h"
 

@@ -1,9 +1,12 @@
 #include "../../DxLibEngine.h"
 #include "PauseMenu.h"
+// マネージャー---------------------------------------------------
 #include "../../Manager/Scene/SceneManager.h"
 #include "../../Manager/Sound/SoundManager.h"
+// シーン---------------------------------------------------
 #include "../../ScenePlay/ScenePlay.h"
 #include "../../SceneSelectDifficulty/SceneSelectDifficulty.h"
+// ---------------------------------------------------
 #include "../game/ScenePlay/Character/Player/Player.h"
 #include "../../Utility/InputFuncTable.h"
 
@@ -11,7 +14,6 @@
 namespace inl {
 
 	bool PauseMenu::_isShowPauseOption = false;
-
 
 	PauseMenu::PauseMenu(const Shared<Player>& player) {
 
@@ -22,14 +24,14 @@ namespace inl {
 
 	void PauseMenu::UpdatePauseMenuCursor_ByInput() noexcept {
 
-		if (InputFuncTable::IsButtonDownTrigger_UP())
+		if (InputFuncTable::IsButtonDownTrigger_UP() && !_isShowConfigInfo)
 		{
 			_menuIndex--;
 
-			if (_menuIndex < 0) 
+			if (_menuIndex < 0)
 				_menuIndex = _MENU_INDEX_COUNT - 1;
 		}
-		if (InputFuncTable::IsButtonDownTrigger_DOWN())
+		if (InputFuncTable::IsButtonDownTrigger_DOWN() && !_isShowConfigInfo)
 		{
 			_menuIndex++;
 
@@ -136,22 +138,36 @@ namespace inl {
 	void PauseMenu::RenderConfigStateInfo() noexcept {
 
 		int color = -1;
+
+		switch (ScenePlay::GetStageID())
+		{
+		case 1:	color = 1;	break;
+		case 2:	color = GetColor(0, 220, 0); break;
+		}
+
 		int upSide = 200;
 		int leftSide = 700;
 		int y_offset = 30;
 
 		const char* descriptions[] = {
 
-			 "移動　      キーボードWASDキー、ゲームパッド十字キー",
-			 "前進　      キーボードSpaceキー、ゲームパッドL1、LB",
-			 "スロー移動  キーボードShiftキー、ゲームパッド△、Y",
-			 "弾発射　    マウス左、ゲームパッド〇、B",
-			 "カメラ固定　マウス右、ゲームパッドR1、RB",
-			 "視点操作　  マウス、ゲームパッド左スティック",
-			 "ボム　　    マウス中央、",
+			"弾発射            　  |マウス左、           ゲームパッド〇 or B|",
+			 "移動             　    |キーボードWASDキー   ゲームパッド十字キー|",
+			 "前進             　    |キーボードSpaceキー  ゲームパッドL1、LB|",
+			 "スロー移動        　 |キーボードShiftキー  ゲームパッド△、Y|",
+			 "視点操作          　 |マウス               ゲームパッド右スティック|",
+			 "カメラ固定・解除 　  |マウス右             ゲームパッドR1 or RB|",
+			 "固定対象の切り替え　 |マウスホイール       ゲームパッド右スティック押し込み|",
+			 "ボム               |マウス中央           ゲームパッド X or A|",
 		};
 
 		SetFontSize(22);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		DrawBox(leftSide - 10, upSide - 10, leftSide + 580, upSide + 40 + (y_offset * 7), 1, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		SetFontSize(18);
 
 		for (int i = 0; i < 7; i++) {
 
@@ -164,7 +180,28 @@ namespace inl {
 
 	void PauseMenu::RenderPauseMenuItems() noexcept {
 
-		int baseColor = 150;
+		int baseColor = 255;
+
+		int clr = -1;
+		switch (ScenePlay::GetStageID())
+		{
+		case 1: 
+		{
+
+			clr = 1;
+			baseColor = 88;
+			break;
+		}
+		case 2:	
+			
+			clr = GetColor(0, 220, 0); 
+			baseColor = GetColor(0, 255, 0);
+			break;
+		case 3:
+
+			clr = GetColor(100, 100, 100);
+			break;
+		}
 
 		int a = GetColor(baseColor, baseColor, baseColor),
 			b = GetColor(baseColor, baseColor, baseColor),
@@ -172,15 +209,17 @@ namespace inl {
 			d = GetColor(baseColor, baseColor, baseColor);
 
 		if (_MENU_INDEX_COUNT == 4) {
-			if (_menuIndex == 0) a = -1;  // "再開する"
-			if (_menuIndex == 1) b = -1;  // "操作確認"
-			if (_menuIndex == 2) c = -1;  // "現在のステージをやり直す"
-			if (_menuIndex == 3) d = -1;  // "ゲームを終了する"
+						
+			if (_menuIndex == 0) a = clr;  // "再開する"
+			if (_menuIndex == 1) b = clr;  // "操作確認"
+			if (_menuIndex == 2) c = clr;  // "現在のステージをやり直す"
+			if (_menuIndex == 3) d = clr;  // "ゲームを終了する"
 		}
-		else {                            
-			if (_menuIndex == 0) b = -1;
-			if (_menuIndex == 1) c = -1;
-			if (_menuIndex == 2) d = -1;
+		else {
+
+			if (_menuIndex == 0) b = clr;
+			if (_menuIndex == 1) c = clr;
+			if (_menuIndex == 2) d = clr;
 		}
 
 		int upSide = 200;
@@ -198,6 +237,10 @@ namespace inl {
 		else {
 			_MENU_INDEX_COUNT = 3;
 		}
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		DrawBox(leftSide - 10, upSide - 50, leftSide + 350, upSide + 100, GetColor(100, 100, 100), true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
 
 		DrawStringEx(leftSide, upSide, b, "操作確認");
 		DrawStringEx(leftSide, upSide + upSideOffset, c, "現在のステージをやり直す");

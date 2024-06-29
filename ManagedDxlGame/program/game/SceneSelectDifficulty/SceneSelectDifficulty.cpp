@@ -35,6 +35,8 @@ SceneSelectDifficulty::SceneSelectDifficulty() {
 	int graph = cus->TryLoadGraph("graphics/Scene/select.jpg", "inl::SceneSelectDifficulty::SceneSelectDifficulty()");
 
 	_backGround_hdl = graph;
+
+	_showNowLoading = false;
 }
 
 
@@ -156,5 +158,5 @@ void SceneSelectDifficulty::Update(const float deltaTime) {
 	}
 
 	UpdateSelectDifficultyCursor_ByInput();
-	DecideSelectedLevel_ByInput();
+	DecideSelectedLevel_ByInput();	
 }

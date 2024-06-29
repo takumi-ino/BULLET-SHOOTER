@@ -1,19 +1,22 @@
 #include <random>
 #include "./../../DxLibEngine.h"
 #include "../../../library/tnl_sequence.h"
+// マネージャー----------------------------------------------------
 #include "EnemyManager.h"
 #include "../Item/ItemManager.h"
 #include "../Sound/SoundManager.h"
 #include "../../Manager/Score/ScoreManager.h"
 #include "../../Manager/Scene/SceneManager.h"
-#include "../../ScenePlay/ScenePlay.h"
-#include "../../ScenePlay/Character/Player/Player.h"
-#include "../../ScenePlay/Collision/Collision.h"
+// 弾--------------------------------------------------------------
 #include "../../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../../ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../../ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../../ScenePlay/Bullet/Enemy/BulletHell.h"
 #include "../../ScenePlay/Bullet/Enemy/EnemyBullet.h"
+// シーン----------------------------------------------------------
+#include "../../ScenePlay/ScenePlay.h"
+#include "../../SceneResult/SceneResult.h"
+// 敵--------------------------------------------------------------
 #include "../../ScenePlay/Character/Enemy/EnemyZako/EnemyZakoBox.h"
 #include "../../ScenePlay/Character/Enemy/EnemyZako/EnemyZakoDome.h"
 #include "../../ScenePlay/Character/Enemy/EnemyZako/EnemyZakoCylinder.h"
@@ -22,11 +25,13 @@
 #include "../../ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
 #include "../../ScenePlay/Character/Enemy/EnemyBossBase.h"
 #include "../../ScenePlay/Character/Enemy/EnemyZakoBase.h"
-#include "../../SceneResult/SceneResult.h"
+// その他-----------------------------------------------------------
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
 #include"../../ScenePlay/Item/ItemBase.h"
 #include "../../Utility/InputFuncTable.h"
 #include "../game/Utility/CustomException.h"
+#include "../../ScenePlay/Character/Player/Player.h"
+#include "../../ScenePlay/Collision/Collision.h"
 
 
 namespace inl {
@@ -66,7 +71,7 @@ namespace inl {
 
 	void EnemyManager::SetMaxEnemySpawnCount() noexcept
 	{
-		if (ScenePlay::GetGameDifficulty() == "Easy")         _maxEnemySpawnCount_PerInterval = 2;
+		if (ScenePlay::GetGameDifficulty() == "Easy")         _maxEnemySpawnCount_PerInterval = 1;
 		else if (ScenePlay::GetGameDifficulty() == "Normal")  _maxEnemySpawnCount_PerInterval = 2;
 		else if (ScenePlay::GetGameDifficulty() == "Hard")    _maxEnemySpawnCount_PerInterval = 3;
 		else if (ScenePlay::GetGameDifficulty() == "Lunatic") _maxEnemySpawnCount_PerInterval = 4;

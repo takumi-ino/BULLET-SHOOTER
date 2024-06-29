@@ -70,6 +70,7 @@ namespace inl {
 		void Update(const float deltaTime);
 		void Render(const Shared<FreeLookCamera> playerCamera);
 
+
 	private:
 
 		// カメラ-------------------------------------------------------------------------------------------------
@@ -95,7 +96,7 @@ namespace inl {
 		void TriggerInvincible(const Shared<FreeLookCamera>& camera);
 
 		// HP 
-		void RenderPlayerHp();
+		void RenderPlayerHp(const int color);
 
 		// 移動 
 		void ControlPlayerMoveByInput(const float deltaTime);  // 移動操作
@@ -115,7 +116,7 @@ namespace inl {
 
 		// 連装砲-----------------------------------------------------------------------------------------------------
 		void ShotGunportBullet();                                  // 発射処理
-		void RenderBulletPowerRate();                              // 弾の現在のパワーを表示
+		void RenderBulletPowerRate(const int color);               // 弾の現在のパワーを表示
 		void RenderGunport(const Shared<FreeLookCamera> camera);   // 描画
 		void UpdateGunport();                                      // 更新
 
@@ -126,13 +127,15 @@ namespace inl {
 		void UseBomb();                                            // 使用
 		void ValidateBombEffect();                                 // エフェクト有効化
 		void InvalidateBombEffect(const float deltaTime);          // エフェクト無効化
-		void RenderBombRemainCount() noexcept;                     // ボム残数描画
+		void RenderBombRemainCount(const int color) noexcept;      // ボム残数描画
 
 		// 敵位置-----------------------------------------------------------------------------------------------------
 		void ChangeTarget_ByMouseWheel();                          // マウスホイールでターゲット変更処理
 		void RenderFollowPointer();                                // ターゲット位置に合わせて描画するポインター
 		void AssignEnemyPosition(tnl::Vector3& enemyPos);          // ローカル変数に敵座標位置を割り当てる
 		bool IsEnemyInCapturableRange();                           // 敵がカメラ固定機能が使用可能な範囲内にいるか
+		// -----------------------------------------------------------------------------------------------------
+		void RenderPlayerParticle(const Shared<inl::FreeLookCamera>& camera);
 
 	public:
 
@@ -151,6 +154,8 @@ namespace inl {
 		Shared<CsvLoader>               _csvLoader = nullptr;			// CSV
 
 		Shared<FreeLookCamera>          _playerCamera = nullptr;		// カメラ
+
+		Shared<dxe::Particle>			_playerParticle = nullptr;      // プレイヤーの前方に配置するパーティクル
 
 	private:
 

@@ -5,8 +5,6 @@
 #include "../game/ScenePlay/Collision/Collision.h"
 #include "../../Bullet/Enemy/EnemyBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletHell.h"
-#include "../game/Utility/FilePathChecker.h"
-#include "../game/Utility/CustomException.h"
 
 
 namespace {

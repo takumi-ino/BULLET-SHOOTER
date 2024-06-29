@@ -59,11 +59,16 @@ int ScoreManager::GetTotalScore() const {
 		ScoreManager::GetSpellCardBonus();
 }
 
-void ScoreManager::RenderTotalScore() {
+void ScoreManager::RenderTotalScore(const int color) {
 
 	SetFontSize(25);
 
 	std::string score_str = std::to_string(GetTotalScore());
-	DrawFormatString(1000, 80, -1, "Score %s", score_str.c_str());
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+	DrawBox(995, 80, 1250, 110, GetColor(100, 100, 100), true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+	DrawFormatString(1000, 80, color, "Score %s", score_str.c_str());
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

@@ -33,7 +33,7 @@ public:
 	int GetSpellCardBonus() const;	     // スペルカードボーナス
 
 	// 全てのスコアの合計
-	void RenderTotalScore();
+	void RenderTotalScore(const int color);
 	int GetTotalScore() const;
 
 private:

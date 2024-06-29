@@ -6,6 +6,8 @@
 #include "Collision/Collision.h"
 #include "Camera/FreeLookCamera.h"
 #include "../Utility/CustomException.h"
+#include "../game/ScenePlay/Wall/Wall.h"
+// 弾-------------------------------------------------------------
 #include "Bullet/Enemy/EnemyBullet.h"
 #include "Bullet/Enemy/BulletHell.h"
 #include "Bullet/Enemy/BulletHellFactory.h"
@@ -13,10 +15,12 @@
 #include "../ScenePlay/Bullet/Enemy/StraightBullet.h"
 #include "../ScenePlay/Bullet/Enemy/HomingBullet.h"
 #include "../SceneResult/SceneResult.h"
+// マネージャー-------------------------------------------------------------
 #include "../Manager/Item/ItemManager.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../Manager/Enemy/EnemyManager.h"
 #include "../Manager/Score/ScoreManager.h"
+// 敵-------------------------------------------------------------
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_PatchouliKnowledge.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_Cirno.h"
 #include "../game/ScenePlay/Character/Enemy/EnemyBoss/EnemyBoss_MoriyaSuwako.h"
@@ -79,6 +83,9 @@ ScenePlay::ScenePlay(const std::string selectedDifficulty, const int stage)
 
 	// スカイボックス(天空)
 	_skyBox = std::make_shared<inl::SkyBox>();
+
+	// 壁
+	_wall = std::make_shared<inl::Wall>();
 
 	// 当たり判定
 	_collision = std::make_shared<inl::Collision>();
@@ -668,22 +675,31 @@ void ScenePlay::Render() {
 	RenderThirdStageBulletHellLists();
 
 	//　スコア--------------------------------------------------------------------------------
-	ScoreManager::GetInstance().RenderTotalScore();
+	int color = -1;
 
-	_screenEffect->renderEnd();
+	switch (ScenePlay::GetStageID())
+	{
+	case 1:	color = 1;	break;
+	case 2:	color = GetColor(0, 220, 0); break;
+	}
 
+	ScoreManager::GetInstance().RenderTotalScore(color);
+
+	_screenEffect->renderEnd();	
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	//　ステージのグリッド線
 	RenderStageGrindGround();
-
+		
 	// ミニマップ
 	DrawRotaGraph(_miniMap_centerPos.x, _miniMap_centerPos.y, _miniMap_extendRate, 0, _miniMap_hdl, 1);
 	RenderEnemyRadarOnMiniMap();
 
 	//　ポーズメニュー
 	RenderPauseMenu();
+
+	_wall->Render(_mainCamera);			  // 壁
 }
 
 
@@ -741,7 +757,8 @@ void ScenePlay::Update(const float deltaTime) {
 
 	_skyBox->Update();
 
-	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LALT)) {
+	//　キーボード左ctrl　または　ゲームパッドStartボタン
+	if (tnl::Input::IsKeyDownTrigger(eKeys::KB_LCONTROL) || tnl::Input::IsPadDownTrigger(ePad::KEY_7)) {
 
 		if (!inl::PauseMenu::_isShowPauseOption) { 
 			
@@ -754,6 +771,25 @@ void ScenePlay::Update(const float deltaTime) {
 		_pauseMenu->Update();
 	}
 	else {
+
+		SetFontSize(18);
+
+		int color = -1;
+
+		switch (ScenePlay::GetStageID())
+		{
+		case 1:	color = 1;	break;
+		case 2:	color = GetColor(0, 220, 0); break;
+		}
+
+		const int alpha = 40;
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);		
+		DrawBox(20, 120, 280, 140, GetColor(alpha, alpha, alpha), true);	 // メニュー
+		DrawBox(945, 660, 1240, 695, GetColor(alpha, alpha, alpha), true);   // ゲーム強制終了
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		DrawString(25, 120, "メニューを開く:左Ctrl or Pad Start", color);
+		DrawStringEx(950, 666, color, "ゲーム強制終了:ESC key or Pad Left");
 
 		_enemyManager->Update(deltaTime);		//　敵
 

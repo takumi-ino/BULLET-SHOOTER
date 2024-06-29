@@ -17,6 +17,7 @@ namespace inl {
 	class Score;
 	class Player;
 	class CustomException;
+	class Wall;
 }
 
 
@@ -121,6 +122,8 @@ private:
 	Shared<inl::PauseMenu>         _pauseMenu = nullptr;		  // ポーズメニュー
 
 	Shared<dxe::ScreenEffect>      _screenEffect = nullptr;		  // スクリーンエフェクト
+
+	Shared<inl::Wall>              _wall = nullptr;				  // 壁
 
 private:
 

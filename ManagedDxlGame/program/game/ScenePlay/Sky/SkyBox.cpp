@@ -59,7 +59,8 @@ namespace inl {
 
 
 	void SkyBox::Render(const Shared<inl::FreeLookCamera>& camera) {
-
+		_skybox->setMtrlDiffuse({ 0, 0, 0 });
+		_skybox->setMtrlEmissive({ 0.7f, 0.7f, 0.7f });
 		_skybox->render(camera);
 	}
 

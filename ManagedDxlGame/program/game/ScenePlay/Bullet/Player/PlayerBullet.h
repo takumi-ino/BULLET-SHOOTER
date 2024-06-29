@@ -10,7 +10,7 @@ namespace inl {
 		//Å@Enum-------------------------------------------------------------------
 		enum class COLOR {
 			None,
-			Red,
+			Gray,
 			White,
 		};
 

@@ -291,6 +291,7 @@ namespace tnl {
 		template<typename... tPads>
 		static bool IsPadDown(tPads... iParams)
 		{
+			if (!joystick_) return false ;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			for (ePad elem : array) {
 				if (static_cast<uint32_t>(elem) <= static_cast<uint32_t>(ePad::KEY_12)) {
@@ -317,6 +318,7 @@ namespace tnl {
 		template<typename... tPads>
 		static void RunIndexPadDown(const std::function<void(uint32_t index)>& func, tPads... iParams)
 		{
+			if (!joystick_) return ;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			uint32_t i = 0;
 			for (ePad elem : array) {
@@ -348,6 +350,7 @@ namespace tnl {
 		template<typename... tPads>
 		static bool IsPadDownTrigger(tPads... iParams)
 		{
+			if (!joystick_) return false ;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			for (ePad elem : array) {
 				if (0 != pad_trg_down[static_cast<uint32_t>(elem)]) return true;
@@ -364,6 +367,7 @@ namespace tnl {
 		template<typename... tPads>
 		static void RunIndexPadDownTrigger(const std::function<void(uint32_t index)>& func, tPads... iParams)
 		{
+			if (!joystick_) return ;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			uint32_t i = 0;
 			for (ePad elem : array) {
@@ -380,6 +384,7 @@ namespace tnl {
 		template<typename... tPads>
 		static bool IsPadReleaseTrigger(tPads... iParams)
 		{
+			if (!joystick_) return false ;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			for (ePad elem : array) {
 				if (0 != pad_trg_release[static_cast<uint32_t>(elem)]) return true;
@@ -396,6 +401,7 @@ namespace tnl {
 		template<typename... tPads>
 		static void RunIndexPadReleaseTrigger(const std::function<void(uint32_t index)>& func, tPads... iParams)
 		{
+			if (!joystick_) return;
 			const ePad array[] = { static_cast<ePad>(iParams)... };
 			uint32_t i = 0;
 			for (ePad elem : array) {

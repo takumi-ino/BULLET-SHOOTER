@@ -17,8 +17,8 @@ namespace inl {
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
 		//　ロードに失敗したら例外発生----------------------------------------------------
-		auto redGraphHandle =
-			cus->TryLoadTexture("graphics/colorTexture/red.bmp", "inl::PlayerBullet::PlayerBullet()");
+		auto grayGraphHandle =
+			cus->TryLoadTexture("graphics/colorTexture/gray.bmp", "inl::PlayerBullet::PlayerBullet()");
 
 		auto whiteGraphHandle = 
 			cus->TryLoadTexture("graphics/colorTexture/white.bmp", "inl::PlayerBullet::PlayerBullet()");
@@ -27,7 +27,7 @@ namespace inl {
 
 		std::map<PlayerBullet::COLOR, Shared<dxe::Texture>> colorMap = {
 
-		   {PlayerBullet::COLOR::Red,    redGraphHandle},
+		   {PlayerBullet::COLOR::Gray,    grayGraphHandle},
 		   {PlayerBullet::COLOR::White,  whiteGraphHandle},
 		};
 
@@ -50,13 +50,13 @@ namespace inl {
 
 		_mesh->pos_ += _moveDirection * deltaTime * _speed;
 
-		float dx = _mesh->pos_.x - start.x;
-		float dy = _mesh->pos_.y - start.y;
-		float dz = _mesh->pos_.z - start.z;
+		tnl::Vector3 d;
+		d.x = _mesh->pos_.x - start.x;
+		d.y = _mesh->pos_.y - start.y;
+		d.z = _mesh->pos_.z - start.z;
+				
+		float dist = sqrt(pow(d.x - 0, 2) + pow(d.y - 0, 2) + pow(d.z - 0, 2));
 
-		float current_distance = sqrt(dx * dx + dy * dy + dz * dz);
-
-		if (abs(current_distance) > 1200)
-			_isActive = false;
+		if (dist > 1300.f) _isActive = false;
 	}
 }

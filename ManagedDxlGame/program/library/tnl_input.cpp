@@ -510,7 +510,7 @@ namespace tnl {
 		return { float(joy_state_.lX) / 1000.0f, float(joy_state_.lY) / 1000.0f, 0 };
 	}
 	tnl::Vector3 Input::GetRightStick() {
-		return { float(joy_state_.lZ) / 1000.0f, float(joy_state_.lRz) / 1000.0f, 0 };
+		return { float(joy_state_.lRx) / 1000.0f, float(joy_state_.lRy) / 1000.0f, 0 };
 	}
 
 	tnl::Vector3 Input::GetMousePosition() {

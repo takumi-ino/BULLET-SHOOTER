@@ -3,6 +3,7 @@
 #include "SceneResult.h"
 #include "../SceneTitle/SceneTitle.h"
 #include "../Manager/Scene/SceneManager.h"
+#include "../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../Utility/InputFuncTable.h"
 #include "../Utility/CustomException.h"
 
@@ -42,6 +43,8 @@ SceneResult::SceneResult(const std::string difficulty, const int totalScore)
 	_resultSE_hdl = sound;
 
 	PlaySoundMem(_resultSE_hdl, DX_PLAYTYPE_BACK);
+
+	inl::PlayerBullet::ResetBulletPowerRate();
 }
 
 
