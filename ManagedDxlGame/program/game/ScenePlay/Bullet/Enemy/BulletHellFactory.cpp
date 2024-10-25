@@ -1,4 +1,3 @@
-#include "BulletHell.h"
 #include "EnemyBullet.h"
 #include "BulletHellFactory.h"
 #include "../game/Utility/CustomException.h"
@@ -57,7 +56,7 @@ namespace inl {
 
 
 
-	std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell(const BulletHell::TYPE type) {
+	std::vector<Shared<EnemyBullet>> BulletHellFactory::CreateBulletHell(const enum BulletHell::TYPE type) {
 
 		switch (type)
 		{

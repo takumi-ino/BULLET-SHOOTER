@@ -21,6 +21,6 @@ namespace inl {
 		StraightBullet();
 		~StraightBullet() override {}
 
-		void Render(const Shared<dxe::Camera> mainCamera) override;
+		void Render() override;
 	};
 }

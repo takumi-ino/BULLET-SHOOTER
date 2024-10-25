@@ -13,14 +13,15 @@ namespace inl {
 
 
 		virtual void Update(const float deltaTime) {}
-		virtual void Render(const Shared<dxe::Camera> mainCamera) {}
+		virtual void Render() {}
 
 	public:
 
-		Shared<dxe::Mesh> _mesh;
+		Shared<dxe::Mesh> _mesh{};
 
 	public:
 
-		float _timer{};
+		int		 _id{};
+		float	 _timer{0.f};
 	};
 }

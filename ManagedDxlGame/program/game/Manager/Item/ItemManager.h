@@ -18,8 +18,6 @@ class ItemManager
 public:
 
 	ItemManager() {}
-	ItemManager(const Shared<inl::Player>& player, const Shared<inl::Collision>& collision)
-		: _player_ref(player), _collision_ref(collision) {}
 
 	static ItemManager& GetInstance() {
 
@@ -118,12 +116,6 @@ private:
 	void RenderEventHitText() const;
 	void UpdateEventHitText(const float deltaTime);
 	void EventNotify_OnCaughtItem(const std::string itemName, const std::string effect);
-
-private:
-
-	Shared<inl::Player>      _player_ref = nullptr;
-
-	Shared<inl::Collision>   _collision_ref = nullptr;
 
 private:
 

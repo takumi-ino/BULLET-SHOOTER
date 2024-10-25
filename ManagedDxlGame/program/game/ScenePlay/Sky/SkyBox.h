@@ -3,7 +3,6 @@
 
 namespace inl {
 
-	class FreeLookCamera;
 	class CustomException;
 
 	// ステージのテクスチャ　空模様
@@ -15,7 +14,7 @@ namespace inl {
 		SkyBox();
 
 		void Update();
-		void Render(const Shared<inl::FreeLookCamera>& camera);
+		void Render();
 
 	private:
 
@@ -23,6 +22,6 @@ namespace inl {
 
 	public:
 
-		Shared<dxe::Mesh> _skybox = nullptr;
+		Shared<dxe::Mesh> _mesh = nullptr;
 	};
 }

@@ -25,12 +25,7 @@ namespace inl {
 
 		explicit EnemyBoss_PatchouliKnowledge(Shared<EnemyBoss_PatchouliKnowledge> boss) {}
 
-		EnemyBoss_PatchouliKnowledge(
-			const EnemyBossInfo& info,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyBoss_PatchouliKnowledge(const EnemyBossInfo& info);
 
 
 		// ‰Šú‰»---------------------------------------------------------------------------------
@@ -38,7 +33,7 @@ namespace inl {
 		void InitBulletHellInstance() override;
 
 		// •`‰æEXV-----------------------------------------------------------------------------
-		void Render(Shared<dxe::Camera> camera) override;
+		void Render() override;
 		bool Update(const float deltaTime) override;
 
 	private:

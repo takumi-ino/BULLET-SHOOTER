@@ -33,6 +33,4 @@ private:
 
 	int         _backGround_hdl{};
 	int         _difficultyItemIndex{};
-
-	bool        _showNowLoading{};
 };

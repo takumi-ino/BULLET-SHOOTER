@@ -10,12 +10,7 @@ namespace inl {
 		EnemyZakoCylinder() {}
 		~EnemyZakoCylinder() override {}
 
-		EnemyZakoCylinder(
-			const EnemyZakoInfo& info,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyZakoCylinder(const EnemyZakoInfo& info);
 
 		// ‰Šú‰»---------------------------------------------------------------------------------
 		void InitBulletFactoryInstance() override;

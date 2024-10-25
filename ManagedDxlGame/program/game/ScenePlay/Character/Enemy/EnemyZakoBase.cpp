@@ -30,11 +30,7 @@ namespace inl {
 
 
 	// 雑魚エネミーデータ読み取り
-	EnemyZakoBase::EnemyZakoBase(
-		const EnemyZakoInfo& data,
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision)
+	EnemyZakoBase::EnemyZakoBase(const EnemyZakoInfo& data)
 	{
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
@@ -53,14 +49,10 @@ namespace inl {
 		_bulletMoveSpeed = data._bulletMoveSpeed;					  // 弾のスピード
 		_bulletFireInterval = data._bulletFireInterval;				  // 弾の撃つ間隔
 		_bulletReloadTimeInterval = data._bulletReloadTimeInterval;	  // 弾のリロード間隔
-
-		_player_ref = player;										  // プレイヤー
-		_enemyCamera = camera;										  // カメラ
-		_collision_ref = collision;									  // 当たり判定
 	}
 
 
-	bool EnemyZakoBase::DecreaseHP(int damage, const Shared<dxe::Camera> camera) {
+	bool EnemyZakoBase::DecreaseHP(int damage) {
 
 		if (_hp > 0) {
 
@@ -76,7 +68,7 @@ namespace inl {
 			dxe::DirectXRenderBegin();
 			_explode_particle->setPosition(_mesh->pos_);
 			_explode_particle->start();
-			_explode_particle->render(camera);
+			_explode_particle->render(ScenePlay::GetInstance()->_mainCamera);
 			dxe::DirectXRenderEnd();
 
 			//　キルボーナス獲得
@@ -135,7 +127,7 @@ namespace inl {
 
 	void EnemyZakoBase::ReloadStraightBulletByTimer(const float deltaTime)
 	{
-		if (!_straightBullet_queue.empty()) 
+		if (!_straightBullet_queue.empty())
 			return;         // 弾がまだあればリターン
 
 		_reloadStraightBullet_timeCounter += deltaTime;
@@ -194,13 +186,14 @@ namespace inl {
 			if ((*it_blt)->_isActive) {
 
 				// 当たり判定　bool
-				if (_collision_ref->CheckCollision_EnemyStraightBulletAndPlayer((*it_blt), _player_ref)) {
+				if (ScenePlay::GetInstance()->_collision->CheckCollision_EnemyStraightBulletAndPlayer(
+					(*it_blt), ScenePlay::GetInstance()->_player)) {
 
 					//　攻撃力からプレイヤー防御力を引いた分 HPを削る
-					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
+					if (ScenePlay::GetInstance()->_player->DecreaseHP(_at - ScenePlay::GetInstance()->_player->GetDEF())) {
 
-						_player_ref->SetIsInvincible(true);   // 無敵時間
-						_player_ref->PlayDamageHitSE();       // ダメージ音
+						ScenePlay::GetInstance()->_player->_isInvincible = true;
+						ScenePlay::GetInstance()->_player->PlayDamageHitSE();       // ダメージ音
 					}
 
 					(*it_blt)->_isActive = false;             // 非アクティブ化
@@ -243,13 +236,15 @@ namespace inl {
 			if ((*it_blt)->_isActive) {
 
 				// 当たり判定　bool
-				if (_collision_ref->CheckCollision_EnemyHomingBulletAndPlayer((*it_blt), _player_ref)) {
+				if (ScenePlay::GetInstance()->_collision->CheckCollision_EnemyHomingBulletAndPlayer(
+					(*it_blt), ScenePlay::GetInstance()->_player))
+				{
 
 					//　攻撃力からプレイヤー防御力を引いた分 HPを削る
-					if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
+					if (ScenePlay::GetInstance()->_player->DecreaseHP(_at - ScenePlay::GetInstance()->_player->GetDEF())) {
 
-						_player_ref->SetIsInvincible(true);
-						_player_ref->PlayDamageHitSE();
+						ScenePlay::GetInstance()->_player->_isInvincible = true;
+						ScenePlay::GetInstance()->_player->PlayDamageHitSE();
 					}
 
 					(*it_blt)->_isActive = false;
@@ -266,7 +261,7 @@ namespace inl {
 				// 上の時間を指定の範囲内に制限
 				timeToReachPlayer = std::clamp(timeToReachPlayer, _minTimeToReach, _maxTimeToReach);
 
-				tnl::Vector3 targetDir = _player_ref->GetPos() - (*it_blt)->_mesh->pos_;
+				tnl::Vector3 targetDir = ScenePlay::GetInstance()->_player->GetPos() - (*it_blt)->_mesh->pos_;
 				targetDir.normalize();
 
 				// 線形補間で弾を旋回させる
@@ -303,7 +298,7 @@ namespace inl {
 	void EnemyZakoBase::ChasePlayer(const float deltaTime) {
 
 		//プレイヤー追跡
-		tnl::Vector3 direction = _player_ref->GetPos() - _mesh->pos_;
+		tnl::Vector3 direction = ScenePlay::GetInstance()->_player->GetPos() - _mesh->pos_;
 
 		direction.Normalize(direction);
 
@@ -429,7 +424,7 @@ namespace inl {
 		if (_investigatePos.x == 0 && _investigatePos.y == 0 && _investigatePos.z == 0) {
 
 			auto randomVector = RandomValueGenerator::Vector(
-				-_randomInvestigateRange_x, _randomInvestigateRange_x, 
+				-_randomInvestigateRange_x, _randomInvestigateRange_x,
 				-_randomInvestigateRange_y, _randomInvestigateRange_y,
 				-_randomInvestigateRange_z, _randomInvestigateRange_z
 			);
@@ -495,9 +490,10 @@ namespace inl {
 	void EnemyZakoBase::DoRoutineMoves(const float deltaTime) {
 
 		// 距離 250～270内で、プレイヤーHPが０でなければプレイヤー追跡
-		if (GetDistanceToPlayer() < GetIdleDistance()
-			&& GetDistanceToPlayer() > GetAttackDistance()
-			&& _player_ref->GetHP() != 0 || _isNoticedPlayer) {
+		if (GetDistanceToPlayer() < GetIdleDistance() &&
+			GetDistanceToPlayer() > GetAttackDistance() &&
+			ScenePlay::GetInstance()->_player->GetHP() != 0 ||
+			_isNoticedPlayer) {
 
 			LookAtPlayer();
 
@@ -506,7 +502,7 @@ namespace inl {
 		}
 
 		// 250以内でプレイヤーHPが０でなければ攻撃
-		if (GetDistanceToPlayer() < GetAttackDistance() && _player_ref->GetHP() != 0) {
+		if (GetDistanceToPlayer() < GetAttackDistance() && ScenePlay::GetInstance()->_player->GetHP() != 0) {
 
 			LookAtPlayer();
 
@@ -530,8 +526,8 @@ namespace inl {
 			_mesh->pos_,
 			DXE_WINDOW_WIDTH,
 			DXE_WINDOW_HEIGHT,
-			_enemyCamera->view_,
-			_enemyCamera->proj_
+			ScenePlay::GetInstance()->_mainCamera->view_,
+			ScenePlay::GetInstance()->_mainCamera->proj_
 		);
 
 		float x1 = hpGage_pos.x - 30;
@@ -549,21 +545,21 @@ namespace inl {
 	}
 
 
-	void EnemyZakoBase::Render(const Shared<dxe::Camera> camera) {
+	void EnemyZakoBase::Render() {
 
 		if (_isDead) return;
 
-		_mesh->render(camera);
+		_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 
 		ShowHpGage_EnemyZako();
 
 		for (const auto& blt : _straight_bullets) {
 
-			blt->Render(camera);
+			blt->Render();
 		}
 		for (const auto& blt : _homing_bullets) {
 
-			blt->Render(camera);
+			blt->Render();
 		}
 	}
 

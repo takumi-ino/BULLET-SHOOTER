@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "../../Sky/SkyBox.h"
-#include "../../ScenePlay.h"
 #include "../../Camera/FreeLookCamera.h"
 #include "../../Pause/PauseMenu.h"
 #include "../game/Loader/CsvLoader.h"
@@ -19,15 +18,12 @@
 
 namespace inl {
 
-	Shared<dxe::Particle> Player::_bombParticle;
-
 	namespace {
 
 		// プレイヤーステータス -------------------------------------------------
 		const float           _forwardVelocity{ 150.0f };
 		const float           _HP_POS_X{ 60 };
 		const float           _HP_POS_Y{ 50 };
-		const tnl::Vector3    _START_POSITION{ 0, 100, -300 };
 
 		// ボム------------------------------------------------------------------
 		const float           _BOMBEFFECT_TIME_LIMIT{ 3.0f };
@@ -55,35 +51,52 @@ namespace inl {
 		const float          _CENTROID_RADIUS{ 100 };  // 重心
 		const float          _MASS{ 100 };             // 質量
 		const float          _FRICTION{ 0.6f };        // 摩擦
+
+		//　各連装砲の配置座標（ 最大５ ）----------------------------------------
+		const tnl::Vector3 coords[] = {
+		{  0, -25, -20},
+		{-25,   0, -20},
+		{ 25,   0, -20},
+		{-15, -15, -20},
+		{ 15, -15, -20}
+		};
 	}
 
+	Shared<dxe::Particle> Player::_bombParticle;                   // ボムパーティクル
+	int Player::_getScoreSE_hdl;
+	int	Player::_increaseGunport;
 
-	Player::Player(const Shared<FreeLookCamera> mainCamera) : _playerCamera(mainCamera) {
+	Player::Player() {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
 		//　ロードに失敗したら例外発生----------------------------------------------------
-		auto textureHandle = cus->TryLoadTexture("graphics/prismatic-star.png", "inl::Player::Player()");
-		auto soundHandle = cus->TryLoadSound("sound/se/getHit.mp3", "inl::Player::Player()");
-		auto bombParticleBinary = cus->TryLoadParticleBinaryFile("particle/preset/bombEffect.bin", "inl::Player::Player()");
+		auto getBombHandle = cus->TryLoadSound("sound/se/player/getBomb.mp3", "inl::Player::Player()");
+		auto getScoreHandle = cus->TryLoadSound("sound/se/player/getScore.mp3", "inl::Player::Player()");
+		auto getHitHandle = cus->TryLoadSound("sound/se/player/getHit.mp3", "inl::Player::Player()");
+		auto healSeHandle = cus->TryLoadSound("sound/se/player/heal.mp3", "inl::Player::Player()");
+		auto enhanceSeHandle = cus->TryLoadSound("sound/se/player/enhance.mp3", "inl::Player::Player()");
+		auto increaseGunportSeHandle = cus->TryLoadSound("sound/se/player/increaseGunport.mp3", "inl::Player::Player()");
+
 		auto playerParticleBinary = cus->TryLoadParticleBinaryFile("particle/preset/playerParticle.bin", "inl::Player::Player()");
 		auto csvPlayerStatus = cus->TryLoadCsvFile("csv/PlayerStatus.csv", "inl::Player::Player()");
-
 		//--------------------------------------------------------------------------------
 
 		InitPlayerStatus(csvPlayerStatus);
 
-		// プレイヤー生成
-		_mesh = dxe::Mesh::CreateCubeMV(20, 20, 20, false);
-		_mesh->setTexture(textureHandle);
-		_mesh->scl_ = { 1.0f, 1.0f, 1.0f };
-		_mesh->pos_ = _START_POSITION;
+		_getScoreSE_hdl = getScoreHandle;
 
-		// ダメージSE
-		_getDamageSE_hdl = soundHandle;
+		_getBombSE_hdl = getBombHandle;
 
-		// 爆発エフェクト
-		_bombParticle = bombParticleBinary;
+		_getDamageSE_hdl = getHitHandle;
+
+		_healSE_hdl = healSeHandle;
+
+		_increaseGunport = increaseGunportSeHandle;
+
+		_enhanceSE_hdl = enhanceSeHandle;
+
+		_shotSe = LoadSoundMem("sound/se/player/playerShot.mp3");
 
 		//プレイヤー前方エフェクト
 		_playerParticle = playerParticleBinary;
@@ -112,7 +125,7 @@ namespace inl {
 
 		if (_hp > 0) {
 
-			if (!_isInvincible) {
+			if (!ScenePlay::GetInstance()->_player->_isInvincible) {
 
 				damage = max(damage, 1);
 
@@ -133,12 +146,6 @@ namespace inl {
 	}
 
 
-	void Player::PlayDamageHitSE() noexcept {
-
-		PlaySoundMem(_getDamageSE_hdl, DX_PLAYTYPE_BACK, TRUE);
-	}
-
-
 	void Player::NormalizeCameraSpeed(const float speed) {
 
 		tnl::Vector3 zero = { 0,0,0 };
@@ -153,7 +160,7 @@ namespace inl {
 
 	bool Player::IsEnemyInCapturableRange() {
 
-		if (!_enemyManager_ref)
+		if (!ScenePlay::GetInstance()->_enemyManager)
 			return false;
 
 		tnl::Vector3 enemyPos;
@@ -172,15 +179,15 @@ namespace inl {
 
 	void Player::AssignEnemyPosition(tnl::Vector3& enemyPos) {
 
-		int enemyZakoLeftCount = _enemyManager_ref->GetRemainingEnemyCount();
-		auto zakoList = _enemyManager_ref->_enemyZakoList;
-		auto it_zako = _enemyManager_ref->_itZako;
+		int enemyZakoLeftCount = ScenePlay::GetInstance()->_enemyManager->GetRemainingEnemyCount();
+		auto zakoList = ScenePlay::GetInstance()->_enemyManager->_enemyZakoList;
+		auto it_zako = ScenePlay::GetInstance()->_enemyManager->_itZako;
 
-		auto bossList = _enemyManager_ref->_enemyBossList;
-		auto it_boss = _enemyManager_ref->_itBoss;
+		auto bossList = ScenePlay::GetInstance()->_enemyManager->_enemyBossList;
+		auto it_boss = ScenePlay::GetInstance()->_enemyManager->_itBoss;
 
 		//　通常エネミーが全滅していれば
-		if (_enemyManager_ref->_enemyZakoList.empty()) {
+		if (ScenePlay::GetInstance()->_enemyManager->_enemyZakoList.empty()) {
 			enemyZakoLeftCount = 0;
 		}
 
@@ -225,7 +232,7 @@ namespace inl {
 
 		tnl::Vector3 moveDir, enemyPos;
 
-		if (_playerCamera->follow) {
+		if (ScenePlay::GetInstance()->_mainCamera->follow) {
 
 			AssignEnemyPosition(enemyPos);
 			moveDir = enemyPos - _mesh->pos_;
@@ -238,44 +245,150 @@ namespace inl {
 		return moveDir;
 	}
 
+
 	// 操作－-----------------------－-----------------------－----------------------------------------------------
-	void Player::ShotPlayerBullet() {
+	void Player::ShotPlayerBullet(const tnl::Vector3 spawnPos, const tnl::Vector3 moveDir) {
 
-		if (!IsShooting()) return;
+		_straightBulletCount++;
 
-		tnl::Vector3 spawnPos = _mesh->pos_;
-		tnl::Vector3 moveDir = GetBulletMoveDirection();
+		// 各弾の発射タイミングずらしのための条件
+		if (_straightBulletCount % _bulletFireInterval == 0) {
 
-		_straightBullets_player.emplace_back(
-			std::make_shared<inl::PlayerBullet>(
-				spawnPos,                        //　位置
-				moveDir,						 //　方向
-				inl::PlayerBullet::COLOR::Gray,  //　色
-				10.0f)							 //　サイズ
-		);
-	}
+			if (_bulletOrderIdx >= ScenePlay::GetInstance()->_player->_straightBullet.size()) {
 
+				_bulletOrderIdx = 0;
+			}
 
-	void Player::ShotGunportBullet() {
+			auto bullet = ScenePlay::GetInstance()->_player->_straightBullet[_bulletOrderIdx];
 
-		if (!IsShooting()) return;
+			bullet->_isActive = true;
+			bullet->SetDirectionAndPosition(spawnPos, moveDir);
 
-		tnl::Vector3 moveDir = GetBulletMoveDirection();
-
-		for (const auto& blt : _gunportVec) {
-
-			if (!blt) return;
-
-			_straightBullets_player.emplace_back(
-				std::make_shared<inl::PlayerBullet>(
-					blt->_mesh->pos_,                   //　位置
-					moveDir,							//　方向
-					inl::PlayerBullet::COLOR::White,	//　色
-					7.0f                                //　サイズ
-				)
-			);
+			_bulletOrderIdx++;
+			_straightBulletCount = 0;
 		}
 	}
+
+
+	void Player::ShotGunportBullet(tnl::Vector3 spawnPos, const tnl::Vector3 moveDir) {
+
+		// ガンポート
+		for (const auto& gunports : _gunportVec) {
+
+			switch (_gunportVec.size()) {
+
+			case 1:
+
+				_gunportBulletCount[0]++;
+
+				if (_gunportBulletCount[0] % _bulletFireInterval == 0) {
+
+					if (_gunportBulletOrderIdx[0] >= ScenePlay::GetInstance()->_player->_gunportBullet[0].size()) {
+
+						_gunportBulletOrderIdx[0] = 0;
+					}
+
+					auto& bullet = ScenePlay::GetInstance()->_player->_gunportBullet[0][_gunportBulletOrderIdx[0]];
+
+					tnl::Vector3 pos = spawnPos + tnl::Vector3::TransformCoord(coords[0], ScenePlay::GetInstance()->_player->_gunportVec[0]->_mesh->rot_);
+					bullet->SetDirectionAndPosition(pos, moveDir);
+
+					_gunportBulletOrderIdx[0]++;
+					_gunportBulletCount[0] = 0;
+				}
+
+				break;
+			case 2:
+				for (int i = 0; i < 2; i++) {
+
+					_gunportBulletCount[i]++;
+
+					if (_gunportBulletCount[i] % _bulletFireInterval == 0) {
+
+						if (_gunportBulletOrderIdx[i] >= ScenePlay::GetInstance()->_player->_gunportBullet[i].size()) {
+							_gunportBulletOrderIdx[i] = 0;
+						}
+
+						auto& gunportBullet = ScenePlay::GetInstance()->_player->_gunportBullet[i][_gunportBulletOrderIdx[i]];
+
+						tnl::Vector3 pos = spawnPos + tnl::Vector3::TransformCoord(coords[i + 1], ScenePlay::GetInstance()->_player->_gunportVec[i]->_mesh->rot_);
+						gunportBullet->_isActive = true;
+						gunportBullet->SetDirectionAndPosition(pos, moveDir);
+
+						_gunportBulletOrderIdx[i]++;
+						_gunportBulletCount[i] = 0;
+					}
+				}
+				break;
+			case 3:
+				for (int i = 0; i < 3; i++) {
+					_gunportBulletCount[i]++;
+
+					if (_gunportBulletCount[i] % _bulletFireInterval == 0) {
+
+						if (_gunportBulletOrderIdx[i] >= ScenePlay::GetInstance()->_player->_gunportBullet[i].size()) {
+							_gunportBulletOrderIdx[i] = 0;
+						}
+
+						auto& gunportBullet = ScenePlay::GetInstance()->_player->_gunportBullet[i][_gunportBulletOrderIdx[i]];
+
+						tnl::Vector3 pos = spawnPos + tnl::Vector3::TransformCoord(coords[i], ScenePlay::GetInstance()->_player->_gunportVec[i]->_mesh->rot_);
+						gunportBullet->_isActive = true;
+						gunportBullet->SetDirectionAndPosition(pos, moveDir);
+
+						_gunportBulletOrderIdx[i]++;
+						_gunportBulletCount[i] = 0;
+					}
+				}
+				break;
+
+			case 4:
+				for (int i = 0; i < 4; i++) {
+					_gunportBulletCount[i]++;
+
+					if (_gunportBulletCount[i] % _bulletFireInterval == 0) {
+
+						if (_gunportBulletOrderIdx[i] >= ScenePlay::GetInstance()->_player->_gunportBullet[i].size()) {
+							_gunportBulletOrderIdx[i] = 0;
+						}
+
+						auto& gunportBullet = ScenePlay::GetInstance()->_player->_gunportBullet[i][_gunportBulletOrderIdx[i]];
+
+						tnl::Vector3 pos = spawnPos + tnl::Vector3::TransformCoord(coords[i + 1], ScenePlay::GetInstance()->_player->_gunportVec[i]->_mesh->rot_);
+						gunportBullet->_isActive = true;
+						gunportBullet->SetDirectionAndPosition(pos, moveDir);
+
+						_gunportBulletOrderIdx[i]++;
+						_gunportBulletCount[i] = 0;
+					}
+				}
+				break;
+
+			case 5:
+				for (int i = 0; i < 5; i++) {
+					_gunportBulletCount[i]++;
+
+					if (_gunportBulletCount[i] % _bulletFireInterval == 0) {
+
+						if (_gunportBulletOrderIdx[i] >= ScenePlay::GetInstance()->_player->_gunportBullet[i].size()) {
+							_gunportBulletOrderIdx[i] = 0;
+						}
+
+						auto& gunportBullet = ScenePlay::GetInstance()->_player->_gunportBullet[i][_gunportBulletOrderIdx[i]];
+
+						tnl::Vector3 pos = spawnPos + tnl::Vector3::TransformCoord(coords[i], ScenePlay::GetInstance()->_player->_gunportVec[i]->_mesh->rot_);
+						gunportBullet->_isActive = true;
+						gunportBullet->SetDirectionAndPosition(pos, moveDir);
+
+						_gunportBulletOrderIdx[i]++;
+						_gunportBulletCount[i] = 0;
+					}
+				}
+				break;
+			}
+		}
+	}
+
 
 
 	void Player::ControlPlayerMoveByInput(const float deltaTime) {
@@ -291,7 +404,7 @@ namespace inl {
 
 		// 左方向
 		if (InputFuncTable::IsButtonDown_LEFT() &&
-			!_playerCamera->follow)
+			!ScenePlay::GetInstance()->_mainCamera->follow)
 		{
 
 			_moveVelocity -= tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
@@ -300,7 +413,7 @@ namespace inl {
 
 		// 右方向
 		if (InputFuncTable::IsButtonDown_RIGHT() &&
-			!_playerCamera->follow)
+			!ScenePlay::GetInstance()->_mainCamera->follow)
 		{
 
 			_moveVelocity += tnl::Vector3::TransformCoord({ 1.0f, 0, 0 }, _rotY);
@@ -338,7 +451,7 @@ namespace inl {
 		tnl::Vector3 vel = tnl::Input::GetRightStick();
 
 		int wheel = tnl::Input::GetMouseWheel();
-		auto zakoList = _enemyManager_ref->_enemyZakoList;
+		auto zakoList = ScenePlay::GetInstance()->_enemyManager->_enemyZakoList;
 
 		// マウスホイールの入力に応じて敵のインデックスを増減
 		if (wheel > 0 || tnl::Input::IsPadDownTrigger(ePad::KEY_9)) {
@@ -363,7 +476,7 @@ namespace inl {
 	void Player::ControlRotationByPadOrMouse() {
 
 		// ゲームパッド
-		if (!_playerCamera->follow) {
+		if (!ScenePlay::GetInstance()->_mainCamera->follow) {
 
 			tnl::Vector3 vel = tnl::Input::GetRightStick();
 
@@ -387,7 +500,7 @@ namespace inl {
 		}
 
 		// マウス
-		if (!_playerCamera->follow
+		if (!ScenePlay::GetInstance()->_mainCamera->follow
 			&& tnl::Input::GetRightStick().x == 0
 			&& tnl::Input::GetRightStick().y == 0
 			&& tnl::Input::GetRightStick().z == 0) {
@@ -455,7 +568,7 @@ namespace inl {
 		//　敵とのユークリッド距離
 		float dis_player_enemy = (targetEnemyPos - playerPos).length();
 
-		if (_playerCamera->follow) {
+		if (ScenePlay::GetInstance()->_mainCamera->follow) {
 
 			ControlCameraWithEnemyFocus(playerPos, targetEnemyPos);
 		}
@@ -466,14 +579,13 @@ namespace inl {
 	}
 
 
-
 	void Player::ControlCameraWithoutEnemyFocus()
 	{
 		tnl::Vector3 playerPos = _mesh->pos_;
 
 		// 敵にカメラを固定しない場合
-		_playerCamera->target_ = playerPos;
-		_playerCamera->target_ -= _CAMERA_OFFSET;
+		ScenePlay::GetInstance()->_mainCamera->target_ = playerPos;
+		ScenePlay::GetInstance()->_mainCamera->target_ -= _CAMERA_OFFSET;
 
 		ControlRotationByPadOrMouse();
 
@@ -481,17 +593,17 @@ namespace inl {
 		tnl::Vector3 fixPos =
 			playerPos + tnl::Vector3::TransformCoord(_DEFAULT_CAMERA_POSITION, _mesh->rot_);
 
-		_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * _CAMERAMOVE_DELAY_RATE;
+		ScenePlay::GetInstance()->_mainCamera->pos_ += (fixPos - ScenePlay::GetInstance()->_mainCamera->pos_) * _CAMERAMOVE_DELAY_RATE;
 
 		// 追従ポインターOFF
-		_playerCamera->isShowTargetPointer = false;
+		ScenePlay::GetInstance()->_mainCamera->isShowTargetPointer = false;
 	}
 
 
 	void Player::ControlCameraWithEnemyFocus(const tnl::Vector3& playerPos, const tnl::Vector3& targetEnemyPos)
 	{
 		// 追従ポインターON（描画）
-		_playerCamera->isShowTargetPointer = true;
+		ScenePlay::GetInstance()->_mainCamera->isShowTargetPointer = true;
 
 		ChangeTarget_ByMouseWheel();
 		RenderFollowPointer();
@@ -499,13 +611,14 @@ namespace inl {
 		tnl::Vector3 tmp{};
 		tmp.y = playerPos.y + 100;
 		// カメラをプレイヤーと敵の中間地点に固定
-		_playerCamera->target_ = (tmp + targetEnemyPos) / 2;
+		ScenePlay::GetInstance()->_mainCamera->target_ = (tmp + targetEnemyPos) / 2;
 
-		tnl::Quaternion q = tnl::Quaternion::RotationAxis({ 0,1,0 }, _playerCamera->axis_y_angle_);
+		tnl::Quaternion q = tnl::Quaternion::RotationAxis({ 0,1,0 }, ScenePlay::GetInstance()->_mainCamera->axis_y_angle_);
 		tnl::Vector3 xz = tnl::Vector3::TransformCoord({ 0,0,1 }, q);
 		tnl::Vector3 localAxis_x = tnl::Vector3::Cross({ 0,1,0 }, xz);
-		q *= tnl::Quaternion::RotationAxis(localAxis_x, _playerCamera->axis_x_angle_);
+		q *= tnl::Quaternion::RotationAxis(localAxis_x, ScenePlay::GetInstance()->_mainCamera->axis_x_angle_);
 
+		// プレイヤーの回転を敵の方向に向ける
 		_mesh->rot_ = tnl::Quaternion::LookAt(playerPos, targetEnemyPos, localAxis_x);
 
 		float y = 0;
@@ -514,9 +627,39 @@ namespace inl {
 
 		// カメラの動きの遅延処理
 		tnl::Vector3 fixPos = playerPos + tnl::Vector3::TransformCoord({ 50, y, -140 }, _mesh->rot_);
-		_playerCamera->pos_ += (fixPos - _playerCamera->pos_) * 0.1f;
+		ScenePlay::GetInstance()->_mainCamera->pos_ += (fixPos - ScenePlay::GetInstance()->_mainCamera->pos_) * 0.1f;
 	}
 
+
+	void Player::CameraTrigger()
+	{
+		if (EnemyManager::IsClearedCurrentStage()) {
+
+			ScenePlay::GetInstance()->_mainCamera->follow = false;
+			return;
+		}
+
+		// カメラが敵に固定中なら
+		if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) ||
+			tnl::Input::IsPadDownTrigger(ePad::KEY_5) &&
+			ScenePlay::GetInstance()->_mainCamera->follow) {
+
+			ScenePlay::GetInstance()->_mainCamera->follow = false;
+		}
+
+		// 敵が有効範囲内にいれば
+		if (IsEnemyInCapturableRange()) {
+
+			// カメラを敵に固定する
+			// マウス右　ゲームパッドの場合はR1（RB)
+			if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) ||
+				tnl::Input::IsPadDownTrigger(ePad::KEY_5) &&
+				!ScenePlay::GetInstance()->_mainCamera->follow)
+			{
+				ScenePlay::GetInstance()->_mainCamera->follow = true;
+			}
+		}
+	}
 
 
 	void Player::ControlPlayerMoveWithEnemyFocus(tnl::Quaternion& q, float& y)
@@ -525,28 +668,28 @@ namespace inl {
 		if (InputFuncTable::IsButtonDown_LEFT()) {
 
 			tnl::Vector3 newPos =   //　カメラ焦点座標　+　指定の座標
-				_playerCamera->target_ +
+				ScenePlay::GetInstance()->_mainCamera->target_ +
 				tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
 
 			y = 100;
 			_mesh->pos_ = newPos;
-			_playerCamera->axis_y_angle_ += tnl::ToRadian(2);
+			ScenePlay::GetInstance()->_mainCamera->axis_y_angle_ += tnl::ToRadian(2);
 		}
 
 		//　右方向
 		if (InputFuncTable::IsButtonDown_RIGHT()) {
 
 			tnl::Vector3 newPos =  //　カメラ焦点座標　+　指定の座標
-				_playerCamera->target_ +
+				ScenePlay::GetInstance()->_mainCamera->target_ +
 				tnl::Vector3::TransformCoord({ _DISTANCE_OFFSET, 0, _DISTANCE_OFFSET }, q);
 
 			newPos.y = _mesh->pos_.y;
 
 			y = -100;
 			_mesh->pos_ = newPos;
-			_playerCamera->axis_y_angle_ -= tnl::ToRadian(2);
+			ScenePlay::GetInstance()->_mainCamera->axis_y_angle_ -= tnl::ToRadian(2);
 		}
 	}
 
@@ -555,7 +698,7 @@ namespace inl {
 
 		float adaptRange = 200.f;
 
-		float euclideanDistance = (_bombParticle->getPosition() - _mesh->pos_).length();
+		float euclideanDistance = (ScenePlay::GetInstance()->_player->_bombParticle->getPosition() - _mesh->pos_).length();
 
 		if (euclideanDistance <= adaptRange) {
 			ScenePlay::DeactivateAllEnemyBullets();
@@ -592,12 +735,12 @@ namespace inl {
 	}
 
 
-	// 描画－-----------------------－-----------------------－-----------------------－-----------------------------
+	// 描画－-----------------------－-----------------------－-----------------------－---------------------
 	void Player::RenderFollowPointer() {
 
 		tnl::Vector3 enemyPos;
 
-		if (_playerCamera->isShowTargetPointer) {
+		if (ScenePlay::GetInstance()->_mainCamera->isShowTargetPointer) {
 
 			AssignEnemyPosition(enemyPos);
 		}
@@ -608,8 +751,8 @@ namespace inl {
 			{ enemyPos.x, enemyPos.y, enemyPos.z }
 			, DXE_WINDOW_WIDTH
 			, DXE_WINDOW_HEIGHT
-			, _playerCamera->view_
-			, _playerCamera->proj_
+			, ScenePlay::GetInstance()->_mainCamera->view_
+			, ScenePlay::GetInstance()->_mainCamera->proj_
 		);
 
 		// 追従ポインター描画
@@ -617,12 +760,12 @@ namespace inl {
 	}
 
 
-	void Player::RenderGunport(const Shared<inl::FreeLookCamera> camera) {
+	void Player::RenderGunport() {
 
 		if (_gunportVec.empty()) return;
 
 		for (const auto& it : _gunportVec) {
-			it->Render(camera);
+			it->Render(ScenePlay::GetInstance()->_mainCamera);
 		}
 	}
 
@@ -688,13 +831,15 @@ namespace inl {
 	}
 
 
-	void Player::Render(const Shared<inl::FreeLookCamera> camera) {
+	void Player::Render() {
 
-		RenderPlayerParticle(camera);
+		if (!ScenePlay::GetInstance()->_initComplete) return;
 
-		TriggerInvincible(camera);
+		RenderPlayerParticle();
 
-		RenderGunport(camera);
+		TriggerInvincible();
+
+		RenderGunport();
 
 		int color = -1;
 
@@ -703,8 +848,7 @@ namespace inl {
 		case 1:	color = 1;	break;
 		case 2:	color = GetColor(0, 220, 0); break;
 		}
-		
-		
+
 		RenderPlayerHp(color);
 
 		// ボムの残数
@@ -712,12 +856,31 @@ namespace inl {
 		RenderBombRemainCount(color);
 
 		RenderBulletPowerRate(color);
-		
-		for (auto& blt : _straightBullets_player) {
-			blt->Render(camera);
+
+		// 弾
+		for (auto& blt : ScenePlay::GetInstance()->_player->_straightBullet) {
+
+			if (blt->_isActive)
+				blt->Render();
 		}
 
-		if (_playerCamera->follow) {
+
+		for (int i = 0; i < 5; i++) {
+
+			for (auto& blt : ScenePlay::GetInstance()->_player->_gunportBullet[i]) {
+
+				if (blt->_isActive)
+					blt->Render();
+			}
+		}
+
+		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
+		//DrawBox(20, 475, 280, 505, 1, true);
+		//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
+
+		DrawStringEx(25, 480, color, "姿勢を戻す: Key C or Pad X (□)");
+
+		if (ScenePlay::GetInstance()->_mainCamera->follow) {
 
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
 			DrawBox(20, 430, 410, 460, 1, true);
@@ -725,40 +888,34 @@ namespace inl {
 
 			DrawStringEx(25, 435, color, "ターゲット変更：マウスホイール or 右スティック押下");
 		}
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 40);
-		DrawBox(20, 475, 280, 505, 1, true);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 255);
-
-		DrawStringEx(25, 480, color, "姿勢を戻す: Key C or Pad X (□)");
 	}
 
 
-	void Player::RenderPlayerParticle(const Shared<inl::FreeLookCamera>& camera)
+	void Player::RenderPlayerParticle()
 	{
 		dxe::DirectXRenderBegin();
-		inl::Player::_playerParticle->setPosition(_mesh->pos_);
-		inl::Player::_playerParticle->start();
-		inl::Player::_playerParticle->render(camera);
+		ScenePlay::GetInstance()->_player->_playerParticle->setPosition(ScenePlay::GetInstance()->_player->_mesh->pos_);
+		ScenePlay::GetInstance()->_player->_playerParticle->start();
+		ScenePlay::GetInstance()->_player->_playerParticle->render(ScenePlay::GetInstance()->_mainCamera);
 		dxe::DirectXRenderEnd();
 	}
 
 
-	void Player::TriggerInvincible(const Shared<inl::FreeLookCamera>& camera)
+	void Player::TriggerInvincible()
 	{
-		if (_isInvincible) {
+		if (ScenePlay::GetInstance()->_player->_isInvincible) {
 
 			if (static_cast<int>(_invincibleTimer * 10) % 3 == 0) {
 
 				//　プレイヤー半透明化
-				_mesh->setBlendMode(DX_BLENDMODE_ADD);
-				_mesh->setAlpha(0.8f);
-				_mesh->render(camera);
+				ScenePlay::GetInstance()->_player->_mesh->setBlendMode(DX_BLENDMODE_ADD);
+				ScenePlay::GetInstance()->_player->_mesh->setAlpha(0.8f);
+				ScenePlay::GetInstance()->_player->_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 			}
 		}
 		else {
-			_mesh->setBlendMode(DX_BLENDMODE_NOBLEND);
-			_mesh->render(camera);
+			ScenePlay::GetInstance()->_player->_mesh->setBlendMode(DX_BLENDMODE_NOBLEND);
+			ScenePlay::GetInstance()->_player->_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 		}
 	}
 
@@ -766,32 +923,56 @@ namespace inl {
 	// 更新－-----------------------－-----------------------－-----------------------－-----------------------－-----
 	void Player::UpdateStraightBullet(const float deltaTime)
 	{
-		auto it_blt = _straightBullets_player.begin();
+		auto it_blt = ScenePlay::GetInstance()->_player->_straightBullet.begin();
 
-		while (it_blt != _straightBullets_player.end()) {
+		while (it_blt != ScenePlay::GetInstance()->_player->_straightBullet.end()) {
 
 			(*it_blt)->Update(deltaTime);
 
 			if (!(*it_blt)->_isActive) {
 
-				it_blt = _straightBullets_player.erase(it_blt);
+				(*it_blt)->_isActive = true;
 				continue;
 			}
-			it_blt++;
+			else {
+				it_blt++;
+			}
+		}
+	}
+
+	void Player::UpdateGunportBullet(const float deltaTime)
+	{
+		for (int i = 0; i < 5; i++) {
+
+			auto it_blt = ScenePlay::GetInstance()->_player->_gunportBullet[i].begin();
+
+			while (it_blt != ScenePlay::GetInstance()->_player->_gunportBullet[i].end()) {
+
+				(*it_blt)->Update(deltaTime);
+
+				if (!(*it_blt)->_isActive) {
+
+					(*it_blt)->_isActive = true;
+					continue;
+				}
+				else {
+					it_blt++;
+				}
+			}
 		}
 	}
 
 
 	void Player::WatchInvincibleTimer(const float deltaTime) noexcept {
 
-		if (_isInvincible) {
+		if (ScenePlay::GetInstance()->_player->_isInvincible) {
 
 			_invincibleTimer += deltaTime;
 
 			if (_invincibleTimer >= _INVINCIBLE_TIME_LIMIT) {
 
 				_invincibleTimer = 0.0f;
-				_isInvincible = false;
+				ScenePlay::GetInstance()->_player->_isInvincible = false;
 			}
 		}
 	}
@@ -809,16 +990,6 @@ namespace inl {
 	void Player::UpdateGunport() {
 
 		if (_gunportVec.empty()) return;
-
-		//　各連装砲の配置座標（ 最大５ ）
-		const tnl::Vector3 coords[] = {
-		{  0, -25, -20},
-		{-25,   0, -20},
-		{ 25,   0, -20},
-		{-15, -15, -20},
-		{ 15, -15, -20}
-		};
-
 
 		switch (_gunportVec.size())
 		{
@@ -863,34 +1034,36 @@ namespace inl {
 
 	void Player::Update(const float deltaTime) {
 
+		if (!ScenePlay::GetInstance()->_initComplete) return;
+
 		//　「 Begin 」テキスト
 		WatchInvincibleTimer(deltaTime);
 
-		// カメラを敵に固定するフラグを反転
-		// マウス右　ゲームパッドの場合はR1（RB)
-		if (tnl::Input::IsMouseTrigger(eMouseTrigger::IN_RIGHT) ||
-			tnl::Input::IsPadDownTrigger(ePad::KEY_5))
-		{
-			if (IsEnemyInCapturableRange() || _playerCamera->follow)
-				_playerCamera->follow = !_playerCamera->follow;
-		}
-
 		//　カメラ
+		CameraTrigger();
 		ActivateDarkSoulsCamera();
-		_playerCamera->Update(deltaTime);
+		ScenePlay::GetInstance()->_mainCamera->Update(deltaTime);
 
 		//　プレイヤー操作
 		ControlPlayerMoveByInput(deltaTime);
 		AdjustPlayerVelocity();
 
+		tnl::Vector3 spawnPos = _mesh->pos_;
+		tnl::Vector3 moveDir = GetBulletMoveDirection();
+
 		//　弾発射
-		ShotPlayerBullet();
-		ShotGunportBullet();
-		UpdateStraightBullet(deltaTime);
+		if (IsShooting()) {
+
+			ShotPlayerBullet(spawnPos, moveDir);
+			ShotGunportBullet(spawnPos, moveDir);
+		}
 
 		//　ガンポート
 		_playerGunport->ManageGunportCount(_gunportVec);
 		UpdateGunport();
+		UpdateGunportBullet(deltaTime);
+
+		UpdateStraightBullet(deltaTime);
 
 		//　ボム
 		UseBomb();

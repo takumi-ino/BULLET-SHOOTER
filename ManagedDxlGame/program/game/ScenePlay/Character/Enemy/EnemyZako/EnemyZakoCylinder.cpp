@@ -6,8 +6,7 @@
 
 namespace inl {
 
-	EnemyZakoCylinder::EnemyZakoCylinder(const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
-		: EnemyZakoBase(data, player, camera, collision)
+	EnemyZakoCylinder::EnemyZakoCylinder(const EnemyZakoInfo& data) : EnemyZakoBase(data)
 	{
 		_explode_particle = std::make_shared<dxe::Particle>("particle/preset/explosion.bin");
 
@@ -30,7 +29,6 @@ namespace inl {
 		_NOTICE_LIMIT_DURATION = 5.0f;
 		_CHANGE_NEXT_BEHAVE_DURATION = 4.0f;
 	}
-
 
 
 	void EnemyZakoCylinder::SetMeshInfo() {

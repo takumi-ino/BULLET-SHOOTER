@@ -36,15 +36,11 @@
 
 namespace inl {
 
+	bool EnemyManager::_isClearedCurrentStage = false;
 
 	// 初期化処理-----------------------------------------------------------------------------------------------
-	EnemyManager::EnemyManager(
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision)
-		: _player_ref(player), _mainCamera_ref(camera), _collision_ref(collision)
+	EnemyManager::EnemyManager()
 	{
-
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 		_alertSE_hdl = cus->TryLoadSound("sound/se/bossAppears.mp3", "inl::EnemyManager::EnemyManager()");
 
@@ -60,11 +56,9 @@ namespace inl {
 		SetSpawnEnemyBoss();
 
 		_isInitializedBossInfo = false;
-
 		SoundManager::GetInstance().LoadStageBGM(ScenePlay::GetStageID());
-		SoundManager::GetInstance().PlayStageBGM(false);       // ボス(true)か雑魚(false)か
 
-		_itemManager = std::make_shared<ItemManager>(_player_ref, _collision_ref);
+		_itemManager = std::make_shared<ItemManager>();
 		this->AttachItemManagerInstance(_itemManager);
 	}
 
@@ -194,9 +188,7 @@ namespace inl {
 		if (ScenePlay::GetStageID() == _sBoss_PatchouliKnowledge_info._stageID) {
 
 			auto boss_patchouli = // インスタンス生成
-				std::make_shared<EnemyBoss_PatchouliKnowledge>(
-					_enemyBossData_map[0], _player_ref, _mainCamera_ref, _collision_ref
-				);
+				std::make_shared<EnemyBoss_PatchouliKnowledge>(_enemyBossData_map[0]);
 
 			//　死亡フラグ
 			boss_patchouli->_isDead = false;
@@ -213,9 +205,7 @@ namespace inl {
 		else if (ScenePlay::GetStageID() == _sBoss_Cirno_info._stageID) {
 
 			auto boss_cirno =
-				std::make_shared<EnemyBoss_Cirno>(
-					_enemyBossData_map[1], _player_ref, _mainCamera_ref, _collision_ref
-				);
+				std::make_shared<EnemyBoss_Cirno>(_enemyBossData_map[1]);
 
 			boss_cirno->_isDead = false;
 			boss_cirno->_enemyMoveSpeed = _sBoss_Cirno_info._enemyMoveSpeed;
@@ -228,9 +218,7 @@ namespace inl {
 		else if (ScenePlay::GetStageID() == _sBoss_MoriyaSuwako_info._stageID) {
 
 			auto boss_suwako =
-				std::make_shared<EnemyBoss_MoriyaSuwako>(
-					_enemyBossData_map[2], _player_ref, _mainCamera_ref, _collision_ref
-				);
+				std::make_shared<EnemyBoss_MoriyaSuwako>(_enemyBossData_map[2]);
 
 			boss_suwako->_isDead = false;
 			boss_suwako->_enemyMoveSpeed = _sBoss_MoriyaSuwako_info._enemyMoveSpeed;
@@ -257,12 +245,7 @@ namespace inl {
 
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
-					auto enemy_box = std::make_shared<EnemyZakoBox>(
-						_enemyZakoData_map[0], 
-						_player_ref,
-						_mainCamera_ref,
-						_collision_ref
-					);
+					auto enemy_box = std::make_shared<EnemyZakoBox>(_enemyZakoData_map[0]);
 
 					enemy_box->_isDead = false;
 					enemy_box->SetMeshInfo();
@@ -288,12 +271,7 @@ namespace inl {
 
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
-					auto enemy_dome = std::make_shared<EnemyZakoDome>(
-						_enemyZakoData_map[1],
-						_player_ref,
-						_mainCamera_ref,
-						_collision_ref
-					);
+					auto enemy_dome = std::make_shared<EnemyZakoDome>(_enemyZakoData_map[1]);
 
 					enemy_dome->_isDead = false;
 					enemy_dome->SetMeshInfo();
@@ -317,12 +295,7 @@ namespace inl {
 
 				for (int i = 0; i < enemiesToSpawnNow; i++) {
 
-					auto enemy_cylinder = std::make_shared<EnemyZakoCylinder>(
-						_enemyZakoData_map[2], 
-						_player_ref,
-						_mainCamera_ref,
-						_collision_ref
-					);
+					auto enemy_cylinder = std::make_shared<EnemyZakoCylinder>(_enemyZakoData_map[2]);
 
 					enemy_cylinder->_isDead = false;
 					enemy_cylinder->SetMeshInfo();
@@ -373,18 +346,20 @@ namespace inl {
 			if (it->_mesh != nullptr) {
 
 				// プレイヤーとZakoエネミー各種
-				_collision_ref->CheckCollision_PlayerAndEnemyZako(
-					_player_ref, it, _player_ref->GetPos(), it->_mesh->pos_
+				ScenePlay::GetInstance()->_collision->CheckCollision_PlayerAndEnemyZako(
+					ScenePlay::GetInstance()->_player, it, ScenePlay::GetInstance()->_player->GetPos(), it->_mesh->pos_
 				);
 			}
-			// プレイヤーの弾とZakoエネミー各種
-			for (Shared<PlayerBullet> pb : _player_ref->_straightBullets_player) {
 
-				if (_collision_ref->CheckCollision_PlayerBulletAndEnemyZako(pb, it)) {
+
+			// プレイヤーの弾とZakoエネミー各種
+			for (Shared<PlayerBullet>& pb : ScenePlay::GetInstance()->_player->_straightBullet) {
+
+				if (ScenePlay::GetInstance()->_collision->CheckCollision_PlayerBulletAndEnemyZako(pb, it)) {
 
 					pb->_isActive = false;
 
-					if (it->DecreaseHP(_player_ref->GetAT(), _mainCamera_ref)) {
+					if (it->DecreaseHP(ScenePlay::GetInstance()->_player->GetAT())) {
 
 						// スコア加算
 						ScoreManager::GetInstance().AddHitBulletScore(100);
@@ -405,10 +380,10 @@ namespace inl {
 			// Zakoエネミー同士の当たり判定
 			for (auto& it2 : _enemyZakoList) {
 
-				if (it == it2) 
+				if (it == it2)
 					continue;
 
-				_collision_ref->CheckCollision_EnemyAndEnemy(
+				ScenePlay::GetInstance()->_collision->CheckCollision_EnemyAndEnemy(
 					it,
 					it2,
 					it->_mesh->pos_,
@@ -426,21 +401,21 @@ namespace inl {
 			if (it->_mesh != nullptr) {
 
 				// プレイヤーとBossエネミー各種
-				_collision_ref->CheckCollision_PlayerAndEnemyBoss(
-					_player_ref,
-					it, 
-					_player_ref->GetPos(),
+				ScenePlay::GetInstance()->_collision->CheckCollision_PlayerAndEnemyBoss(
+					ScenePlay::GetInstance()->_player,
+					it,
+					ScenePlay::GetInstance()->_player->GetPos(),
 					it->_mesh->pos_
 				);
 			}
 
 			// プレイヤーの弾とBossエネミー各種
-			for (Shared<inl::PlayerBullet> pb : _player_ref->_straightBullets_player) {
+			for (Shared<inl::PlayerBullet>& pb : ScenePlay::GetInstance()->_player->_straightBullet) {
 
-				if (_collision_ref->CheckCollision_PlayerBulletAndEnemyBoss(pb, it)) {
+				if (ScenePlay::GetInstance()->_collision->CheckCollision_PlayerBulletAndEnemyBoss(pb, it)) {
 
 					pb->_isActive = false;
-					it->DecreaseBossHP(_player_ref->GetAT());
+					it->DecreaseBossHP(ScenePlay::GetInstance()->_player->GetAT());
 					ScoreManager::GetInstance().AddHitBulletScore(100);
 
 					inl::PlayerBullet::_bulletPowerRate += 0.01f;
@@ -460,19 +435,20 @@ namespace inl {
 
 	//　ボスの位置座標の通知------------------------------------------------------------------------------------------
 	void EnemyManager::AttachItemManagerInstance(const Shared<ItemManager>& observer) {
-		_observerItems.push_back(observer);
+
+		_itemManagerObserver.push_back(observer);
 	}
 
 
 	void EnemyManager::NotifyEnemyPosition_ToItemManager() {
 
-		for (const auto& observer : _observerItems) {
+		for (const auto& observer : _itemManagerObserver) {
 			observer->SpawnItemsOnEnemyDeath(_enemyZako_position, _isEnemyZako_dead);
 		}
 	}
 
 
-	void EnemyManager::SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyDead) {
+	void EnemyManager::AssignEnemyStatus(const tnl::Vector3& newPosition, const bool isEnemyDead) {
 
 		_enemyZako_position = newPosition;
 		_isEnemyZako_dead = isEnemyDead;
@@ -536,8 +512,11 @@ namespace inl {
 	bool EnemyManager::IsKilledStageBoss() {
 
 		if (_enemyZakoList.empty() && _enemyBossList.empty()) {
+
+			_isClearedCurrentStage = true;
 			return true;
 		}
+
 		return false;
 	}
 
@@ -626,18 +605,18 @@ namespace inl {
 		if (IsKilledStageBoss() && !_isDefeatedAllStageEnemy) {
 
 			SetFontSize(80);
-			DrawString(450, 200, "Stage Clear", GetColor(0, 255, 0));
-			SetFontSize(40);
-			DrawString(480, 450, "Move to Next Stage!", GetColor(0, 255, 0));
+			DrawString(450, 200, "Stage Clear!", GetColor(0, 255, 0));
+			SetFontSize(35);
+			DrawString(444, 350, "Press Enter to Move to Next", GetColor(0, 255, 0));
 			SetFontSize(DEFAULT_FONT_SIZE);
 
 			if (InputFuncTable::IsButtonTrigger_ENTER()) {
 
+				_isClearedCurrentStage = false;
+
 				SoundManager::GetInstance().DestroyStageBGM(false);  // BGM削除
 
-				ScenePlay* sp = new ScenePlay();
-				sp->MoveToNextStage(ScenePlay::GetStageID(), ScenePlay::GetGameDifficulty());
-				delete sp; sp = nullptr;
+				ScenePlay::GetInstance()->MoveToNextStage(ScenePlay::GetStageID(), ScenePlay::GetGameDifficulty());
 
 				return true;
 			}
@@ -656,8 +635,8 @@ namespace inl {
 
 			SetFontSize(60);
 			DrawString(470, 250, "Accomplished", GetColor(0, 255, 0));
-			SetFontSize(30);
-			DrawString(535, 450, "Move to Result!", GetColor(0, 255, 0));
+			SetFontSize(40);
+			DrawString(515, 415, "Move to Result!", GetColor(0, 255, 0));
 
 			// 決定ボタン押下
 			if (InputFuncTable::IsButtonTrigger_ENTER()) {
@@ -665,8 +644,6 @@ namespace inl {
 				inl::PlayerBullet::ResetBulletPowerRate();          // プレイヤーの弾威力初期化
 
 				SoundManager::GetInstance().DestroyStageBGM(false); // BGM削除
-
-				ScenePlay::DestroyThirdStageBulletHellLists();      // 第３ステージボスの弾幕を削除
 
 				MoveToResult();
 
@@ -697,17 +674,17 @@ namespace inl {
 	}
 
 	// 描画-----------------------------------------------------------------------------------------------------------
-	void EnemyManager::Render(const Shared<dxe::Camera>& camera) const {
+	void EnemyManager::Render() const {
 
-		_itemManager->Render(camera);
+		_itemManager->Render(ScenePlay::GetInstance()->_mainCamera);
 
 		RenderEventHitText();
 
 		// ザコ
 		for (const auto& enemy : _enemyZakoList) {
 
-			if (enemy) 
-				enemy->Render(_mainCamera_ref);
+			if (enemy)
+				enemy->Render();
 		}
 
 		// ボス
@@ -716,8 +693,8 @@ namespace inl {
 			if (_isSummonBoss) {
 
 				for (const auto& boss : _enemyBossList) {
-					if (boss) 
-						boss->Render(_mainCamera_ref);
+					if (boss)
+						boss->Render();
 				}
 			}
 		}
@@ -726,7 +703,7 @@ namespace inl {
 	// 更新---------------------------------------------------------------------------------------------------------
 	void EnemyManager::UpdateEnemyBossList(const float deltaTime)
 	{
-		if (!_enemyZakoList.empty() || _enemyBossList.empty()) 
+		if (!_enemyZakoList.empty() || _enemyBossList.empty())
 			return;
 
 		if (!_isSummonBoss)
@@ -750,7 +727,7 @@ namespace inl {
 
 	void EnemyManager::UpdateEnemyZakoList(const float deltaTime)
 	{
-		if (_enemyZakoList.empty()) 
+		if (_enemyZakoList.empty())
 			return;
 
 		for (auto it_zako = _enemyZakoList.begin(); it_zako != _enemyZakoList.end();) {
@@ -758,7 +735,7 @@ namespace inl {
 			if ((*it_zako)->Update(deltaTime) == false) {
 
 				// 関数内でItemManagerクラスに通知
-				SendEnemyPosition((*it_zako)->_mesh->pos_, (*it_zako)->_isDead);
+				AssignEnemyStatus((*it_zako)->_mesh->pos_, (*it_zako)->_isDead);
 
 				//　削除
 				it_zako = _enemyZakoList.erase(it_zako);

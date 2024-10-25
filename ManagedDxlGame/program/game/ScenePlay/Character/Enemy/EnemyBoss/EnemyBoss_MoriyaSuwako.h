@@ -24,19 +24,14 @@ namespace inl {
 
 		explicit EnemyBoss_MoriyaSuwako(Shared<EnemyBoss_MoriyaSuwako> boss) {}
 
-		EnemyBoss_MoriyaSuwako(
-			const EnemyBossInfo& info,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyBoss_MoriyaSuwako(const EnemyBossInfo& info);
 
 		// ‰Šú‰»---------------------------------------------------------------------------------
 		void SetMeshInfo() override;
 		void InitBulletHellInstance() override;
 
 		// •`‰æEXV-----------------------------------------------------------------------------
-		void Render(Shared<dxe::Camera> camera) override;
+		void Render() override;
 		bool Update(const float deltaTime) override;
 
 	private:

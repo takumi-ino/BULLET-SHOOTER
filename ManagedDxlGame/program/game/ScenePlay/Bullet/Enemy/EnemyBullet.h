@@ -59,10 +59,12 @@ namespace inl {
 		EnemyBullet() {}
 		EnemyBullet(EnemyBullet::SHAPE shape, EnemyBullet::COLOR color, const float size);
 
-		~EnemyBullet() override {}
+		~EnemyBullet() override 
+		{
+		}
 
 		// ï`âÊÅiíeñãópÅj-------------------------------------------------------------------------------------
-		void Render(const Shared<dxe::Camera> camera) override;
+		void Render() override;
 
 	protected:
 
@@ -72,7 +74,6 @@ namespace inl {
 
 		SPECIFICTYPE    specificType = EnemyBullet::SPECIFICTYPE::None;
 
-		int             _id{};
 		float           _speed{};
 		float           _radius{};
 		float           _angle{};

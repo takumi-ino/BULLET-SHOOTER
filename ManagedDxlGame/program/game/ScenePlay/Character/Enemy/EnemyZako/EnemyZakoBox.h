@@ -11,12 +11,7 @@ namespace inl {
 		~EnemyZakoBox() override {}
 
 
-		EnemyZakoBox(
-			const EnemyZakoInfo& info,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyZakoBox(const EnemyZakoInfo& info);
 
 		// èâä˙âª---------------------------------------------------------------------------------
 		void InitBulletFactoryInstance() override;

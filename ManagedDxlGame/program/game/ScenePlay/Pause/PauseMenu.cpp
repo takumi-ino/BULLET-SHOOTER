@@ -6,6 +6,7 @@
 // シーン---------------------------------------------------
 #include "../../ScenePlay/ScenePlay.h"
 #include "../../SceneSelectDifficulty/SceneSelectDifficulty.h"
+#include "../game/SceneNowLoading/SceneNowLoading.h"
 // ---------------------------------------------------
 #include "../game/ScenePlay/Character/Player/Player.h"
 #include "../../Utility/InputFuncTable.h"
@@ -14,12 +15,6 @@
 namespace inl {
 
 	bool PauseMenu::_isShowPauseOption = false;
-
-	PauseMenu::PauseMenu(const Shared<Player>& player) {
-
-		_player_ref = player;
-		_scenePlay = std::make_shared<ScenePlay>();
-	}
 
 
 	void PauseMenu::UpdatePauseMenuCursor_ByInput() noexcept {
@@ -43,6 +38,7 @@ namespace inl {
 
 	void PauseMenu::PickPauseMenuItemByInput() {
 
+		// プレイヤーが生きている場合
 		if (_MENU_INDEX_COUNT == 4) {
 
 			// ゲーム再開
@@ -66,9 +62,10 @@ namespace inl {
 
 					ResetGame();
 
-					auto mgr = SceneManager::GetInstance();
-					mgr->ChangeScene(
-						new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
+					ScenePlay::GetInstance()->_initComplete = false;
+
+					/*SceneManager::GetInstance()->ChangeScene(
+						new SceneNowLoading(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));*/
 				}
 			}
 			// 難易度選択に戻る
@@ -78,11 +75,11 @@ namespace inl {
 
 					ResetGame();
 
-					auto mgr = SceneManager::GetInstance();
-					mgr->ChangeScene(new SceneSelectDifficulty());
+					SceneManager::GetInstance()->ChangeScene(new SceneSelectDifficulty());
 				}
 			}
 		}
+		// プレイヤーが死亡した場合
 		else {
 			if (_menuIndex == 0) {
 
@@ -99,9 +96,8 @@ namespace inl {
 
 					ResetGame();
 
-					auto mgr = SceneManager::GetInstance();
-					mgr->ChangeScene(
-						new ScenePlay(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
+					SceneManager::GetInstance()->ChangeScene(
+						new SceneNowLoading(ScenePlay::GetGameDifficulty(), ScenePlay::GetStageID()));
 				}
 			}
 			if (_menuIndex == 2) {
@@ -111,8 +107,7 @@ namespace inl {
 
 					ResetGame();
 
-					auto mgr = SceneManager::GetInstance();
-					mgr->ChangeScene(new SceneSelectDifficulty());
+					SceneManager::GetInstance()->ChangeScene(new SceneSelectDifficulty());
 				}
 			}
 		}
@@ -121,9 +116,9 @@ namespace inl {
 
 	void PauseMenu::ResetGame()
 	{
-		_scenePlay->TurnOffFirstStageBulletHellLists();
-		_scenePlay->TurnOffSecondStageBulletHellLists();
-		_scenePlay->TurnOffThirdStageBulletHellLists();
+		ScenePlay::TurnOffFirstStageBulletHellLists();
+		ScenePlay::TurnOffSecondStageBulletHellLists();
+		ScenePlay::TurnOffThirdStageBulletHellLists();
 
 		ScenePlay::DestroyFirstStageBulletHellLists();
 		ScenePlay::DestroySecondStageBulletHellLists();
@@ -131,7 +126,7 @@ namespace inl {
 
 		SoundManager::GetInstance().DestroyStageBGM(false);
 
-		_player_ref->SetHP(_player_ref->GetMaxHP());
+		ScenePlay::GetInstance()->_player->SetHP(ScenePlay::GetInstance()->_player->GetMaxHP());
 	}
 
 
@@ -228,7 +223,7 @@ namespace inl {
 		int leftSide = 120;
 		SetFontSize(25);
 
-		if (_player_ref->GetHP() != 0) {  // プレイヤー死亡時のみ  "再開する" 　がなくなる
+		if (ScenePlay::GetInstance()->_player->GetHP() != 0) {  // プレイヤー死亡時のみ  "再開する" がなくなる
 
 			_MENU_INDEX_COUNT = 4;
 			DrawStringEx(leftSide, upSide, a, "再開する");

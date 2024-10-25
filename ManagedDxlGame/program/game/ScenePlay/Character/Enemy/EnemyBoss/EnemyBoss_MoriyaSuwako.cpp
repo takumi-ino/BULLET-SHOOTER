@@ -11,12 +11,7 @@ namespace inl {
 	bool EnemyBoss_MoriyaSuwako::_isUsingBullet_keroChanStandsFirmAgainstTheStorm_suwako;
 
 
-	EnemyBoss_MoriyaSuwako::EnemyBoss_MoriyaSuwako(
-		const EnemyBossInfo& info, 
-		const Shared<Player>& player, 
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision)
-		: EnemyBossBase(info, player, camera, collision) {
+	EnemyBoss_MoriyaSuwako::EnemyBoss_MoriyaSuwako(const EnemyBossInfo& info) : EnemyBossBase(info) {
 
 		_collideSize = { 50,50,50 };
 		_at = 6;
@@ -29,7 +24,7 @@ namespace inl {
 
 		Shared<CustomException> cus = std::make_shared<CustomException>();
 
-		auto texture = 
+		auto texture =
 			cus->TryLoadTexture("graphics/bossTexture/Suwako.jpg", "inl::EnemyBoss_Suwako::SetMeshInfo()");
 
 		_mesh = dxe::Mesh::CreateCubeMV(100);
@@ -42,7 +37,7 @@ namespace inl {
 
 	void EnemyBoss_MoriyaSuwako::InitBulletHellInstance() {
 
-		_bulletHell = std::make_shared<BulletHell>(_mesh, _player_ref);
+		_bulletHell = std::make_shared<BulletHell>(_mesh);
 	}
 
 
@@ -119,11 +114,11 @@ namespace inl {
 	}
 
 
-	void EnemyBoss_MoriyaSuwako::Render(Shared<dxe::Camera> camera) {
+	void EnemyBoss_MoriyaSuwako::Render() {
 
 		if (_isDead) return;
 
-		_mesh->render(camera);
+		_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 
 		ShowHpGage_EnemyBoss();
 		RenderBossSpellCardName();

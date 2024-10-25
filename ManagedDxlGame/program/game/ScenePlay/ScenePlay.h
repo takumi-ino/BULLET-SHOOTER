@@ -6,7 +6,6 @@ class ItemManager;
 namespace inl {
 
 	class SkyBox;
-	class FreeLookCamera;
 	class PauseMenu;
 	class EnemyBullet;
 	class BulletHellFactory;
@@ -18,18 +17,48 @@ namespace inl {
 	class Player;
 	class CustomException;
 	class Wall;
+	class SceneNowLoading;
 }
 
 
 // インゲーム地点。あらゆるモジュールをここで使用可能
 class ScenePlay : public SceneBase
 {
+private:
+
+	static ScenePlay* instance;
+
 public:
 
 	ScenePlay() {}
-	ScenePlay(const std::string selectedDifficulty, const int stage);
-
 	~ScenePlay() override {}
+
+	ScenePlay(const std::string difficulty, const int stage);
+
+	static ScenePlay* GetInstance() {
+
+		return instance;
+	}
+
+	static void CreateInstance() {
+
+		if (instance == nullptr) {
+
+			instance = new ScenePlay();
+			instance->Initialize();
+		}
+	}
+
+	static void Destroy() {
+
+		if (instance != nullptr) {
+
+			delete instance;
+			instance = nullptr;
+		}
+	}
+
+	void Initialize();
 
 	// ステージ移動----------------------------------------------------------------------
 	void MoveToNextStage(const int stage, const std::string difficulty);
@@ -40,9 +69,9 @@ public:
 	void InitThirdStageBulletHellLists();   // ステージ３
 
 	//　各弾幕のアクティブ状態を false に一括リセット-------------------
-	void TurnOffFirstStageBulletHellLists();
-	void TurnOffSecondStageBulletHellLists();
-	void TurnOffThirdStageBulletHellLists();
+	static void TurnOffFirstStageBulletHellLists();
+	static void TurnOffSecondStageBulletHellLists();
+	static void TurnOffThirdStageBulletHellLists();
 
 	// プレイヤーのボム効果による弾の無効化・有効化--------------------------------------
 	static void ReactivateEnemyBullets();
@@ -57,16 +86,79 @@ public:
 	// ステージID
 	static const int GetStageID() noexcept { return _STAGE_ID; }
 
+	// ステージID
+	static void SetStageID(const int next) noexcept { _STAGE_ID = next; }
+
+
 	// 選択難易度
 	static const std::string GetGameDifficulty() noexcept { return _GAME_DIFFICULTY; }
 
 	// デルタタイム
 	static const float GetDeltaTime() noexcept { return _deltaTime; };
 
-private:
+	bool GetInitializationComplete()
+	{
+		return ScenePlay::GetInstance()->_initComplete;
+	}
 
-	// パーティクル ----------------------------------------------------
-	void InitWeatherParticle(const Shared<inl::CustomException>& cus);
+	// Setter ---------------------------------------------------------------------------
+	void SetInitializationComplete()
+	{
+		ScenePlay::GetInstance()->_initComplete = true;
+	}
+
+	void SetWeatherParticle(const Shared<dxe::Particle>& particle)
+	{
+		_weatherParticle = particle;
+	}
+
+	void SetMainCamera(const Shared<dxe::Camera>& camera)
+	{
+		_mainCamera = camera;
+	}
+
+	void SetPlayer(const Shared<inl::Player>& player)
+	{
+		_player = player;
+	}
+
+	void SetSkyBox(Shared<inl::SkyBox>& skyBox)
+	{
+		_skyBox = std::move(skyBox);
+	}
+
+	void SetWall(Shared<inl::Wall>& wall)
+	{
+		_wall = std::move(wall);
+	}
+
+	void SetCollision(Shared<inl::Collision>& collision)
+	{
+		_collision = std::move(collision);
+	}
+
+	void SetEnemyManager(const Shared<inl::EnemyManager>& enemyManager)
+	{
+		_enemyManager = enemyManager;
+	}
+
+	void SetBulletHellFactory(Shared<inl::BulletHellFactory>& bulletHellFactory)
+	{
+		_bltHellFactory = std::move(bulletHellFactory);
+	}
+
+	void SetPauseMenu(Shared<inl::PauseMenu>& pauseMenu)
+	{
+		_pauseMenu = std::move(pauseMenu);
+	}
+
+	void SetPauseMenu(Shared<dxe::ScreenEffect>& screenEffect)
+	{
+		_screenEffect = std::move(screenEffect);
+	}
+
+
+private:
 
 	// Setter ----------------------------------------------------------
 	void SetDeltaTime(const float deltaTime) { _deltaTime = deltaTime; };
@@ -85,9 +177,6 @@ private:
 	void RenderBeginText() noexcept;
 	void UpdateShowBeginTextTimer(const float deltaTime) noexcept;
 
-	// ボム-------------------------------------------------------------
-	void InitPlayersBombCount(const std::string selectedDifficulty) noexcept;
-
 	// ミニマップ-------------------------------------------------------
 	void RenderEnemyRadarOnMiniMap();
 	void RenderStageGrindGround() noexcept;
@@ -101,29 +190,33 @@ private:
 
 public:
 
-	static Shared<dxe::Particle>   _weatherParticle;              // ウェザーパーティクル
+	static Shared<dxe::Particle>   _weatherParticle;  // ウェザーパーティクル
 
-private:
+	Shared<inl::SceneNowLoading>   _nowLoading;
 
-	Shared<inl::FreeLookCamera>    _mainCamera = nullptr;         // カメラ
+	Shared<dxe::Camera>			   _mainCamera;       // カメラ
 
-	Shared<inl::Player>            _player = nullptr;			  // プレイヤー
+	Shared<inl::Player>            _player;			  // プレイヤー
 
-	Shared<inl::EnemyManager>      _enemyManager = nullptr;		  // エネミーマネージャー
+	Shared<inl::EnemyManager>      _enemyManager;	  // エネミーマネージャー
 
-	Shared<inl::SkyBox>            _skyBox = nullptr;			  // スカイボックス
+	Shared<inl::SkyBox>            _skyBox;			  // スカイボックス
 
-	Shared<inl::Collision>         _collision = nullptr;		  // コリジョン（当たり判定）
+	Shared<inl::Collision>         _collision;		  // コリジョン（当たり判定）
 
-	Shared<inl::Score>             _score = nullptr;			  // スコア
+	Shared<inl::Score>			   _score = nullptr;  // スコア
 
-	Shared<inl::BulletHellFactory> _bltHellFactory = nullptr;	  // 弾幕
+	Shared<inl::BulletHellFactory> _bltHellFactory;	  // 弾幕
 
-	Shared<inl::PauseMenu>         _pauseMenu = nullptr;		  // ポーズメニュー
+	Shared<inl::PauseMenu>         _pauseMenu;		  // ポーズメニュー
 
-	Shared<dxe::ScreenEffect>      _screenEffect = nullptr;		  // スクリーンエフェクト
+	Shared<dxe::ScreenEffect>      _screenEffect;	  // スクリーンエフェクト
 
-	Shared<inl::Wall>              _wall = nullptr;				  // 壁
+	Shared<inl::Wall>              _wall;			  // 壁
+
+public:
+
+	bool				_initComplete{};
 
 private:
 
@@ -131,6 +224,7 @@ private:
 	static int          _STAGE_ID;                                // ステージID
 	static std::string  _GAME_DIFFICULTY;						  // 難易度文字列
 	static float        _deltaTime;								  // デルタタイム
+
 
 	// ポーズ画面表示中に調整する背景の明暗度---------------
 	int                 _bgAlpha_whenCall_pauseMenu{ 255 };		  // 背景のアルファ値

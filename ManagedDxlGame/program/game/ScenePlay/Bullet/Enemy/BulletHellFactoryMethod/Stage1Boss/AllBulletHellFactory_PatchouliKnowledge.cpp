@@ -160,7 +160,7 @@ namespace inl {
 		int id,
 		Shared<EnemyBullet>& splitOneIntoEight_bullet,
 		std::vector<Shared<EnemyBullet>>& enemyBullet,
-		const EnemyBullet::SPECIFICTYPE wave)
+		const enum EnemyBullet::SPECIFICTYPE wave)
 	{
 		for (int i = 0; i < splitOneIntoEight_wave; i++) {
 

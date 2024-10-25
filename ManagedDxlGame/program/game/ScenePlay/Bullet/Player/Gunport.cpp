@@ -1,5 +1,6 @@
 #include "../game/DxLibEngine.h"
 #include "Gunport.h"
+#include "../game/ScenePlay/Character/Player/Player.h"
 #include "../game/ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../game/Utility/CustomException.h"
 
@@ -29,6 +30,8 @@ namespace inl {
 
 			if (0 == _bulletPowerPhase) {
 
+				Player::PlayIncreaseGunportSe();
+
 				gunPort.emplace_back(std::make_shared<Gunport>());
 				_bulletPowerPhase++;
 			}
@@ -36,6 +39,8 @@ namespace inl {
 		if (currentBulletPower >= 2.0f && currentBulletPower < 3.0f) {
 
 			if (1 == _bulletPowerPhase) {
+
+				Player::PlayIncreaseGunportSe();
 
 				gunPort.emplace_back(std::make_shared<Gunport>());
 				_bulletPowerPhase++;
@@ -45,6 +50,8 @@ namespace inl {
 
 			if (2 == _bulletPowerPhase) {
 
+				Player::PlayIncreaseGunportSe();
+
 				gunPort.emplace_back(std::make_shared<Gunport>());
 				_bulletPowerPhase++;
 			}
@@ -52,6 +59,8 @@ namespace inl {
 		if (currentBulletPower >= 4.0f && currentBulletPower < 5.0f) {
 
 			if (3 == _bulletPowerPhase) {
+
+				Player::PlayIncreaseGunportSe();
 
 				gunPort.emplace_back(std::make_shared<Gunport>());
 				_bulletPowerPhase++;
@@ -61,9 +70,12 @@ namespace inl {
 
 			if (4 == _bulletPowerPhase) {
 
+				Player::PlayIncreaseGunportSe();
+
 				gunPort.emplace_back(std::make_shared<Gunport>());
 				_bulletPowerPhase++;
 			}
+
 			currentBulletPower = 5.0f;
 		}
 	}

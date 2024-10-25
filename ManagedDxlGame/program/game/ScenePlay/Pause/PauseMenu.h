@@ -11,8 +11,7 @@ namespace inl {
 	{
 	public:
 
-		PauseMenu() {}
-		PauseMenu(const Shared<Player>& player);
+		PauseMenu(){}
 
 		void Update();
 		void Render();
@@ -33,11 +32,6 @@ namespace inl {
 
 		//  BGMハンドルの削除とプレイヤーHPのリセット
 		void ResetGame();
-
-	private:
-
-		Shared<ScenePlay> _scenePlay = nullptr;
-		Shared<Player>    _player_ref = nullptr;
 
 	public:
 

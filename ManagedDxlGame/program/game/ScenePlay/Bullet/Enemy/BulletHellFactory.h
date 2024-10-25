@@ -1,6 +1,7 @@
 #pragma once
 #include "../../../Loader/CsvLoader.h"
 #include "BulletHellsBulletNumInfo.h"
+#include "BulletHell.h"
 
 
 
@@ -38,7 +39,7 @@ namespace inl {
 
 		// èâä˙âª-------------------------------------------------------------------
 		void InitBulletHellInfo();
-		std::vector<Shared<EnemyBullet>> CreateBulletHell(const BulletHell::TYPE type);
+		std::vector<Shared<EnemyBullet>> CreateBulletHell(const enum BulletHell::TYPE type);
 
 	private:
 
@@ -101,7 +102,7 @@ namespace inl {
 			int id,
 			Shared<EnemyBullet>& splitOneIntoEight_bullet,
 			std::vector<Shared<EnemyBullet>>& enemyBullet,
-			const EnemyBullet::SPECIFICTYPE wave
+			const enum EnemyBullet::SPECIFICTYPE wave
 		);
 
 		//// <summary>

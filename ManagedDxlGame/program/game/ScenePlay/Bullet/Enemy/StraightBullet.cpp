@@ -14,7 +14,7 @@ namespace inl {
 	}
 
 
-	void StraightBullet::Render(const Shared<dxe::Camera> mainCamera) {
-		_mesh->render(mainCamera);
+	void StraightBullet::Render() {
+		_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 	}
 }

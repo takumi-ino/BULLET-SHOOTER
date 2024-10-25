@@ -30,22 +30,16 @@ namespace inl {
 		EnemyZakoBase() {}
 		~EnemyZakoBase() override {}
 
-
-		EnemyZakoBase(
-			const EnemyZakoInfo& data,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyZakoBase(const EnemyZakoInfo& data);
 
 		// 初期化 --------------------------------------------------------------
 		virtual void InitBulletFactoryInstance() {}                                  //　弾幕生成
 
 		// HP ------------------------------------------------------------------
-		bool DecreaseHP(int damage, Shared<dxe::Camera> camera);                     //　HP減少
+		bool DecreaseHP(int damage);                     //　HP減少
 
 		// 描画・更新 ----------------------------------------------------------
-		void Render(Shared<dxe::Camera> camera) override;
+		void Render() override;
 		bool Update(const float deltaTime) override;
 
 	protected:
@@ -66,16 +60,16 @@ namespace inl {
 		// 挙動	-------------------------------------------------------------------------------
 
 		 // 追跡、攻撃、待機を使い分ける
-		void DoRoutineMoves(const float deltaTime);             
+		void DoRoutineMoves(const float deltaTime) override;
 
 		// 待機状態中、STOP・ MOVE・ TURNのステートによって行動
-		void SearchPlayerMovementState(const float deltaTime);  
+		void SearchPlayerMovementState(const float deltaTime);
 
 		// 待機状態中、ランダム移動
-		void MoveToRandomInvestigatePos(const float deltaTime); 
+		void MoveToRandomInvestigatePos(const float deltaTime);
 
 		// プレイヤー追跡
-		void ChasePlayer(const float deltaTime);                 
+		void ChasePlayer(const float deltaTime);
 
 	private:
 
@@ -85,8 +79,6 @@ namespace inl {
 		const float GetAttackDistance() const noexcept { return _ATTACK_DISTANCE; }   //　攻撃範囲距離
 
 	protected:
-
-		Shared<Collision>                      _collision_ref = nullptr;              // 当たり判定
 
 		Shared<BulletFactory>                  _bulletFactory = nullptr;              // 弾幕
 

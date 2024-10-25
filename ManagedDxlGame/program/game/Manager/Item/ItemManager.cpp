@@ -9,14 +9,13 @@
 #include "../../ScenePlay/EventMessage/EventNoticeText.h"
 #include "../../ScenePlay/RandomValue/RandomValueGenerator.h"
 
-
 // 得点アイテム--------------------------------------------------------------------------------------------------------------------------
 std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_small;
 std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_medium;
 std::vector<Shared<inl::ScoreItem>> ItemManager::_scoreItem_large;
 
 void ItemManager::CreateScoreItemPool(const std::string difficulty, const int stageId) {
-
+	
 	struct ItemSize {
 		int s, m, l;
 	};
@@ -102,7 +101,7 @@ void ItemManager::EventHit_ScoreItemAndPlayer_DRY(
 			return;
 
 		//　当たり判定
-		if (_collision_ref->CheckCollision_PlayerAndScoreItem(it, _player_ref)) {
+		if (ScenePlay::GetInstance()->_collision->CheckCollision_PlayerAndScoreItem(it, ScenePlay::GetInstance()->_player)) {
 
 			switch (type)
 			{
@@ -128,6 +127,8 @@ void ItemManager::EventHit_ScoreItemAndPlayer_DRY(
 				break;
 			}
 			}
+
+			inl::Player::PlayGetScoreSE();
 
 			it->_isActive = false;
 		}
@@ -286,7 +287,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			return;
 
 		// 当たり判定
-		if (_collision_ref->CheckCollision_PlayerAndPowerUpItem(it, _player_ref)) {
+		if (ScenePlay::GetInstance()->_collision->CheckCollision_PlayerAndPowerUpItem(it, ScenePlay::GetInstance()->_player)) {
 
 			switch (it->_type)
 			{
@@ -294,18 +295,18 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			case inl::PowerUpItem::TYPE::Heal:
 			{
 				//　HPが最大HPと同じかそれ以上なら処理を抜ける
-				if (_player_ref->GetHP() >= _player_ref->GetMaxHP()) {
+				if (ScenePlay::GetInstance()->_player->GetHP() >= ScenePlay::GetInstance()->_player->GetMaxHP()) {
 					break;
 				}
 
 				EventNotify_OnCaughtItem("回復アイテム", "HPが上昇。");
 
-				_player_ref->HealHP(10);
+				ScenePlay::GetInstance()->_player->HealHP(10);
 
 				//　HP上昇後、HPが最大HP以上になったらHPを最大値でキャップ
-				if (_player_ref->GetHP() > _player_ref->GetMaxHP()) {
+				if (ScenePlay::GetInstance()->_player->GetHP() > ScenePlay::GetInstance()->_player->GetMaxHP()) {
 
-					_player_ref->SetHP(_player_ref->GetMaxHP());
+					ScenePlay::GetInstance()->_player->SetHP(ScenePlay::GetInstance()->_player->GetMaxHP());
 				}
 				break;
 			}
@@ -314,7 +315,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			{
 				EventNotify_OnCaughtItem("攻撃強化アイテム", "攻撃力が上昇。");
 
-				_player_ref->AddAT(2);
+				ScenePlay::GetInstance()->_player->AddAT(2);
 				break;
 			}
 			//　防御アイテム
@@ -322,7 +323,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			{
 				EventNotify_OnCaughtItem("防御強化アイテム", "防御力が上昇。");
 
-				_player_ref->AddDEF(2);
+				ScenePlay::GetInstance()->_player->AddDEF(2);
 				break;
 			}
 			//　スピードアイテム
@@ -330,7 +331,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			{
 				EventNotify_OnCaughtItem("スピード強化アイテム", "スピードが上昇。");
 
-				_player_ref->AddSpeed(0.1f);
+				ScenePlay::GetInstance()->_player->AddSpeed(0.1f);
 				break;
 			}
 			//　ボムアイテム
@@ -338,7 +339,7 @@ void ItemManager::EventHit_PowerUpItemAndPlayer_DRY(std::vector<Shared<inl::Powe
 			{
 				EventNotify_OnCaughtItem("ボム", "");
 
-				_player_ref->AddBombStockCount();
+				ScenePlay::GetInstance()->_player->AddBombStockCount();
 				break;
 			}
 			}
@@ -423,7 +424,7 @@ void ItemManager::AvoidOverlap_ScoreItemAndScoreItem_DRY(
 	for (decltype(auto) it : scoreItems_1) {
 		for (decltype(auto) it2 : scoreItems_2) {
 
-			_collision_ref->CheckCollision_ScoreItemAndScoreItem(
+			ScenePlay::GetInstance()->_collision->CheckCollision_ScoreItemAndScoreItem(
 				it,                // アイテム１
 				it2,			   // アイテム２
 				it->_mesh->pos_,   // アイテム１位置
@@ -453,7 +454,7 @@ void ItemManager::AvoidOverlap_PowerUpItemAndPowerUpItem_DRY(
 	for (decltype(auto) it : powerUpItems_1) {
 		for (decltype(auto) it2 : powerUpItems_2) {
 
-			_collision_ref->CheckCollision_PowerUpItemAndPowerUpItem(
+			ScenePlay::GetInstance()->_collision->CheckCollision_PowerUpItemAndPowerUpItem(
 				it,                // アイテム１
 				it2,			   // アイテム２
 				it->_mesh->pos_,   // アイテム１位置
@@ -496,7 +497,7 @@ void ItemManager::AvoidOverlap_ScoreItemAndPowerUpItem_DRY(
 	for (decltype(auto) it : scoreItems) {
 		for (decltype(auto) it2 : powerUpItems) {
 
-			_collision_ref->CheckCollision_ScoreItemAndPowerUpItem(
+			ScenePlay::GetInstance()->_collision->CheckCollision_ScoreItemAndPowerUpItem(
 				it,                // アイテム１
 				it2,			   // アイテム２
 				it->_mesh->pos_,   // アイテム１位置

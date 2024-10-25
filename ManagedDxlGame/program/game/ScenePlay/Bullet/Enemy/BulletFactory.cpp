@@ -23,7 +23,6 @@ namespace inl {
 	}
 
 
-
 	std::list<Shared<StraightBullet>> BulletFactory::CreateStraightBullet_ZakoBox(const int maxBulletSpawnCount) {
 
 		std::list<Shared<StraightBullet>> straightBullet;
@@ -68,9 +67,7 @@ namespace inl {
 			straightBullet.push_back(bullet);
 		}
 
-
 		return straightBullet;
-
 	}
 
 

@@ -14,12 +14,7 @@ namespace inl {
 	{
 	public:
 
-		EnemyManager() {}
-		EnemyManager(
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyManager();
 
 		virtual ~EnemyManager() {
 			_enemyZakoList.clear();
@@ -34,7 +29,9 @@ namespace inl {
 		const int GetRemainingEnemyCount() const noexcept { return _zakoEnemyTotalLeftCount; }
 
 		//------------------------------------------------------------
-		void Render(const Shared<dxe::Camera>& camera) const;
+		static bool IsClearedCurrentStage() noexcept { return _isClearedCurrentStage; }
+
+		void Render() const;
 		void Update(const float deltaTime);
 
 	private:
@@ -70,12 +67,15 @@ namespace inl {
 		void EnemyBossCollisionPairLists();
 
 		// アイテム取得イベント通知---------------------------------------------------------------------------------------
+
+		//　敵が Subject、アイテムマネージャーが Observer
+
 		void AttachItemManagerInstance(const Shared<ItemManager>& observer);
 
 		// アイテムスポーンに必要な敵の位置情報を通達
-		void NotifyEnemyPosition_ToItemManager();                 
+		void NotifyEnemyPosition_ToItemManager();
 
-		void SendEnemyPosition(const tnl::Vector3& newPosition, const bool isEnemyActive);
+		void AssignEnemyStatus(const tnl::Vector3& newPosition, const bool isEnemyActive);
 
 		// 敵殺傷イベント通知---------------------------------------------------------------------------------------------
 		void EventNotify_OnEnemyKilled(const std::string enemyName);    // 敵の撃破情報を通達
@@ -87,7 +87,7 @@ namespace inl {
 		bool SeqMoveToNextStage(const float deltaTime);
 
 		// リザルトへ飛ぶ前に必要な処理をまとめて実行
-		bool SeqMoveToResult(const float deltaTime);    
+		bool SeqMoveToResult(const float deltaTime);
 
 		void MoveToResult(); // 純粋なリザルト移行機能
 
@@ -104,11 +104,6 @@ namespace inl {
 		Shared<ItemManager>                    _itemManager = nullptr;
 		Shared<CsvLoader>                      _csvLoader = nullptr;
 
-		// 参照				                   
-		Shared<Player>                         _player_ref = nullptr;
-		Shared<dxe::Camera>                    _mainCamera_ref = nullptr;
-		Shared<Collision>                      _collision_ref = nullptr;
-
 		// Zako
 		std::unordered_map<int, EnemyZakoInfo> _enemyZakoData_map{};
 		EnemyZakoInfo                          _sEnemy_zakoBox_info{};
@@ -124,7 +119,7 @@ namespace inl {
 	private:
 
 		// オブザーバーパターン。敵の位置からアイテムをスポーン
-		std::vector<Shared<ItemManager>>       _observerItems;
+		std::vector<Shared<ItemManager>>       _itemManagerObserver;
 		tnl::Vector3                           _enemyZako_position{};
 		bool                                   _isEnemyZako_dead{};
 
@@ -151,6 +146,8 @@ namespace inl {
 		bool           _isInitializedBossInfo{ false };	    // ボス初期化フラグ
 
 		bool           _isDefeatedAllStageEnemy{};          // 敵を全滅させたかのフラグ
+
+		static bool	   _isClearedCurrentStage;
 
 		tnl::Vector3   _enemyBossPos{};
 

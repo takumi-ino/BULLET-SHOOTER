@@ -19,13 +19,7 @@ namespace inl {
 		EnemyBossBase() {}
 		~EnemyBossBase() override {}
 
-
-		EnemyBossBase(
-			const EnemyBossInfo& data,
-			const Shared<Player>& player,
-			const Shared<dxe::Camera>& camera,
-			const Shared<Collision>& collision
-		);
+		EnemyBossBase(const EnemyBossInfo& data);
 
 		// èâä˙âª----------------------------------------------------------
 		virtual void InitBulletHellInstance() {}
@@ -62,11 +56,8 @@ namespace inl {
 
 	protected:
 
-		Shared<Collision>                _collision_ref = nullptr;
-
-	protected:
-
 		int       _MAX_HP{};
+		int       _warppingSound{};
 		float     _WARPING_DURATION{};
 
 	private:

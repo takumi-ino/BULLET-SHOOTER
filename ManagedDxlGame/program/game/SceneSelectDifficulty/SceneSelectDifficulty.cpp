@@ -6,6 +6,7 @@
 #include "../Manager/Score/ScoreManager.h"
 #include "../Utility/InputFuncTable.h"
 #include "../Utility/CustomException.h"
+#include "../game/SceneNowLoading/SceneNowLoading.h"
 
 
 namespace {
@@ -36,7 +37,6 @@ SceneSelectDifficulty::SceneSelectDifficulty() {
 
 	_backGround_hdl = graph;
 
-	_showNowLoading = false;
 }
 
 
@@ -114,22 +114,19 @@ void SceneSelectDifficulty::DecideSelectedLevel_ByInput() {
 
 		if (_difficultyItemIndex == 0) {
 
-			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Easy", startStage));
+			SceneManager::GetInstance()->ChangeScene(new ScenePlay("Easy", startStage));
 		}
 		if (_difficultyItemIndex == 1) {
 
-			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Normal", startStage));
+			SceneManager::GetInstance()->ChangeScene(new ScenePlay("Normal", startStage));
 		}
 		if (_difficultyItemIndex == 2) {
-			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Hard", startStage));
+
+			SceneManager::GetInstance()->ChangeScene(new ScenePlay("Hard", startStage));
 		}
 		if (_difficultyItemIndex == 3) {
 
-			auto mgr = SceneManager::GetInstance();
-			mgr->ChangeScene(new ScenePlay("Lunatic", startStage));
+			SceneManager::GetInstance()->ChangeScene(new ScenePlay("Lunatic", startStage));
 		}
 	}
 }
@@ -151,12 +148,12 @@ void SceneSelectDifficulty::Render() {
 
 void SceneSelectDifficulty::Update(const float deltaTime) {
 
+	// back space ‚Åƒ^ƒCƒgƒ‹‚Ö
 	if (inl::InputFuncTable::IsButtonTrigger_CANCEL()) {
 
-		auto mgr = SceneManager::GetInstance();
-		mgr->ChangeScene(new SceneTitle());
+		SceneManager::GetInstance()->ChangeScene(new SceneTitle());
 	}
-
+	
 	UpdateSelectDifficultyCursor_ByInput();
 	DecideSelectedLevel_ByInput();	
 }

@@ -5,8 +5,7 @@
 
 namespace inl {
 
-	EnemyZakoDome::EnemyZakoDome(const EnemyZakoInfo& data, const Shared<Player>& player, const Shared<dxe::Camera>& camera, const Shared<Collision>& collision)
-		: EnemyZakoBase(data, player, camera, collision)
+	EnemyZakoDome::EnemyZakoDome(const EnemyZakoInfo& data) : EnemyZakoBase(data)
 	{
 		_explode_particle = std::make_shared<dxe::Particle>("particle/preset/explosion.bin");
 

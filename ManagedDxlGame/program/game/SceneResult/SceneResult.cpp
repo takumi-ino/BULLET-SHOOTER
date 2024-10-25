@@ -2,6 +2,7 @@
 #include "../Manager/Scene/SceneBase.h"
 #include "SceneResult.h"
 #include "../SceneTitle/SceneTitle.h"
+#include "../ScenePlay/ScenePlay.h"
 #include "../Manager/Scene/SceneManager.h"
 #include "../ScenePlay/Bullet/Player/PlayerBullet.h"
 #include "../Utility/InputFuncTable.h"
@@ -30,7 +31,7 @@ namespace {
 
 
 SceneResult::SceneResult(const std::string difficulty, const int totalScore)
-	: _TOTAL_SCORE(totalScore), _DIFFICULTY(difficulty) 
+	: _TOTAL_SCORE(totalScore), _DIFFICULTY(difficulty)
 {
 	Shared<inl::CustomException> cus = std::make_shared<inl::CustomException>();
 
@@ -53,8 +54,8 @@ void SceneResult::RenderLiteralResult() noexcept
 	//@Result@‚Æ‚¢‚¤•¶Žš—ñ
 	SetFontSize(70);
 	DrawString(
-		_resultText_posX, 
-		_resultText_posY, 
+		_resultText_posX,
+		_resultText_posY,
 		"Result",
 		GetColor(0, 200, 100)
 	);
@@ -85,9 +86,9 @@ void SceneResult::RenderBackGround() noexcept
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, _backGround_baseAlpha);
 	DrawRotaGraph(
 		_backGround_posX,
-		_backGround_posY, 
+		_backGround_posY,
 		_backGround_extendRate,
-		0, 
+		0,
 		_backGround_hdl,
 		true
 	);
@@ -109,8 +110,11 @@ void SceneResult::MoveToSceneTitle()
 {
 	if (inl::InputFuncTable::IsButtonTrigger_ENTER()) {
 
-		auto mgr = SceneManager::GetInstance();
-		mgr->ChangeScene(new SceneTitle());
+		SceneManager::GetInstance()->ChangeScene(new SceneTitle());
+
+		ScenePlay::Destroy();
+
+		ScenePlay::CreateInstance();
 	}
 }
 

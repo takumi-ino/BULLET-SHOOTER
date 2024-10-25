@@ -54,11 +54,7 @@ namespace inl {
 		// コンストラクタ--------------------------------------------------------------------------------
 
 		BulletHell() {}
-		BulletHell(const Shared<dxe::Mesh>& bossMesh, const Shared<Player>& player)
-			: _bossMesh_ref(bossMesh) {
-
-			_player_ref = player;
-		}
+		BulletHell(const Shared<dxe::Mesh>& bossMesh) : _bossMesh_ref(bossMesh) {}
 
 		~BulletHell() override {}
 

@@ -15,10 +15,6 @@ namespace inl {
 
 		Shared<dxe::Mesh>  _mesh = nullptr;
 
-	protected:
-
-		Shared<Player>     _player_ref = nullptr;
-
 	public:
 
 		tnl::Vector3       _collideSize{};

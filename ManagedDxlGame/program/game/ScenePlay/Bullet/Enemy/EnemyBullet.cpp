@@ -39,8 +39,8 @@ namespace inl {
 	}
 
 
-	void EnemyBullet::Render(const Shared<dxe::Camera> camera) {
+	void EnemyBullet::Render() {
 
-		_mesh->render(camera);
+		_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 	}
 }

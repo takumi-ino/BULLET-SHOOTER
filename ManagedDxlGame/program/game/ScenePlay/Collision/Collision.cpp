@@ -23,7 +23,8 @@ namespace inl {
 	{
 		if (!enemy->_mesh) return false;
 
-		if (tnl::IsIntersectAABB(bullet->_mesh->pos_, 
+		if (tnl::IsIntersectAABB(
+			bullet->_mesh->pos_, 
 			bullet->_collisionSize,
 			enemy->_mesh->pos_, 
 			enemy->_collideSize))
@@ -42,7 +43,8 @@ namespace inl {
 	{
 		if (!enemy->_mesh) return false;
 
-		if (tnl::IsIntersectAABB(bullet->_mesh->pos_, 
+		if (tnl::IsIntersectAABB(
+			bullet->_mesh->pos_, 
 			bullet->_collisionSize, 
 			enemy->_mesh->pos_, 
 			enemy->_collideSize))
@@ -59,10 +61,11 @@ namespace inl {
 		const Shared<StraightBullet>& bullet,
 		const Shared<Player>& player)
 	{
-		if (tnl::IsIntersectAABB(bullet->_mesh->pos_, 
+		if (tnl::IsIntersectAABB(
+			bullet->_mesh->pos_, 
 			bullet->_collisionSize, 
-			player->_mesh->pos_, 
-			player->_collideSize))
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_collideSize))
 		{
 			return true;
 		}
@@ -71,15 +74,16 @@ namespace inl {
 	}
 
 
-	// 敵と敵------------------------------------------------------------------------------------------------
+	// ------------------------------------------------------------------------------------------------
 	bool Collision::CheckCollision_EnemyHomingBulletAndPlayer(
 		const Shared<HomingBullet>& bullet, 
 		const Shared<Player>& player) 
 	{
-		if (tnl::IsIntersectAABB(bullet->_mesh->pos_, 
+		if (tnl::IsIntersectAABB(
+			bullet->_mesh->pos_, 
 			bullet->_collisionSize, 
-			player->_mesh->pos_,
-			player->_collideSize)) 
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_collideSize))
 		{
 			return true;
 		}
@@ -95,8 +99,8 @@ namespace inl {
 	{
 		if (tnl::IsIntersectAABB(bullet->_mesh->pos_,
 			bullet->_collisionSize,
-			player->_mesh->pos_,
-			player->_collideSize)) 
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_collideSize))
 		{
 			return true;
 		}
@@ -107,23 +111,25 @@ namespace inl {
 	// プレイヤーと通常エネミー----------------------------------------------------------------------------
 
 	bool Collision::CheckCollision_PlayerAndEnemyZako(
-		Shared<Player>& player, Shared<EnemyZakoBase>& enemy,
+		Shared<Player>& player, 
+		Shared<EnemyZakoBase>& enemy,
 		const tnl::Vector3 prevPos_player,
 		const tnl::Vector3 prevPos_enemy)
 	{
 		if (!enemy->_mesh) return false;
 
-		if (tnl::IsIntersectAABB(player->_mesh->pos_, 
-			player->_mesh->scl_,
+		if (tnl::IsIntersectAABB(
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_mesh->scl_,
 			enemy->_mesh->pos_, 
 			enemy->_mesh->scl_)) 
 		{
 
 			tnl::CorrectPositionAABB(
 				prevPos_player, prevPos_enemy,
-				player->_mesh->scl_, 
+				ScenePlay::GetInstance()->_player->_mesh->scl_,
 				enemy->_mesh->scl_,
-				player->_mesh->pos_, 
+				ScenePlay::GetInstance()->_player->_mesh->pos_,
 				enemy->_mesh->pos_,
 				tnl::eCorrTypeAABB::BOTH, 
 				tnl::eCorrTypeAABB::BOTH,
@@ -147,17 +153,18 @@ namespace inl {
 	{
 		if (!enemy->_mesh) return false;
 
-		if (tnl::IsIntersectAABB(player->_mesh->pos_, 
-			player->_mesh->scl_,
+		if (tnl::IsIntersectAABB(
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_mesh->scl_,
 			enemy->_mesh->pos_, 
 			enemy->_mesh->scl_))
 		{
 
 			tnl::CorrectPositionAABB(
 				prevPos_player, prevPos_enemy,
-				player->_mesh->scl_,
+				ScenePlay::GetInstance()->_player->_mesh->scl_,
 				enemy->_mesh->scl_,
-				player->_mesh->pos_, 
+				ScenePlay::GetInstance()->_player->_mesh->pos_,
 				enemy->_mesh->pos_,
 				tnl::eCorrTypeAABB::BOTH, 
 				tnl::eCorrTypeAABB::BOTH,
@@ -212,8 +219,8 @@ namespace inl {
 	{
 		if (tnl::IsIntersectAABB(scoreItem->_mesh->pos_,
 			scoreItem->_collisionSize,
-			player->_mesh->pos_,
-			player->_mesh->scl_)) 
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_mesh->scl_))
 		{
 			return true;
 		}
@@ -257,8 +264,8 @@ namespace inl {
 	{
 		if (tnl::IsIntersectAABB(powerUpItem->_mesh->pos_,
 			powerUpItem->_collisionSize,
-			player->_mesh->pos_,
-			player->_mesh->scl_)) 
+			ScenePlay::GetInstance()->_player->_mesh->pos_,
+			ScenePlay::GetInstance()->_player->_mesh->scl_))
 		{
 			return true;
 		}

@@ -14,7 +14,7 @@ namespace inl {
 	}
 
 
-	void HomingBullet::Render(const Shared<dxe::Camera> mainCamera) {
-		_mesh->render(mainCamera);
+	void HomingBullet::Render() {
+		_mesh->render(ScenePlay::GetInstance()->_mainCamera);
 	}
 }

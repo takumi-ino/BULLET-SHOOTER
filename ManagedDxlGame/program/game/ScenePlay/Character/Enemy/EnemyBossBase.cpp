@@ -5,7 +5,8 @@
 #include "../game/ScenePlay/Collision/Collision.h"
 #include "../../Bullet/Enemy/EnemyBullet.h"
 #include "../game/ScenePlay/Bullet/Enemy/BulletHell.h"
-
+#include "../game/Utility/FilePathChecker.h"
+#include "../game/Utility//CustomException.h"
 
 namespace {
 
@@ -37,11 +38,7 @@ namespace inl {
 
 
 	// ボスエネミーデータ読み取り
-	EnemyBossBase::EnemyBossBase(
-		const EnemyBossInfo& data,
-		const Shared<Player>& player,
-		const Shared<dxe::Camera>& camera,
-		const Shared<Collision>& collision)
+	EnemyBossBase::EnemyBossBase(const EnemyBossInfo& data)
 	{
 
 		_bossHp.clear(); //　ボスHPをリセット
@@ -62,10 +59,12 @@ namespace inl {
 		_scale = data._scale;							   // サイズ
 		_enemyMoveSpeed = data._enemyMoveSpeed;			   // 移動スピード
 		_maxBulletSpawnCount = data._maxBulletSpawnCount;  // 弾の最大生成数
-														   
-		_player_ref = player;                              //　プレイヤー
-		_enemyCamera = camera;							   //　カメラ
-		_collision_ref = collision;						   //　当たり判定
+
+
+		Shared<CustomException> cus = std::make_shared<CustomException>();
+		auto warpSound = cus->TryLoadSound("sound/se/enemy/warp.mp3","EnemyBossBase::EnemyBossBase()");
+
+		_warppingSound = warpSound;
 	}
 
 
@@ -74,7 +73,7 @@ namespace inl {
 		// 敵とプレイヤーの距離
 		float distance_from_player = GetDistanceToPlayer();
 		// 敵とプレイヤーの距離の差分
-		tnl::Vector3 differenceVector = _player_ref->_mesh->pos_ - _mesh->pos_;
+		tnl::Vector3 differenceVector = ScenePlay::GetInstance()->_player->_mesh->pos_ - _mesh->pos_;
 
 		tnl::Vector3 moveDirection;
 
@@ -98,7 +97,7 @@ namespace inl {
 		ClampMovableRange(moveDirection);
 
 		// Y座標はプレイヤーに合わせるように動く
-		float diffY = _player_ref->GetPos().y - _mesh->pos_.y;
+		float diffY = ScenePlay::GetInstance()->_player->GetPos().y - _mesh->pos_.y;
 		moveDirection.y = diffY;
 
 		moveDirection.normalize();
@@ -117,6 +116,8 @@ namespace inl {
 			tnl::Vector3 targetPos = _mesh->pos_ + GetRandomPosition();
 
 			_mesh->pos_ += (targetPos - _mesh->pos_);
+
+			PlaySoundMem(_warppingSound, DX_PLAYTYPE_BACK);
 
 			_warpToRandPosTimer = 0.f;
 		}
@@ -142,13 +143,13 @@ namespace inl {
 
 		for (auto& blt : bulletVector) {
 
-			if (_collision_ref->CheckCollision_BulletHellBulletsAndPlayer(blt, _player_ref)) {
+			if (ScenePlay::GetInstance()->_collision->CheckCollision_BulletHellBulletsAndPlayer(blt, ScenePlay::GetInstance()->_player)) {
 
 				// 敵の攻撃力からプレイヤーの防御力を引いた分 HPを削る
-				if (_player_ref->DecreaseHP(_at - _player_ref->GetDEF())) {
+				if (ScenePlay::GetInstance()->_player->DecreaseHP(_at - ScenePlay::GetInstance()->_player->GetDEF())) {
 
-					_player_ref->SetIsInvincible(true);  // 無敵時間
-					_player_ref->PlayDamageHitSE();      // ダメージ音
+					ScenePlay::GetInstance()->_player->_isInvincible = true;
+					ScenePlay::GetInstance()->_player->PlayDamageHitSE();      // ダメージ音
 				}
 			}
 

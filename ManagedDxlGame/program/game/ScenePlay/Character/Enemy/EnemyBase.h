@@ -19,7 +19,7 @@ namespace inl {
 
 		virtual bool Update(const float deltaTime) { return true; }
 
-		virtual void Render(Shared<dxe::Camera> camera) {}
+		virtual void Render() {}
 
 	protected:
 
@@ -33,10 +33,6 @@ namespace inl {
 		void LookAtPlayer();
 		//Å@
 		tnl::Vector3 GetRandomPosition() const;
-
-	protected:
-
-		Shared<dxe::Camera>  _enemyCamera = nullptr;
 
 	public:
 
